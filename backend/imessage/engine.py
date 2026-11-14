@@ -145,7 +145,7 @@ class Engine:
             return self.play(s, daily)
         if intent.kind == "reset":  # a fresh detective (handy between demo players)
             s.player_id, s.case_id, s.opened, s.awaiting_trick = self.api.new_player(), None, {}, None
-            return [Out.t("New detective, clean record. 🧂")] + self.play(s)
+            return [Out.t("New detective, clean record.\n\n" + render.WELCOME)] + self.play(s)
         post, index = self.current(s, daily)
         if post is None:  # nothing in progress: any other text means "play"
             return self.play(s, daily)
@@ -164,7 +164,7 @@ class Engine:
             return self.check(s, daily, post, intent.tool)
         if s.awaiting_trick == post["id"]:
             return [render.trick_question(daily["case"].get("trick_options") or [])]
-        return [Out.t("Reply REAL or FAKE for this post (or CHECK for evidence, HELP for more).")]
+        return [Out.t("Didn't catch that. " + render.COMMANDS)]
 
     # ---- steps ---------------------------------------------------------------------
 

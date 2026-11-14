@@ -173,16 +173,18 @@ def stats(player: dict) -> Out:
     return Out.t("\n".join(lines))
 
 
-HELP = ("🧂 Grain of Salt: spot the doctored post.\n\n"
-        "Every day: 5 real-looking posts, 0–3 of them doctored.\n"
-        "• REAL or FAKE (add a number for the trick: FAKE 2)\n"
-        "• CHECK to spend a 🔍 on evidence (CHECK SOURCE / DATA / ACCOUNT)\n"
-        "• PLAY to start or resume today's Daily\n"
-        "• STATS for your streak and weak spots\n"
-        "• STOP to pause the daily reminder\n"
-        "• RESET to start over as a new detective")
+COMMANDS = ("Commands:\n"
+            "• REAL or FAKE (add the trick number: FAKE 2)\n"
+            "• CHECK to spend a 🔍 on evidence (CHECK SOURCE / DATA / ACCOUNT)\n"
+            "• PLAY to start or resume today's Daily\n"
+            "• STATS for your streak and weak spots\n"
+            "• STOP / REMIND to pause or resume the daily reminder\n"
+            "• RESET to start over as a new detective\n"
+            "• HELP to see this list again")
+
+HELP = ("🧂 Grain of Salt: spot the doctored post.\n"
+        "Every day: 5 real-looking posts, 0–3 of them doctored.\n\n" + COMMANDS)
 
 WELCOME = ("Hi, detective. 🧂 I'm Grain of Salt.\n\n"
            "Each day I'll text you 5 posts about real news. Some are doctored: a cropped quote, a squashed "
-           "chart axis, a cherry-picked number. Your job: REAL or FAKE.\n\n"
-           "Text HELP anytime. Here's today's.")
+           "chart axis, a cherry-picked number. Your job: REAL or FAKE.\n\n" + COMMANDS + "\n\nHere's today's.")

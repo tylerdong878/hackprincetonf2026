@@ -59,6 +59,7 @@ def key():
 def test_whole_daily_over_text(engine):
     first = engine.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
     t = texts(first)
+    assert "Commands:" in t and "STATS" in t
     assert "I'm Grain of Salt" in t and "Daily #" in t and "Post 1/5" in t
     assert any(o.image for o in first)  # p1 is a chart post -> sent as an image
 
@@ -99,7 +100,8 @@ def test_sessions_survive_restart(engine, tmp_path):
 
 def test_unknown_text_hints_and_out_of_clues(engine):
     engine.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
-    assert "REAL or FAKE" in texts(engine.handle(PHONE, "banana"))
+    hint = texts(engine.handle(PHONE, "banana"))
+    assert "Didn't catch that" in hint and "RESET" in hint
     assert "No data for this post" not in texts(engine.handle(PHONE, "check data"))
     engine.handle(PHONE, "check account")
     engine.handle(PHONE, "real")
