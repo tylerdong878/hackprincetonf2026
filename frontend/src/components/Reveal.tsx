@@ -1,0 +1,345 @@
+import { useEffect, useState, type ReactNode } from 'react'
+import { formatNumber, outcomeStyle } from '../lib/format'
+import { useReducedMotion, useTween } from '../lib/hooks'
+import type { ChartSpec, Diff, Post } from '../lib/types'
+import { FeedCard } from './PostCard'
+import { PostChart } from './PostChart'
+import { Button, SectionLabel } from './ui'
+
+export function OutcomeBadge({ outcome, animate = true, size = 'md' }: { outcome: string; animate?: boolean; size?: 'sm' | 'md' }) {
+  const s = outcomeStyle(outcome)
+  const dark = outcome === 'false_alarm'
+  return (
+    <span
+      className={`stamp inline-flex items-center gap-1.5 ${animate ? 'stamp-thunk' : ''} ${size === 'sm' ? 'text-xs' : 'text-sm md:text-base'}`}
+      style={{
+        background: s.color,
+        borderColor: s.color,
+        color: dark ? '#1B1B1F' : '#FFFFFF',
+        ['--stamp-rot' as string]: '-2deg',
+        ['--stamp-rot-from' as string]: '-10deg',
+      }}
+    >
+      <span aria-hidden="true">{s.icon}</span>
+      {s.word}
+    </span>
+  )
+}
+
+export function change(spec: ChartSpec): { text: string; from: string; to: string } | null {
+  const pts = spec.points
+  if (pts.length < 2) return null
+  const a = pts[0]
+  const b = pts[pts.length - 1]
+  if (!a.value) return null
+  const pctChange = ((b.value - a.value) / Math.abs(a.value)) * 100
+  const sign = pctChange >= 0 ? '+' : '−'
+  return { text: `${sign}${formatNumber(Math.abs(pctChange), 1)}%`, from: a.label, to: b.label }
+}
+
+/** Splits `text` into plain and highlighted runs for each phrase in `marks`. */
+export function highlightRuns(text: string, marks: string[]): { s: string; hit: boolean }[] {
+  const phrases = marks.map((m) => m.trim()).filter(Boolean)
+  if (!phrases.length) return [{ s: text, hit: false }]
+  const lower = text.toLowerCase()
+  const ranges: [number, number][] = []
+  for (const p of phrases) {
+    let from = 0
+    const lp = p.toLowerCase()
+    for (;;) {
+      const i = lower.indexOf(lp, from)
+      if (i < 0) break
+      ranges.push([i, i + p.length])
+      from = i + p.length
+    }
+  }
+  ranges.sort((x, y) => x[0] - y[0])
+  const runs: { s: string; hit: boolean }[] = []
+  let pos = 0
+  for (const [a, b] of ranges) {
+    if (a < pos) continue
+    if (a > pos) runs.push({ s: text.slice(pos, a), hit: false })
+    runs.push({ s: text.slice(a, b), hit: true })
+    pos = b
+  }
+  if (pos < text.length) runs.push({ s: text.slice(pos), hit: false })
+  return runs
+}
+
+/** When the diff doesn't list removed words, highlight whatever surrounds the shown crop. */
+export function restoredRuns(shown: string, original: string): { s: string; hit: boolean }[] {
+  const core = shown.replace(/^[\s“"'….]+|[\s”"'….]+$/g, '')
+  const i = core ? original.indexOf(core) : -1
+  if (i < 0) return [{ s: original, hit: false }]
+  const runs = [
+    { s: original.slice(0, i), hit: true },
+    { s: original.slice(i, i + core.length), hit: false },
+    { s: original.slice(i + core.length), hit: true },
+  ]
+  return runs.filter((r) => r.s.trim().length > 0 || !r.hit)
+}
+
+export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
+  return (
+    <>
+      {runs.map((r, i) =>
+        r.hit ? (
+          <mark
+            key={i}
+            className="rounded-sm px-0.5 text-inherit underline decoration-2 underline-offset-[3px]"
+            style={{ background: 'color-mix(in srgb, #22804F 25%, transparent)', textDecorationColor: '#22804F' }}
+          >
+            <span className="sr-only">[restored: </span>
+            {r.s}
+            <span className="sr-only">]</span>
+          </mark>
+        ) : (
+          <span key={i}>{r.s}</span>
+        ),
+      )}
+    </>
+  )
+}
+
+function OriginalPanel({ children, note }: { children: ReactNode; note?: ReactNode }) {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-xl bg-white text-[#1B1B1F] shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
+      <div className="flex-1 p-4">{children}</div>
+      {note && <div className="border-t border-[#E7E2D6] bg-[#F7F4EE] px-4 py-2 text-[13px] text-[#4A4A55]">{note}</div>}
+    </div>
+  )
+}
+
+/**
+ * "What you saw" next to "The original" (SPEC §3.7). For charts, the posted chart's axis
+ * animates down to the honest floor (automatically once, then on click).
+ */
+export function DiffView({
+  post,
+  caseNumber,
+  diff,
+  autoplay,
+  shownLabel = 'What you saw',
+  watermarkText,
+}: {
+  post: Post
+  caseNumber: number
+  diff: Diff
+  autoplay: boolean
+  shownLabel?: string
+  watermarkText?: string
+}) {
+  const reduced = useReducedMotion()
+  const [playKey, setPlayKey] = useState(0)
+  const isChart = diff.type === 'chart'
+  const shownSpec = isChart ? diff.shown ?? post.chart ?? null : post.chart ?? null
+  const from = shownSpec?.y_min ?? 0
+  const to = isChart ? diff.original?.y_min ?? 0 : from
+  const yMin = useTween(from, to, playKey, 800, reduced)
+  const morphed = playKey > 0
+
+  useEffect(() => {
+    if (!autoplay || !isChart || from === to) return
+    const id = window.setTimeout(() => setPlayKey((k) => k || 1), 900)
+    return () => window.clearTimeout(id)
+  }, [autoplay, isChart, from, to])
+
+  const shownPost: Post = isChart && shownSpec ? { ...post, chart: shownSpec } : post
+
+  let right: ReactNode = null
+  if (diff.type === 'chart' && diff.original) {
+    const c = change(diff.original)
+    right = (
+      <OriginalPanel note={c && <>Change, {c.from} → {c.to}: <b className="font-mono">{c.text}</b></>}>
+        <PostChart spec={diff.original} height={200} />
+      </OriginalPanel>
+    )
+  } else if (diff.type === 'quote') {
+    const runs = diff.removed?.length ? highlightRuns(diff.original, diff.removed) : restoredRuns(diff.shown, diff.original)
+    right = (
+      <OriginalPanel note={<>Highlighted: the words the post cut.</>}>
+        <p className="text-[15px] leading-relaxed">
+          “<Restored runs={runs} />”
+        </p>
+      </OriginalPanel>
+    )
+  } else if (diff.type === 'stat') {
+    const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
+    const found = runs.some((r) => r.hit)
+    right = (
+      <OriginalPanel note={diff.missing && !found ? <>Left out: <b>{diff.missing}</b></> : <>Highlighted: what the post left out.</>}>
+        <p className="text-[15px] leading-relaxed">
+          <Restored runs={runs} />
+        </p>
+      </OriginalPanel>
+    )
+  } else if (diff.type === 'detail') {
+    const changed = diff.changed ?? []
+    right = (
+      <OriginalPanel note={<DetailChanges changed={changed} />}>
+        <p className="text-[15px] leading-relaxed">
+          <Restored runs={highlightRuns(diff.original, changed.map((c) => c.from))} />
+        </p>
+      </OriginalPanel>
+    )
+  }
+
+  const shownChange = isChart && shownSpec ? change(shownSpec) : null
+  const axisNow = morphed ? yMin : from
+  const axisLabel = Math.abs(axisNow - Math.round(axisNow)) < 0.05 ? formatNumber(Math.round(axisNow), 0) : formatNumber(axisNow, 1)
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-2">
+        <SectionLabel>{shownLabel}</SectionLabel>
+        <FeedCard
+          post={shownPost}
+          caseNumber={caseNumber}
+          watermarkText={watermarkText}
+          doctoredStamp
+          renderChart={
+            isChart
+              ? (spec) => (
+                  <PostChart spec={spec} height={200} yMinOverride={morphed ? yMin : undefined} animating={morphed && Math.abs(yMin - to) > 1e-6} />
+                )
+              : undefined
+          }
+        />
+        {isChart && from !== to && (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <span>
+              Axis starts at <b className="font-mono text-text">{axisLabel}</b>
+              {shownChange && (
+                <>
+                  {' '}
+                  · {shownChange.from} → {shownChange.to}: <b className="font-mono text-text">{shownChange.text}</b>
+                </>
+              )}
+            </span>
+            <Button size="sm" variant="con" className="ml-auto" onClick={() => setPlayKey((k) => k + 1)}>
+              {morphed ? '↺ Drop the axis again' : `↓ Drop the axis to ${formatNumber(to, Number.isInteger(to) ? 0 : 1)}`}
+            </Button>
+          </div>
+        )}
+      </div>
+      <div className="flex min-w-0 flex-col gap-2">
+        <SectionLabel>The original</SectionLabel>
+        {right}
+      </div>
+    </div>
+  )
+}
+
+export function DetailChanges({ changed }: { changed: { from: string; to: string }[] }) {
+  if (!changed.length) return <>Highlighted: the detail that was changed.</>
+  return (
+    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {changed.map((c, i) => (
+        <span key={i}>
+          Really <b className="font-mono">{c.from}</b>, posted as{' '}
+          <s className="font-mono decoration-[#B8322A] decoration-2">{c.to}</s>
+        </span>
+      ))}
+    </span>
+  )
+}
+
+/**
+ * The compact before-and-after on a Daily card's back (PLAN_V2 §1A): the chart's axis animates
+ * to its honest start, cut words come back highlighted, a missing number reappears, a swapped detail is shown.
+ */
+export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
+  const reduced = useReducedMotion()
+  const [playKey, setPlayKey] = useState(0)
+  const shownSpec = diff.type === 'chart' ? diff.shown ?? post?.chart ?? null : null
+  const from = shownSpec?.y_min ?? 0
+  const to = diff.type === 'chart' ? diff.original?.y_min ?? 0 : from
+  const yMin = useTween(from, to, playKey, 800, reduced)
+
+  // No auto-play: the player first sees the chart exactly as posted (the trick visible),
+  // then chooses to drop the axis. The honest comparison is always shown underneath.
+  const box = 'rounded-xl bg-white p-3 text-[14px] leading-relaxed text-[#1B1B1F]'
+  const label = 'text-[11px] font-bold tracking-[0.14em] text-muted uppercase'
+
+  if (diff.type === 'chart' && shownSpec) {
+    const a = change(shownSpec)
+    const b = diff.original ? change(diff.original) : null
+    const fmt = (v: number) => formatNumber(v, Number.isInteger(v) ? 0 : 2)
+    return (
+      <div className="flex flex-col gap-2">
+        <p className={label}>What you saw</p>
+        <div className={box}>
+          <PostChart spec={shownSpec} height={150} compact yMinOverride={playKey ? yMin : undefined} animating={!!playKey && Math.abs(yMin - to) > 1e-6} />
+        </div>
+        <p className="text-[13px] text-muted">
+          Axis starts at <b className="font-mono text-text">{fmt(from)}</b>, not 0
+          {a && (
+            <>
+              {' '}· shows <b className="font-mono text-text">{a.text}</b> ({a.from} → {a.to})
+            </>
+          )}
+        </p>
+        {from !== to && (
+          <button type="button" className="self-start text-xs font-semibold text-con hover:underline" onClick={() => setPlayKey((k) => k + 1)}>
+            {playKey ? '↺ Replay the axis drop' : '▶ Drop the axis to 0'}
+          </button>
+        )}
+        {diff.original && (
+          <>
+            <p className={`${label} mt-2`}>The honest view</p>
+            <div className={box}>
+              <PostChart spec={diff.original} height={150} compact />
+            </div>
+            {b && (
+              <p className="text-[13px] text-muted">
+                {b.from} → {b.to}: <b className="font-mono text-text">{b.text}</b>
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    )
+  }
+  if (diff.type === 'quote') {
+    const runs = diff.removed?.length ? highlightRuns(diff.original, diff.removed) : restoredRuns(diff.shown, diff.original)
+    return (
+      <div className={box}>
+        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The full quote</p>
+        <p>
+          “<Restored runs={runs} />”
+        </p>
+      </div>
+    )
+  }
+  if (diff.type === 'stat') {
+    const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
+    return (
+      <div className={box}>
+        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The full numbers</p>
+        <p>
+          <Restored runs={runs} />
+        </p>
+        {diff.missing && !runs.some((r) => r.hit) && (
+          <p className="mt-1 text-[13px] text-[#4A4A55]">
+            Left out: <b>{diff.missing}</b>
+          </p>
+        )}
+      </div>
+    )
+  }
+  if (diff.type === 'detail') {
+    const changed = diff.changed ?? []
+    return (
+      <div className={box}>
+        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The original</p>
+        <p>
+          <Restored runs={highlightRuns(diff.original, changed.map((c) => c.from))} />
+        </p>
+        <p className="mt-1.5 text-[13px] text-[#4A4A55]">
+          <DetailChanges changed={changed} />
+        </p>
+      </div>
+    )
+  }
+  return null
+}

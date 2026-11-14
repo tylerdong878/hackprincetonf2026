@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" viewBox="0 0 512 512">
+  <rect id="background" width="512" height="512" rx="112" fill="#FFFFFF"/>
+  <g id="logo" transform="translate(13,-2)">
+    <g id="shaker" transform="rotate(10 256 300)">
+      <path id="body" d="M156,252 L144,410 Q142,446 178,446 L334,446 Q370,446 368,410 L356,252 Z" fill="#FFFFFF" stroke="#111111" stroke-width="14" stroke-linejoin="round"/>
+      <path id="salt-line" d="M170,352 Q191,338 212,352 Q234,366 256,352 Q278,338 300,352 Q321,366 342,352" fill="none" stroke="#111111" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="head" d="M156,238 C156,150 200,112 256,112 C312,112 356,150 356,238 Z" fill="#FFFFFF" stroke="#111111" stroke-width="14" stroke-linejoin="round"/>
+      <rect id="band" x="146" y="230" width="220" height="30" rx="15" fill="#FFFFFF" stroke="#111111" stroke-width="14"/>
+      <g id="holes" fill="#111111"><circle cx="230" cy="142" r="6"/><circle cx="256" cy="134" r="6"/><circle cx="282" cy="142" r="6"/></g>
+      <g id="blush" fill="#D6D6D6"><ellipse cx="203" cy="206" rx="13" ry="8"/><ellipse cx="309" cy="206" rx="13" ry="8"/></g>
+      <g id="eyes" fill="#111111"><circle cx="226" cy="190" r="9"/><circle cx="286" cy="190" r="9"/></g>
+      <path id="smile" d="M242,206 Q256,219 270,206" fill="none" stroke="#111111" stroke-width="9" stroke-linecap="round"/>
+    </g>
+    <g id="grains" fill="#111111"><rect x="312" y="72" width="16" height="16" rx="4" transform="rotate(20 320 80)"/><rect x="343" y="93" width="14" height="14" rx="4" transform="rotate(-12 350 100)"/><rect x="332" y="46" width="12" height="12" rx="3" transform="rotate(35 338 52)"/></g>
+  </g>
+</svg>
