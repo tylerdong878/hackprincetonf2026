@@ -44,7 +44,7 @@ def daily_posts(ctx, ids) -> list[dict]:
         {"id": "p3", "role": "real_suspicious", "source_id": ids["bpu20"]},
         {"id": "p4", "role": "doctored", "forgery_id": "f2", "author_name": "Turnpike Tea",
          "author_handle": "@turnpiketea"},
-        {"id": "p5", "role": "real", "source_id": ids["peak"]},
+        {"id": "p5", "role": "real", "source_id": ids["peak"], "by_persona": True},  # real, by a persona
     ]
 
 
@@ -180,8 +180,8 @@ def test_daily_with_nothing_doctored(tmp_path):
     ids["head"] = headline(ctx)
     make_chart_impl(ctx, months=["2025-07", "2026-07"], honest=True)
     posts = [{"id": "p1", "role": "real", "source_id": ids["net"]},
-             {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Priya (watt nerd)",
-              "author_handle": "@wattnerd"},
+             {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Calm Down Daily",
+              "author_handle": "@calmdowndaily"},
              {"id": "p3", "role": "real", "source_id": ids["bpu20"]},
              {"id": "p4", "role": "real", "source_id": ids["head"]},
              {"id": "p5", "role": "real", "source_id": ids["ace"]}]

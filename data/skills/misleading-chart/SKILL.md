@@ -12,7 +12,9 @@ seasonal peak, or two months from different seasons presented as "one year".
 
 ## When to use
 - The case's trick is `misleading-chart`.
-- The topic has a numeric time series in the run (NJ electricity prices: EIA monthly, ¢/kWh, through 2026-08).
+- The topic's research hints list a data series (NJ electricity prices: EIA monthly, ¢/kWh, through 2026-08).
+  On other topics `make_chart` isn't offered and the trick isn't planned: never chart NJ power prices on a
+  food, sports or science day.
 - Best material: series with a strong seasonal swing. NJ prices peak every summer (Jun-Aug), so spring vs.
   summer comparisons look dramatic.
 
@@ -26,7 +28,7 @@ Call `make_chart` once. You only choose framing; every value comes from the EIA 
 4. The tool returns a forgery id (`f1`), the honest counterpart (same month a year apart, axis from 0), the
    numbers you may use in the post body, and a suggested body. Write a body that states the shown change
    (e.g. "NJ power prices are up 27% in ONE YEAR."). Numbers not derived from the chart are rejected.
-5. In `write_case`, give the doctored post `forgery_id`, a made-up `author_name`/`author_handle`, the body,
+5. In `write_case`, give the doctored post `forgery_id`, a made-up persona (or leave `author_name` empty), the body,
    a one-sentence `tell` and a 2-3 sentence `explanation`.
 
 Not allowed: changing values, inventing months, dropping points from inside a window, or a y_min above the data.

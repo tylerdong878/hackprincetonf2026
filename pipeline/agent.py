@@ -9,6 +9,8 @@ Deep Agents features used here (see README "Pipeline"):
   deny reading answer keys and writing case/skill files through the file tools.
 - Skills: one SKILL.md per trick under data/skills/, given to the forger with `skills=["/skills/"]`.
 - Human-in-the-loop: `interrupt_on={"submit_for_review": ...}` + `MemorySaver` checkpointer.
+- Budget: the last model calls are kept for the orchestrator's hand-off (`BudgetGuardMiddleware`).
+- Topic scoping: the EIA tools (get_eia_series, make_chart) exist only on topics whose hints list data.
 """
 
 from __future__ import annotations
@@ -33,7 +35,7 @@ from langchain_core.language_models import BaseChatModel
 from langgraph.checkpoint.memory import MemorySaver
 
 from pipeline.context import RunContext
-from pipeline.middleware import EventMiddleware, ForgerContextMiddleware
+from pipeline.middleware import BudgetGuardMiddleware, EventMiddleware, ForgerContextMiddleware
 from pipeline.models import ModelSet
 from pipeline.prompts import (
     FORGER_DESCRIPTION,
@@ -166,7 +168,8 @@ def build_agent(ctx: RunContext, models: ModelSet, *, checkpointer: Any | None =
         system_prompt=ORCHESTRATOR_PROMPT,
         tools=o_tools,
         subagents=[researcher, forger, blind_solver],
-        middleware=[TodoListMiddleware(), EventMiddleware("orchestrator", ctx),
+        # BudgetGuard after EventMiddleware, so a refused or cut-short task still shows up in the Workshop log
+        middleware=[TodoListMiddleware(), EventMiddleware("orchestrator", ctx), BudgetGuardMiddleware(ctx),
                     *models.middleware_for("orchestrator", "orchestrator", ctx.stats)],
         backend=backend,
         permissions=PERMISSIONS,

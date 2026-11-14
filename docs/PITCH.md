@@ -117,7 +117,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 We love daily games like Wordle and GeoGuessr: two minutes, a share grid, and bragging rights. We wanted one where the opponent is an AI con artist. The research gave us the twist. Earlier fake-news games like *Bad News* were meant to make people sharper, but a 2023 reanalysis found they mostly made players doubt *everything*, true news included. So we built a game where being paranoid loses, just like being gullible.
 
 ### What it does
-- **Daily Grain.** Five real news posts a day. The Con has secretly doctored some of them: a cropped quote, a truncated chart axis, a cherry-picked time window. Some days nothing is fake. Tap Trust or Call it, get an instant reveal with the side-by-side original, and see how everyone else did. Rare catches earn bonus points ("One in a shaker!"). Your Gullible ↔ Paranoid meter shows which way you lean.
+- **Daily Grain.** Five real news posts a day. The Con has secretly doctored some of them: a cropped quote, a truncated chart axis, a cherry-picked time window. Some days nothing is fake. Tap Real or Doctored, get an instant reveal with the side-by-side original, and see how everyone else did. Rare catches earn bonus points ("One in a shaker!"). Your Gullible ↔ Paranoid meter shows which way you lean.
 - **Con the Con.** Flip roles. You doctor a real post yourself, and the Con, a live AI agent with one evidence check, decides whether it's real. Three boss levels, from Rookie to Master Con.
 - **Streaks and share grid.** 🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled. Spoiler-free.
 - **Editor's Desk.** A human puzzle editor approves every AI-built puzzle before it goes live.
@@ -128,6 +128,8 @@ We love daily games like Wordle and GeoGuessr: two minutes, a share grid, and br
   - A **forger** applies trick skills (`SKILL.md` files) to real material.
   - A **blind solver**, which never sees the answer key, must crack the puzzle with the player's tools. Unfair puzzles get rejected and rebuilt.
 - **Approval and tracing:** a human-in-the-loop interrupt holds each puzzle for the editor, and every build and live judgment is traced in LangSmith.
+- **Guardrails in code, not just prompts:** quotes can only be cropped (never rewritten), real posts must be verbatim from a page fetched that run, doctored posts only come from invented accounts, and a topic blocklist keeps out tragedies, minors and elections.
+- **Launch week:** the first five dailies were curated by us with a scripted builder that re-fetches every source page and checks each excerpt word for word. The Deep Agents pipeline builds the new ones.
 - **The game:** React 19 + TypeScript + Tailwind on FastAPI. Scoring happens on the server, so answers never reach the browser early.
 - **Models:** free open models via OpenRouter, NVIDIA Nemotron for building and judging.
 
@@ -135,17 +137,23 @@ We love daily games like Wordle and GeoGuessr: two minutes, a share grid, and br
 - **Free-tier limits:** 50 requests a day per account. We pre-build puzzles, cache verdicts and cap live rounds.
 - **The Con was too good:** it caught every doctored edit at full strength, so we added boss levels.
 - **Making fakes subtle but fair:** that's why the blind solver exists.
+- **The AI needed an editor:** when we pointed the pipeline at fun topics, its first four puzzles had giveaways (only the fakes lacked source links), realistic-sounding fake names, and one story about a real tragedy. Our editor caught all of it, and we turned each catch into a rule enforced in code.
+- **Answers leaking through metadata:** if only fake posts come from unknown accounts, players learn the pattern instead of the skill. Every day now has real posts from unknown accounts too, and the builder fails if any display field gives an answer away.
 
 ### Accomplishments that we're proud of
 - The blind-solver fairness loop.
 - Con the Con, where a live agent judges your forgery.
 - A scoring rule that punishes paranoia.
+- Every real excerpt in the game is checked word for word against its live source page.
 
 ### What we learned
-*(Fill in together: e.g. why suspicion vs. discernment changed the whole design.)*
+*(Draft; rewrite in your own words.)*
+- One research finding (games that train suspicion don't train discernment) changed our whole scoring design.
+- Agents are great at the grind (finding sources, applying tricks, testing fairness), but a human editor still catches things no prompt anticipated.
+- Free-tier limits shaped the architecture: build each puzzle once and let everyone play it, so cost doesn't grow with players.
 
 ### What's next
-- A nightly puzzle drop.
+- Nightly puzzle drops (the pipeline already builds one a night, held for the editor).
 - An iMessage daily.
 - More tricks, including AI-written posts.
 - Themed weeks with local newsrooms and libraries.

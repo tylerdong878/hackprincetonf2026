@@ -95,23 +95,95 @@ class EventMiddleware(AgentMiddleware):
         return result
 
 
+class BudgetGuardMiddleware(AgentMiddleware):
+    """Orchestrator only: keeps the last model calls for the hand-off (submit_for_review).
+
+    - Refuses a new sub-agent task once fewer than `min_left` calls remain.
+    - If a sub-agent runs into the reserve (CallStats raises CallBudgetExceeded for sub-agents at
+      max_calls - reserve), its task ends with a note instead of ending the whole run.
+    Either way the orchestrator is told to submit what exists, so a finished case isn't left as a draft.
+    """
+
+    def __init__(self, ctx: RunContext, min_left: int = 3) -> None:
+        super().__init__()
+        self.ctx = ctx
+        self.min_left = min_left
+
+    @property
+    def name(self) -> str:
+        return "BudgetGuardMiddleware"
+
+    def _note(self, call: dict[str, Any], text: str) -> ToolMessage:
+        return ToolMessage(content=text, tool_call_id=call.get("id") or "", name=call.get("name") or "task",
+                           status="error")
+
+    def _refusal(self, call: dict[str, Any]) -> ToolMessage | None:
+        if call["name"] != "task" or self.ctx.stats.remaining >= self.min_left:
+            return None
+        sub = (call.get("args") or {}).get("subagent_type", "?")
+        return self._note(call, f"Refused: only {self.ctx.stats.remaining} model calls left, kept for the hand-off, "
+                                f"so {sub} can't start. {self._next_step()}")
+
+    def _next_step(self) -> str:
+        if (self.ctx.case_dir / "meta.json").exists() or self.ctx.write_count:
+            return f"Call submit_for_review now for case {self.ctx.case_id} and say what was not finished."
+        return "No case files exist yet, so there is nothing to submit. Reply with one line and stop."
+
+    def _stopped(self, call: dict[str, Any], exc: Exception) -> ToolMessage:
+        sub = (call.get("args") or {}).get("subagent_type", "?")
+        return self._note(call, f"Stopped: {sub} ran out of model calls ({exc}). {self._next_step()}")
+
+    def wrap_tool_call(self, request: Any, handler: Callable[[Any], Any]) -> Any:
+        from pipeline.models import CallBudgetExceeded
+
+        if (refused := self._refusal(request.tool_call)) is not None:
+            return refused
+        try:
+            return handler(request)
+        except CallBudgetExceeded as exc:
+            if request.tool_call["name"] != "task":
+                raise
+            return self._stopped(request.tool_call, exc)
+
+    async def awrap_tool_call(self, request: Any, handler: Callable[[Any], Awaitable[Any]]) -> Any:
+        from pipeline.models import CallBudgetExceeded
+
+        if (refused := self._refusal(request.tool_call)) is not None:
+            return refused
+        try:
+            return await handler(request)
+        except CallBudgetExceeded as exc:
+            if request.tool_call["name"] != "task":
+                raise
+            return self._stopped(request.tool_call, exc)
+
+
 def forger_context(ctx: RunContext) -> str:
-    """The researcher's saved material + EIA numbers + forgeries so far, for the forger's prompt."""
+    """The researcher's saved material + personas + (data topics) EIA numbers + forgeries so far, for the forger."""
+    from pipeline.tools.case_writer import NO_DERIVATIVES_DOMAINS, persona_list_text
+
     lines = [f"## This run\nCase id: {ctx.case_id} · topic: {ctx.topic}\nCase shape: {ctx.case_shape()}"]
     lines.append("\n## Saved real sources (verbatim; use these ids)")
     if not ctx.sources:
         lines.append("(none yet)")
     for s in ctx.sources:
-        who = f"quote by {s.speaker}" if s.speaker else ("headline" if s.headline else "text")
+        who = f"quote by {s.speaker}" if s.speaker else ("headline" if s.headline else "text, no speaker")
         lines.append(f"- {s.id} · {s.outlet} · {s.date or 'undated'} · {who}: “{s.text}”"
                      + (f"\n  context after: {clip(s.after, 260)}" if s.after else ""))
-    try:
-        prices = load_eia(ctx.eia_path)
-        recent = [(p, v) for p, v in prices.items() if p >= "2024-01"]
-        lines.append("\n## EIA NJ residential price, ¢/kWh (make_chart / make_stat_claim use these)")
-        lines.append(" ".join(f"{p}={v}" for p, v in recent))
-    except (OSError, KeyError, ValueError):
-        pass
+    if ctx.is_daily and any(d in s.url for s in ctx.sources for d in NO_DERIVATIVES_DOMAINS):
+        lines.append("(New Jersey Monitor is CC BY-NC-ND: use its passages only as REAL posts, never doctored.)")
+    lines.append("\n## Made-up personas (author_name; each posts once; leave empty to get one assigned)")
+    lines.append(persona_list_text())
+    if ctx.has_data:
+        try:
+            prices = load_eia(ctx.eia_path)
+            recent = [(p, v) for p, v in prices.items() if p >= "2024-01"]
+            lines.append("\n## EIA NJ residential price, ¢/kWh (make_chart / make_stat_claim use these)")
+            lines.append(" ".join(f"{p}={v}" for p, v in recent))
+        except (OSError, KeyError, ValueError):
+            pass
+    else:
+        lines.append("\n## No data series on this topic: every number comes from a saved source above.")
     made = [a for a in ctx.artifacts.values()]
     if made:
         lines.append("\n## Made so far")

@@ -81,8 +81,11 @@ def user_request(ctx: RunContext, hints: str, trick_reason: str) -> str:
 
 def run_settings(args: argparse.Namespace, now: datetime, cases_dir: Path = CASES_DIR) -> dict[str, Any]:
     """RunContext fields + the trick reason for these CLI args (no model, no files written)."""
-    from pipeline.topics import choose_trick, make_case_id, plan_daily, theme_for
+    from pipeline.topics import choose_trick, hints_for, make_case_id, plan_daily, theme_for
 
+    allowed = hints_for(args.topic).get("tricks")  # e.g. no misleading-chart on a topic without chart data
+    if args.trick and allowed and args.trick not in allowed:
+        raise SystemExit(f"--trick {args.trick} doesn't fit topic '{args.topic}' (it allows {', '.join(allowed)})")
     if args.mode == "daily":
         daily_date = args.daily_date or now.astimezone(_eastern()).strftime("%Y-%m-%d")
         try:
@@ -90,7 +93,7 @@ def run_settings(args: argparse.Namespace, now: datetime, cases_dir: Path = CASE
         except ValueError as exc:
             raise SystemExit(f"--daily-date must be YYYY-MM-DD (got {daily_date!r})") from exc
         n = 0 if args.clean else args.doctored
-        tricks, reason = plan_daily(daily_date, n)
+        tricks, reason = plan_daily(daily_date, n, hints_for(args.topic).get("tricks"))
         if args.trick and tricks:
             tricks[0] = args.trick
         case_id = args.case_id or _unique(f"daily-{daily_date}", cases_dir)
@@ -104,6 +107,10 @@ def run_settings(args: argparse.Namespace, now: datetime, cases_dir: Path = CASE
     else:
         profile = DATA_DIR / "players" / args.player / "profile.json" if args.player else None
         trick, reason = choose_trick(profile)
+        if allowed and trick not in allowed:
+            import random
+
+            trick, reason = random.choice(allowed), f"{trick} doesn't fit this topic; random allowed trick"
     return {"case_id": case_id, "mode": "casefile", "clean": args.clean, "trick": trick, "reason": reason}
 
 
@@ -313,12 +320,16 @@ def dry_run(topic: str, settings: dict[str, Any]) -> int:
     print("Grain of Salt case builder: DRY RUN (placeholder models; no network, nothing written)\n")
     print(f"Case shape: {ctx.case_shape()}")
     print(f"Blind-solver attempts: {ctx.max_solver_attempts}; Con the Con judge: pipeline.fool.judge_post "
-          "(1 evidence check, 2 model calls)\n")
+          "(1 evidence check, 2 model calls)")
+    print(f"Topic scope: feeds {', '.join(ctx.feeds or []) or 'none'}; pages {', '.join(ctx.articles or []) or 'none'}; "
+          f"data {'EIA NJ electricity series' if ctx.has_data else 'none (get_eia_series and make_chart are off)'}")
+    print(f"Budget: the last {ctx.stats.reserve} model calls are kept for the orchestrator's hand-off; no new "
+          "sub-agent task starts with fewer than 3 left\n")
     print(f"Orchestrator  model={models.names['orchestrator']}")
     print(f"  tools: {', '.join(tools.get('orchestrator', []))}")
-    print("  middleware: TodoListMiddleware (planning), WorkshopEventMiddleware, ModelCallMiddleware "
-          "(count/throttle/retry), Nemotron repair; deepagents adds Filesystem, SubAgent, Summarization, "
-          "HumanInTheLoop, ModelRefusal")
+    print("  middleware: TodoListMiddleware (planning), WorkshopEventMiddleware, BudgetGuardMiddleware (keeps the "
+          "hand-off calls), ModelCallMiddleware (count/throttle/retry), Nemotron repair; deepagents adds Filesystem, "
+          "SubAgent, Summarization, HumanInTheLoop, ModelRefusal")
     print("Sub-agents (via the `task` tool):")
     for spec in bundle.subagents:
         name = spec["name"]

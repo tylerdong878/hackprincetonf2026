@@ -390,6 +390,13 @@ Stamp colors in the UI match: green, salt/white, amber, red.
 | `con_false_alarm` | **FALSE ALARM** |
 | `con_trusted` | **TRUSTED** |
 
+### 8.2b Labels and accounts never give the answer away
+- Every post carries a `source_label`. A doctored post cites the outlet it misquotes (or "Data: U.S. EIA"). The exception is New Jersey Monitor material (CC BY-NC-ND), which is never doctored on a daily.
+- Every daily includes at least one REAL post shared by a made-up account, so an unknown account doesn't mean "fake".
+- Made-up accounts use invented, handle-style personas (pipeline: `PERSONAS` in `pipeline/tools/case_writer.py`), never realistic personal names.
+- A doctored quote is never credited to an outlet as its speaker.
+- Enforced by `scripts/build_daily_cases.py` for hand-built content and by `write_case` in the pipeline.
+
 ### 8.3 One made-up account per deck item
 - `GET /fool/deck` items add `"edited_author"`: the made-up account a changed post will show.
 - `apply_edit` must use **exactly** that author. It's deterministic per deck item, from a fixed persona list, using invented handles, never realistic personal names.

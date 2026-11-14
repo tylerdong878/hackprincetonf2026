@@ -21,6 +21,8 @@ def make_ctx(tmp_path, **kw) -> RunContext:
         events=EventLog(cases / kw.get("case_id", "2026-11-14-test-case") / "pipeline_log.jsonl"),
         stats=CallStats(max_calls=100, rpm=0), fetch=fx.FakeFetcher(),
         now=datetime(2026, 11, 14, 15, 0, tzinfo=UTC),
+        # the research scope (normally the topic's TOPIC_HINTS): the fixture feeds and pages
+        feeds=[fx.FEED_URL, fx.FEED2_URL], articles=[fx.PRESS_URL, fx.BLOCKED_URL],
     )
     defaults.update(kw)
     return RunContext(**defaults)

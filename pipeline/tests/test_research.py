@@ -167,6 +167,7 @@ def test_save_source_rejects_blocked_topic(ctx):
         200, b"<p>Students at the high school will see their electricity bills rise next year, officials said.</p>",
         "text/html")
     ctx.fetch = fx.FakeFetcher(routes)
+    ctx.articles.append("https://example-news.test/2026/10/02/school/")
     fetch_article_impl(ctx, "https://example-news.test/2026/10/02/school/")
     out = save_source_impl(ctx, "https://example-news.test/2026/10/02/school/",
                            "Students at the high school will see their electricity bills rise next year")
