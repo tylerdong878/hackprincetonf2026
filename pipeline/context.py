@@ -106,10 +106,10 @@ class RunContext:
     artifacts: dict[str, dict[str, Any]] = field(default_factory=dict)
     solver: SolverSession = field(default_factory=SolverSession)
     solver_history: list[dict[str, Any]] = field(default_factory=list)
-    solver_round_base: int = 0  # attempts before the latest teacher rejection (retry limit is per round)
+    solver_round_base: int = 0  # attempts before the latest editor rejection (retry limit is per round)
     write_count: int = 0
     safety_notes: list[str] = field(default_factory=list)
-    teacher_feedback: list[str] = field(default_factory=list)
+    editor_feedback: list[str] = field(default_factory=list)
     # Where the researcher may read, and whether the topic has a chart data series (EIA). Default: the topic's
     # TOPIC_HINTS (pipeline/topics.py). fetch_rss only reads `feeds`; fetch_article only reads `articles` and
     # stories linked from those feeds.

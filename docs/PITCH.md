@@ -1,7 +1,7 @@
 # Grain of Salt: Pitch Kit (v2, entertainment-first)
 
 Everything for judging day: the 2-minute script, sponsor add-ons, judge Q&A and a Devpost draft.
-Facts and sources are in [RESEARCH.md](RESEARCH.md). The v1 classroom script is in git history.
+Facts and sources are in [RESEARCH.md](RESEARCH.md). The v1 script is in git history.
 
 **The one idea to land:** *you can fool an AI con artist, and it can fool you.* Lead with the game. The research twist is a game rule, and media literacy is what players take away without being told.
 
@@ -82,7 +82,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 | **"Was the puzzle I just played built by the AI?"** | "Not today's. Launch week was curated by us with a scripted builder that checks every quote against its source page. The Deep Agents pipeline builds the new ones, and each waits for a human editor. Here's one it built tonight." *Show the trace, approve the queued Case File, and play it.* |
 | **"Why Deep Agents instead of one prompt?"** | "Each job has its own context, the blind solver gives a validation loop, the files can be audited, and a human approves the result. One prompt can't check its own fairness." |
 | **"What does it cost to run?"** | "Nothing right now. It uses free open models through OpenRouter. A puzzle is built once and played by everyone, so cost doesn't grow with players. Live Con rounds are capped per day and per player." |
-| **"What's the business?"** | "It's a free daily game that grows through share grids. Later, sponsored themed weeks with newsrooms, and an editor tool that libraries and schools can use to make their own puzzles." |
+| **"What's the business?"** | "It's a free daily game that grows through share grids. Later, sponsored themed weeks with newsrooms, and an editor tool that libraries and community groups can use to make their own puzzles." |
 | **"Political bias?"** | "The tricks are about technique, not ideology. We skip elections, tragedies, emergencies and minors." |
 | **"Why the name?"** | "Take what you read with a grain of salt. Not the whole shaker." |
 

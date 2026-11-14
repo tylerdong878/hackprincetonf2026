@@ -14,8 +14,9 @@ SEED_CASES = (DEMO, CLEAN)
 
 
 # Server settings a developer's .env might set (main.py loads .env on import). Tests start from the defaults.
-SERVER_ENV = ("GOS_PUBLIC", "TEACHER_TOKEN", "DEMO_TOKEN", "CON_LIVE_DAILY_CAP", "CON_LIVE_PER_PLAYER",
-              "ANSWER_RATE_PER_MIN", "CROWD_MIN", "GOS_DATA_DIR")
+# TEACHER_TOKEN is the old name of EDITOR_TOKEN, still read as a fallback, so it is cleared too.
+SERVER_ENV = ("GOS_PUBLIC", "EDITOR_TOKEN", "TEACHER_TOKEN", "DEMO_TOKEN", "CON_LIVE_DAILY_CAP",
+              "CON_LIVE_PER_PLAYER", "ANSWER_RATE_PER_MIN", "CROWD_MIN", "GOS_DATA_DIR")
 
 
 @pytest.fixture(autouse=True)

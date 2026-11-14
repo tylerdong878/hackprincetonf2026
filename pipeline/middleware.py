@@ -193,8 +193,8 @@ def forger_context(ctx: RunContext) -> str:
         last = ctx.solver_history[-1]
         lines.append(f"\n## Last blind-solver result: {'PASS' if last['pass'] else 'FAIL'}; missed {last['missed']}, "
                      f"false alarms {last['false_alarms']}")
-    if ctx.teacher_feedback:
-        lines.append("\n## Teacher feedback to address\n" + "\n".join(f"- {f}" for f in ctx.teacher_feedback))
+    if ctx.editor_feedback:
+        lines.append("\n## Editor feedback to address\n" + "\n".join(f"- {f}" for f in ctx.editor_feedback))
     return "\n".join(lines)
 
 

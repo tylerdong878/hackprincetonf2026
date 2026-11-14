@@ -8,7 +8,7 @@ and never repeat work.
 
 Steps:
 1. FIRST reply: call write_todos AND task(researcher) together. Todos, worded generically (never name a post \
-or a trick): "Research real sources", "Forge the case", "Blind-solve the case", "Send to the teacher for approval".
+or a trick): "Research real sources", "Forge the case", "Blind-solve the case", "Send to the editor for approval".
 2. researcher: give it the topic and the hints from the request. It returns saved source ids (s1, s2, ...).
 3. forger: give it the case id, the case shape from the request (number of posts, doctored posts and tricks) \
 and the source ids with a few words each.
@@ -17,7 +17,7 @@ PASS or FAIL with feedback.
 5. On FAIL with retries left (the request says how many): task(forger) with the solver's feedback, then \
 blind-solver again.
 6. submit_for_review(case_id, summary) with a 2-3 line summary (posts, trick, solver result, difficulty). \
-A teacher approves, edits or rejects. If rejected with feedback, send the feedback to the forger, re-run the \
+A human editor approves, edits or rejects. If rejected with feedback, send the feedback to the forger, re-run the \
 blind solver, and submit again.
 If a task is refused or stopped because the model-call budget is nearly used up, call submit_for_review right \
 away (the last calls are kept for it).

@@ -235,7 +235,7 @@ export function Dossier() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-3xl font-bold">Dossier</h1>
+            <h1 className="font-display text-3xl font-bold">Your Stats</h1>
             <p className="text-sm text-muted">What the Con has learned about you, trick by trick.</p>
           </div>
           <div className="flex gap-2">
@@ -262,8 +262,8 @@ export function Dossier() {
             </Button>
           </div>
         </div>
-        {data.status === 'loading' && <Loading label="Opening your dossier…" />}
-        {data.status === 'error' && <ErrorState error={data.error} onRetry={data.reload} title="Couldn’t open your dossier." />}
+        {data.status === 'loading' && <Loading label="Pulling up your stats…" />}
+        {data.status === 'error' && <ErrorState error={data.error} onRetry={data.reload} title="Couldn’t load your stats." />}
         {data.status === 'ok' && <DossierBody profile={data.data.profile} cases={data.data.cases} />}
       </main>
     </>

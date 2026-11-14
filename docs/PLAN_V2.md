@@ -2,7 +2,7 @@
 
 **Why change:** teammate feedback is that v1 feels like homework. You read 4 posts in a feed, click Real/Fake, and the AI is invisible because it only runs offline.
 **Goal:** keep what's strong, change how it plays.
-- **Keep:** real material, doctored posts, scoring both kinds of mistakes (the research twist), the blind solver, teacher approval.
+- **Keep:** real material, doctored posts, scoring both kinds of mistakes (the research twist), the blind solver, human editor approval.
 - **Change:** a 2-minute daily ritual, an AI you play *against* live, and content that's actually fun.
 
 Research behind this: RESEARCH.md, plus the v2 research notes.
@@ -83,9 +83,9 @@ Research behind this: RESEARCH.md, plus the v2 research notes.
 - **Cost:** 1–2 calls per round. Results are cached by (post, edit), so repeats are free.
 - **Without a key, or if the call fails:** show cached real Con verdicts for that post if we have them; otherwise say plainly "the Con is asleep". Never invent an AI verdict.
 
-### C. 🗂️ Case Files (classroom mode, the v1 feed)
-- Keep the v1 four-post feed, the teacher queue, approval and the Workshop replay.
-- Positioned as "for classrooms": teachers approve cases and watch the class stats.
+### C. 🗂️ Case Files (an archive of extra cases, the v1 feed)
+- Keep the v1 four-post feed, the Editor's Desk queue, approval and the Workshop replay.
+- Positioned as extra cases for players who want more. A human editor approves every case on the Editor's Desk.
 
 ---
 
@@ -113,7 +113,7 @@ Research behind this: RESEARCH.md, plus the v2 research notes.
 | 0:00–0:10 | "Grain of Salt: the daily game where an AI con artist doctors real news, and you score points for knowing what's *true*." |
 | 0:10–0:50 | The judge plays 3 Daily cards. One absurd-but-true headline, one doctored chart (the axis drops), one real. Instant reveals plus crowd stats from HackPrinceton players. |
 | 0:50–1:40 | **Con the Con:** the judge crops a real quote or sets a chart axis, and the Con reasons live and rules. If they bluff with an untouched post and the Con calls it fake: "See? Even the AI over-doubts. That's what we train against." |
-| 1:40–2:00 | End card with the Gullible↔Paranoid meter, plus the research line: "Earlier games made people paranoid. We score discernment." Daily = habit, Case Files = classrooms. |
+| 1:40–2:00 | End card with the Gullible↔Paranoid meter, plus the research line: "Earlier games made people paranoid. We score discernment." Daily = habit, Case Files = more to play. |
 
 - **LangChain add-on:** the Workshop replay of the real overnight build of today's Daily, then show that the Con judge is the blind solver.
 - **Saturday evening:** get HackPrinceton attendees playing, so the crowd stats are real by Sunday morning.
@@ -126,7 +126,7 @@ Research behind this: RESEARCH.md, plus the v2 research notes.
 |---|---|
 | Backend | Daily endpoints, per-card answers, crowd stats, lean meter, streaks, Con the Con endpoints that call the pipeline's judge |
 | Pipeline | `judge_post()` reusing the blind solver, deterministic Fool Deck edits, `--daily-date` builds |
-| Frontend | New Home, Daily card flow, end card, Con the Con editor plus a live verdict scene; keep Case Files and Teacher |
+| Frontend | New Home, Daily card flow, end card, Con the Con editor plus a live verdict scene; keep Case Files and the Editor's Desk |
 | Content | A verified material bank of fun real items; assemble 5 seed Dailies plus the Fool Deck |
 | Team | $10 OpenRouter credit decision (raises the cap from 50 to 1,000 calls a day); recruit testers Saturday |
 

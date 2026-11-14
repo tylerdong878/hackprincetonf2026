@@ -65,7 +65,7 @@ PERMISSIONS = [
 INTERRUPT_ON = {
     "submit_for_review": {
         "allowed_decisions": ["approve", "edit", "reject"],
-        "description": "Teacher approval: the case goes live only after a human approves it.",
+        "description": "Editor approval: the case goes live only after a human editor approves it.",
     }
 }
 

@@ -216,7 +216,7 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
               Share <span className="tracking-[0.15em]">{grid}</span>
             </Button>
             <LinkButton to="/dossier" variant="ghost">
-              Dossier
+              Stats
             </LinkButton>
             <LinkButton to="/" variant="ghost">
               Home

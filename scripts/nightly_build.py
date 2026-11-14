@@ -80,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     # 30 calls: a clean run is ~18, and guardrail rejections can push a hard day past the default 25.
     cmd = [sys.executable, "-m", "pipeline.build_case", "--mode", "daily", "--daily-date", d.isoformat(),
-           "--topic", topic, "--hold-for-teacher", "--max-calls", "30"]
+           "--topic", topic, "--hold-for-editor", "--max-calls", "30"]
     return subprocess.run(cmd, cwd=ROOT).returncode
 
 

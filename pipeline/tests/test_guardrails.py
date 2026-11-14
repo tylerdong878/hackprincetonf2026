@@ -474,7 +474,7 @@ def test_budget_guard_refuses_new_tasks_and_ends_cut_short_ones(tmp_path):
 
 
 @pytest.mark.parametrize("max_calls,solver_calls", [(13, 1), (12, 0)])
-def test_tight_budget_still_hands_the_case_to_the_teacher(tmp_path, max_calls, solver_calls):
+def test_tight_budget_still_hands_the_case_to_the_editor(tmp_path, max_calls, solver_calls):
     """Nov 21/23 stopped after the solver with no calls left for submit_for_review. Now the solver is cut short
     (13) or never started (12), and the orchestrator still submits."""
     from pipeline.agent import build_agent

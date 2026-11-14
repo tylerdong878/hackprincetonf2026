@@ -13,7 +13,7 @@ import type {
   PipelineEvent,
   Profile,
   QueueItem,
-  TeacherCase,
+  EditorCase,
   ToolId,
   VerdictChoice,
   VerdictResponse,
@@ -116,9 +116,10 @@ const enc = encodeURIComponent
 
 // ---- Tokens (CONTRACT §8.5, §8.6) ------------------------------------------------------------
 const DEMO_KEY = 'gos.demo_token'
-const TEACHER_KEY = 'gos.teacher_token'
+const EDITOR_KEY = 'gos.editor_token'
+const OLD_EDITOR_KEY = 'gos.teacher_token' // the key's old name; read once and moved to EDITOR_KEY
 let memDemo: string | null = null
-let memTeacher: string | null = null
+let memEditor: string | null = null
 
 /** Reads `?demo=TOKEN` (before or inside the hash) once, stores it, and strips it from the address bar. */
 export function captureDemoToken() {
@@ -156,21 +157,30 @@ export function getDemoToken(): string | null {
   return memDemo
 }
 
-export function getTeacherToken(): string | null {
-  if (memTeacher) return memTeacher
+export function getEditorToken(): string | null {
+  if (memEditor) return memEditor
   try {
-    memTeacher = window.sessionStorage.getItem(TEACHER_KEY)
+    memEditor = window.sessionStorage.getItem(EDITOR_KEY)
+    const old = window.sessionStorage.getItem(OLD_EDITOR_KEY)
+    if (old != null) {
+      // One-time move from the old key name (a tab that unlocked the desk before the rename).
+      window.sessionStorage.removeItem(OLD_EDITOR_KEY)
+      if (!memEditor && old) {
+        memEditor = old
+        window.sessionStorage.setItem(EDITOR_KEY, old)
+      }
+    }
   } catch {
     /* ignore */
   }
-  return memTeacher
+  return memEditor
 }
 
-export function setTeacherToken(token: string | null) {
-  memTeacher = token
+export function setEditorToken(token: string | null) {
+  memEditor = token
   try {
-    if (token) window.sessionStorage.setItem(TEACHER_KEY, token)
-    else window.sessionStorage.removeItem(TEACHER_KEY)
+    if (token) window.sessionStorage.setItem(EDITOR_KEY, token)
+    else window.sessionStorage.removeItem(EDITOR_KEY)
   } catch {
     /* memory only */
   }
@@ -180,9 +190,9 @@ const demoHeaders = (): Record<string, string> => {
   const t = getDemoToken()
   return t ? { 'X-Demo-Token': t } : {}
 }
-const teacherHeaders = (): Record<string, string> => {
-  const t = getTeacherToken()
-  return t ? { 'X-Teacher-Token': t } : {}
+const editorHeaders = (): Record<string, string> => {
+  const t = getEditorToken()
+  return t ? { 'X-Editor-Token': t } : {}
 }
 
 export const api = {
@@ -219,11 +229,11 @@ export const api = {
 
   pipelineLog: (caseId: string) => request<PipelineEvent[] | { events: PipelineEvent[] }>(`/cases/${enc(caseId)}/pipeline-log`),
 
-  // Teacher routes send X-Teacher-Token when one is stored (public mode, CONTRACT §8.6).
-  teacherQueue: () => request<QueueItem[] | { cases: QueueItem[] }>('/teacher/queue', { headers: teacherHeaders() }),
-  teacherCase: (id: string) => request<TeacherCase>(`/teacher/cases/${enc(id)}`, { headers: teacherHeaders() }),
-  approve: (id: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/approve`, json({}, teacherHeaders())),
-  reject: (id: string, reason: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/reject`, json({ reason }, teacherHeaders())),
+  // Editor's Desk routes send X-Editor-Token when one is stored (public mode, CONTRACT §8.6).
+  editorQueue: () => request<QueueItem[] | { cases: QueueItem[] }>('/editor/queue', { headers: editorHeaders() }),
+  editorCase: (id: string) => request<EditorCase>(`/editor/cases/${enc(id)}`, { headers: editorHeaders() }),
+  approve: (id: string) => request<CaseMeta>(`/editor/cases/${enc(id)}/approve`, json({}, editorHeaders())),
+  reject: (id: string, reason: string) => request<CaseMeta>(`/editor/cases/${enc(id)}/reject`, json({ reason }, editorHeaders())),
 }
 
 /** Case objects fetched once are kept so navigation doesn't refetch them. */

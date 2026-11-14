@@ -246,6 +246,39 @@ def test_run_settings_daily(tmp_path):
     assert v1["mode"] == "casefile" and v1["trick"] == "misleading-chart"
 
 
+def test_hold_for_editor_flag_and_its_hidden_old_name(capsys):
+    from pipeline.build_case import parse_args
+
+    assert parse_args(["--hold-for-editor"]).hold_for_editor is True
+    assert parse_args(["--hold-for-teacher"]).hold_for_editor is True  # old name, kept as a hidden alias
+    assert parse_args([]).hold_for_editor is False
+    for flag in ("--hold-for-editor", "--hold-for-teacher"):
+        with pytest.raises(SystemExit):
+            parse_args([flag, "--auto-approve"])  # still mutually exclusive with --auto-approve
+    capsys.readouterr()
+    with pytest.raises(SystemExit):
+        parse_args(["--help"])
+    help_text = capsys.readouterr().out
+    assert "--hold-for-editor" in help_text and "--hold-for-teacher" not in help_text
+
+
+def test_nightly_build_holds_for_the_editor(monkeypatch):
+    from datetime import date
+
+    from pipeline.build_case import parse_args
+    from scripts import nightly_build
+
+    calls = []
+    monkeypatch.setattr(nightly_build, "next_missing", lambda _days: date(2026, 11, 23))
+    monkeypatch.setattr(nightly_build.subprocess, "run",
+                        lambda cmd, cwd=None: calls.append(cmd) or argparse.Namespace(returncode=0))
+    assert nightly_build.main([]) == 0
+    (cmd,) = calls
+    assert cmd[1:3] == ["-m", "pipeline.build_case"]
+    args = parse_args(cmd[3:])
+    assert args.hold_for_editor is True and args.auto_approve is False and args.mode == "daily"
+
+
 def test_user_request_and_ctx_shape_for_daily(daily_ctx):
     from pipeline.build_case import user_request
 

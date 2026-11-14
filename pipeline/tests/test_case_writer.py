@@ -155,7 +155,7 @@ def test_fictional_author_problems_unit():
     ("Candidates promise lower bills", "elections near voting day"),
     ("The shooting left two victims", "ongoing tragedies"),
     ("Measles outbreak in the county", "public-health emergencies"),
-    ("Students and their teachers protest bills", "minors as subjects"),
+    ("Students and their parents protest bills", "minors as subjects"),
 ])
 def test_blocklist_categories(text, category):
     assert category in {c for c, _ in blocklist_hits([text])}

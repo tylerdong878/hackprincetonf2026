@@ -10,7 +10,7 @@ import { ConTheCon } from './screens/ConTheCon'
 import { DailyScreen } from './screens/Daily'
 import { Dossier } from './screens/Dossier'
 import { Home } from './screens/Home'
-import { TeacherCaseScreen, TeacherQueue } from './screens/Teacher'
+import { EditorCaseScreen, EditorQueue } from './screens/EditorDesk'
 
 function NotFound() {
   return (
@@ -32,9 +32,9 @@ const TITLES: Record<string, string> = {
   con: 'Con the Con',
   casefiles: 'Case Files',
   case: 'Case',
-  dossier: 'Dossier',
-  teacher: 'Editor’s Desk',
-  casebook: 'Casebook',
+  dossier: 'Your Stats',
+  editor: 'Editor’s Desk',
+  casebook: 'The Con’s Tricks',
 }
 
 export default function App() {
@@ -49,13 +49,20 @@ export default function App() {
     document.title = head && TITLES[head] ? `${TITLES[head]} · Grain of Salt` : 'Grain of Salt'
   }, [head])
 
+  // Back-compat: the Editor's Desk used to live at #/teacher. Old links redirect to #/editor.
+  const legacyDesk = head === 'teacher'
+  useEffect(() => {
+    if (legacyDesk) window.location.replace(`#/editor${arg ? `/${encodeURIComponent(arg)}` : ''}`)
+  }, [legacyDesk, arg])
+
   if (!head) return <Home />
   if (head === 'daily') return <DailyScreen />
   if (head === 'con') return <ConTheCon />
   if (head === 'casefiles') return <CaseFiles />
   if (head === 'case' && arg) return <CaseScreen key={arg} caseId={arg} />
   if (head === 'dossier') return <Dossier />
-  if (head === 'teacher') return arg ? <TeacherCaseScreen key={arg} caseId={arg} /> : <TeacherQueue />
+  if (head === 'editor') return arg ? <EditorCaseScreen key={arg} caseId={arg} /> : <EditorQueue />
+  if (legacyDesk) return null // redirecting to #/editor (see above)
   if (head === 'casebook') return <Casebook key={arg ?? 'all'} trickId={arg} />
   return <NotFound />
 }

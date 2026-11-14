@@ -200,9 +200,9 @@ export function Home() {
               Case Files <span className="font-normal">(extra cases)</span>
             </a>
             <a href="#/casebook" className="hover:text-text">
-              Casebook
+              Tricks
             </a>
-            <a href="#/teacher" className="hover:text-text">
+            <a href="#/editor" className="hover:text-text">
               Editor’s Desk
             </a>
           </nav>
@@ -226,7 +226,7 @@ export function Home() {
               }
             }}
           >
-            {resetting ? 'Issuing a new badge…' : 'Start as a new detective (fresh streak, clues and dossier)'}
+            {resetting ? 'Issuing a new badge…' : 'Start as a new detective (fresh streak, clues and stats)'}
           </button>
         </footer>
       </main>

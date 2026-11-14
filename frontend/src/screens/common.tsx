@@ -51,7 +51,7 @@ export function RatingBadge({ profile }: { profile: Profile | null }) {
     <a
       href="#/dossier"
       className="ml-1 hidden items-center gap-1.5 rounded-full border border-con/50 bg-con/10 px-3 py-1 text-sm font-semibold sm:inline-flex"
-      aria-label={`Detective rating ${profile.rating}, ${profile.rank}${streak ? `, ${streak}-day streak` : ''}. Open your dossier.`}
+      aria-label={`Detective rating ${profile.rating}, ${profile.rank}${streak ? `, ${streak}-day streak` : ''}. Open your stats.`}
     >
       {streak > 0 && (
         <span aria-hidden="true">

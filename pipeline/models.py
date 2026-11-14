@@ -95,7 +95,7 @@ def call_with_deadline(fn: Callable[[], Any], seconds: float | None) -> Any:
 # --------------------------------------------------------------------------------------
 
 
-FINISHER = "orchestrator"  # the agent whose last calls hand the case to the teacher (submit_for_review)
+FINISHER = "orchestrator"  # the agent whose last calls hand the case to the editor (submit_for_review)
 FINISH_RESERVE = 2  # model calls only the orchestrator may use: submit_for_review, then its closing line
 
 

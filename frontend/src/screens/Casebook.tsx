@@ -49,13 +49,13 @@ export function Casebook({ trickId }: { trickId?: string }) {
           </article>
         ) : (
           <>
-            <h1 className="font-display text-3xl font-bold">Casebook</h1>
+            <h1 className="font-display text-3xl font-bold">The Con’s Tricks</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted">
               Misinformation mostly runs on a handful of repeatable tricks. Learn the tell for each, and which check exposes it.
             </p>
             {trickId && (
               <p className="mt-4 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
-                That trick isn’t in the casebook yet. Here are the ones that are.
+                That trick isn’t on the Con’s list yet. Here are the ones that are.
               </p>
             )}
             <ul className="mt-6 grid gap-4 md:grid-cols-3">

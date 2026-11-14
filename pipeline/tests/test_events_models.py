@@ -63,7 +63,7 @@ def test_spoiler_heuristic():
     assert looks_like_spoiler("Forge a misleading chart for p2")
     assert looks_like_spoiler("crop the quote")
     assert not looks_like_spoiler("Research real sources")
-    assert not looks_like_spoiler("Send to the teacher for approval")
+    assert not looks_like_spoiler("Send to the editor for approval")
 
 
 # ---------------------------------------------------------------- model calls
