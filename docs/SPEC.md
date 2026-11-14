@@ -166,7 +166,7 @@ Outcomes always use **color + icon + word**, never color alone.
   - The glass body says "grain of salt" in Cooper Black, converted to outlines.
   - Every line is the same chunky weight.
   - It stays monochrome on purpose. Use the `-light` or `-dark` variant to match the theme.
-  - Files: `frontend/public/` (web) and `C:\Users\Tyler\Documents\Illustrator\grain-of-salt-logo\cute\` (Illustrator source and generator).
+  - Files: `frontend/public/` (web) and the team's Illustrator folder, outside this repo (Illustrator source and generator).
   - Variants: the main logo (name on the body), an icon (wavy salt line instead of the name: favicon, spinner, empty states), and a horizontal wordmark (top bar, Devpost).
 - Primary button: **"Open today's case"**, labeled with the case number: *Case #0412 · NJ power bills*.
 - Secondary buttons: **Casebook**, **Dossier**, **Teacher mode**.

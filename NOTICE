@@ -1,0 +1,31 @@
+Grain of Salt
+Copyright (c) 2026 The Grain of Salt team
+
+The MIT License in LICENSE covers this project's code only. It does not cover
+the third-party material described below.
+
+QUOTED NEWS EXCERPTS
+data/cases/ and data/fool_deck/ contain short excerpts from published reporting
+and public statements by NPR, New Jersey Monitor, the New Jersey Board of
+Public Utilities, New Jersey 101.5, WHYY, Texas Public Radio and OPB (some
+carrying Associated Press material). Each excerpt is attributed and linked to
+its source; docs/CONTENT_SOURCES.md lists every one. These excerpts remain the
+property of their publishers and are used in short form for commentary and
+education.
+
+New Jersey Monitor content is licensed CC BY-NC-ND 4.0
+(https://creativecommons.org/licenses/by-nc-nd/4.0/). We use short,
+attributed excerpts with links and do not publish modified versions of its
+articles under its name.
+
+DOCTORED POSTS
+Doctored posts in this game are deliberately altered training material for a
+media-literacy game. They are posted only by made-up accounts and are stamped
+as doctored when revealed. They do not represent the views or the actual
+words of any outlet or person. Do not reuse them outside the game.
+
+DATA
+Electricity prices come from the U.S. Energy Information Administration
+(EIA). Food prices are Bureau of Labor Statistics average prices, retrieved
+through FRED (Federal Reserve Bank of St. Louis). U.S. government data is in
+the public domain; FRED's terms of use apply to the retrieved series.

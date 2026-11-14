@@ -1,7 +1,7 @@
 # Content sources
 
 Every real item used in the five seed Dailies (2026-11-13 to 2026-11-17) and the Con-the-Con Fool Deck.
-The material bank lives in [`scripts/build_daily_cases.py`](scripts/build_daily_cases.py) (`BANK`); the files in
+The material bank lives in [`scripts/build_daily_cases.py`](../scripts/build_daily_cases.py) (`BANK`); the files in
 `data/cases/2026-11-1*-daily-*/` and `data/fool_deck/` are generated from it. (`data/cases/daily-2026-11-18` and
 `daily-2026-11-19` are pipeline-built and are not covered here.)
 
