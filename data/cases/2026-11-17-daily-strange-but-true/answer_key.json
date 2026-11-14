@@ -8,41 +8,36 @@
       "con_line_false_alarm": "Real. Donkeys in Arsenal socks. I have limits. Reality doesn't."
     },
     "p2": {
-      "doctored": true,
-      "trick": "edited-detail",
-      "tell": "NPR's headline says 132 years. The magazine was published in 1894.",
-      "explanation": "This fake made the story less weird. The real magazine, from 1894, came back about 132 years overdue after a New Hampshire library announced a fine freeze. A believable number is still a wrong number.",
-      "con_line_fooled": "I knocked a century off and you relaxed. Plausible is my favorite disguise.",
-      "con_line_caught": "132 years. You checked. The truth was weirder than my lie.",
-      "diff": {
-        "type": "detail",
-        "shown": "Overdue library magazine returned after 32 years",
-        "original": "Overdue library magazine returned after 132 years",
-        "changed": [
-          {
-            "from": "132",
-            "to": "32"
-          }
-        ]
-      }
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real, from the Associated Press via OPB. A family of barn owls nested in a water tower near Central Park, the first documented barn owl nest in Manhattan in modern history, according to one expert.",
+      "con_line_false_alarm": "Real. Barn owls in a Manhattan water tower. I'd never pitch anything that adorable."
     },
     "p3": {
       "doctored": false,
       "suspicious_real": true,
-      "explanation": "Real. In the 1950s a Nevada newspaper editor wrote a joke story about a camel race. A few years later the race really happened, and it still runs every year: fake news that came true.",
+      "explanation": "Real. In the 1950s a Nevada newspaper editor wrote a joke story about a camel race. Then the race really happened, and it still runs every year: fake news that came true.",
       "con_line_false_alarm": "Real, and it's my origin story: a fake headline so good it came true."
     },
     "p4": {
-      "doctored": false,
-      "suspicious_real": false,
-      "explanation": "Word for word from NPR's New York City Marathon story: just over 2,000 runners in 1976, about 60,000 this year.",
-      "con_line_false_alarm": "Real. 88 women in 1976, nearly half of 60,000 now. Some numbers just grow."
+      "doctored": true,
+      "trick": "cherry-picked-stat",
+      "tell": "Those numbers are from 1976, the seventh running of the race. NPR's next sentence: about 60,000 runners started on Sunday.",
+      "explanation": "Every number is real, but the year was deleted. In 1976 the race had just over 2,000 runners, including 88 women. This year about 60,000 stepped up to the starting line, nearly half of them women.",
+      "con_line_fooled": "I deleted 'in 1976, the seventh running of the race.' Eight words, fifty years. I'm framing this.",
+      "con_line_caught": "You noticed the missing 1976. Just over 2,000 then, about 60,000 now. My shrink ray failed.",
+      "diff": {
+        "type": "stat",
+        "shown": "There were just over 2,000 competitors, including only 88 women.",
+        "original": "There were just over 2,000 competitors in 1976, the seventh running of the race, including only 88 women.",
+        "missing": "The year: those numbers are from 1976, the seventh running of the race. About 60,000 runners started on Sunday, nearly half of them women."
+      }
     },
     "p5": {
       "doctored": false,
       "suspicious_real": true,
-      "explanation": "Real and word for word from NPR. Read all of it: she isn't saying watching makes you a pro, just that watching beats never watching.",
-      "con_line_false_alarm": "Real. Watching sports counts as practice now. You're welcome, couch."
+      "explanation": "Real. The account is a sofa with opinions, but the quote is word for word from NPR, and it's the whole quote: she isn't saying watching makes you a pro, just that watching beats never watching.",
+      "con_line_false_alarm": "Real. A couch account quoting a Princeton neuroscientist word for word. Comfy, not crooked."
     }
   },
   "con_line_clean": null

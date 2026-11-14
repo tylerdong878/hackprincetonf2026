@@ -20,24 +20,21 @@
   },
   "p2": {
     "source": {
-      "outlet": "NPR",
-      "date": "2026-09-18",
-      "url": "https://www.npr.org/2026/09/18/nx-s1-5971268/overdue-library-magazine-returned-after-132-years",
+      "outlet": "OPB",
+      "date": "2026-10-16",
+      "url": "https://www.opb.org/article/2026/10/16/a-rare-family-of-barn-owls-moved-into-manhattan-captivating-new-yorkers/",
       "before": "",
-      "highlight": "Overdue library magazine returned after 132 years",
-      "after": "After the Concord Public Library in New Hampshire announced a fine freeze, a man has returned an overdue magazine published in 1894. … Well, a magazine from 1894 was just returned to the Concord Public Library in New Hampshire about 132 years overdue."
+      "highlight": "A rare family of barn owls moved into Manhattan's Upper West Side. New Yorkers are captivated",
+      "after": "Manhattan's Upper West Side has been reveling in the company of its latest celebrities: A family of barn owls nested in a water tower atop a building near Central Park. This is the first documented instance of barn owls nesting in Manhattan in modern history, according to one expert, and the owls have attracted nightly crowds of people in the street eager to get a glimpse of the elusive birds."
     },
     "account": {
-      "name": "Shelf Life",
-      "handle": "@shelflifereads",
-      "created": "April 2021",
-      "followers": 12800,
-      "verified": false,
-      "bio": "Book news & library lore 📚",
-      "recent_posts": [
-        "Your library card is a superpower.",
-        "Name a book you never returned. I'll wait."
-      ]
+      "name": "OPB",
+      "handle": "@OPB",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Public media · opb.org",
+      "recent_posts": []
     }
   },
   "p3": {
@@ -47,7 +44,7 @@
       "url": "https://www.npr.org/2026/09/14/nx-s1-5955652/nevada-camel-race",
       "before": "",
       "highlight": "The true fake story behind the annual Virginia City Camel Race",
-      "after": "Back in the 1950s, a newspaper editor in Nevada wrote a fake story about a camel race happening in his town as a joke. Eventually, he helped make it a real thing and the annual Virginia City Camel Race was born, which continues to this day. … Bob Richards lied the thing right into existence."
+      "after": "Back in the 1950s, a newspaper editor in Nevada wrote a fake story about a camel race happening in his town as a joke. Eventually, he helped make it a real thing and the annual Virginia City Camel Race was born, which continues to this day."
     },
     "account": {
       "name": "NPR",
@@ -69,13 +66,16 @@
       "after": "There were runners from more than 140 countries competing Sunday, including defending men's Kipruto."
     },
     "account": {
-      "name": "NPR",
-      "handle": "@NPR",
-      "created": null,
-      "followers": null,
-      "verified": true,
-      "bio": "News outlet · npr.org",
-      "recent_posts": []
+      "name": "Finish Line Feed",
+      "handle": "@finishlinefeed",
+      "created": "March 2020",
+      "followers": 9700,
+      "verified": false,
+      "bio": "Running trivia and race-day numbers. 🏃",
+      "recent_posts": [
+        "Marathon pace math: a thread 🧵",
+        "What's your race-day breakfast?"
+      ]
     }
   },
   "p5": {
@@ -88,13 +88,16 @@
       "after": "In the study, the observer mice fought with a mix of aggressive and defensive behaviors, like they had learned tactics from both sides."
     },
     "account": {
-      "name": "NPR",
-      "handle": "@NPR",
-      "created": null,
-      "followers": null,
-      "verified": true,
-      "bio": "News outlet · npr.org",
-      "recent_posts": []
+      "name": "Couch Coach",
+      "handle": "@couchcoach_",
+      "created": "January 2022",
+      "followers": 5400,
+      "verified": false,
+      "bio": "Sports takes from the sofa. 🛋️🏈",
+      "recent_posts": [
+        "Fantasy lineup locked. Snacks loaded.",
+        "Halftime is a sport."
+      ]
     }
   }
 }

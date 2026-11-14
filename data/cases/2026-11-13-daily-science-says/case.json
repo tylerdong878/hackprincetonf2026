@@ -4,6 +4,7 @@
   "title": "Lab Coats and Tall Tales",
   "topic": "Weird science news",
   "briefing": "Science news. Five posts, 0–3 doctored today. A lab coat makes anything sound true. Or false.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",
   "clue_budget": 3,
   "trick_options": [
     "out-of-context-quote",
@@ -15,21 +16,18 @@
     {
       "id": "p1",
       "author": {
-        "name": "NPR",
-        "handle": "@NPR",
+        "name": "Texas Public Radio",
+        "handle": "@TPRNews",
         "kind": "outlet",
         "verified": true,
-        "avatar_color": "#1D4ED8"
+        "avatar_color": "#B45309"
       },
-      "posted_at": "2026-11-09T21:39:35Z",
-      "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
-      "quote": {
-        "text": "We set this up to look a little bit like a gladiator arena, so the mouse is kind of above the two mice fighting on a platform.",
-        "speaker": "Annegret Falkner, Princeton Neuroscience Institute"
-      },
+      "posted_at": "2026-09-22T16:17:00Z",
+      "body": "This 'fire amoeba' pushes the limit of what's possible for complex life",
+      "quote": null,
       "chart": null,
-      "source_label": "NPR · Nov 9, 2026",
-      "card_style": "quote",
+      "source_label": "NPR via Texas Public Radio · Sept 22, 2026",
+      "card_style": "headline",
       "tools": [
         "source",
         "account"
@@ -48,7 +46,7 @@
       "body": "NPR: \"Scientists found ancient remnants of dinosaur blood\" 🦖🩸 Jurassic Park was a documentary.",
       "quote": null,
       "chart": null,
-      "source_label": null,
+      "source_label": "NPR · Nov 9, 2026",
       "card_style": "headline",
       "tools": [
         "source",
@@ -88,10 +86,10 @@
         "avatar_color": "#4F46E5"
       },
       "posted_at": "2026-11-09T13:30:00Z",
-      "body": "NASA is looking for astronauts to live and work on Mars 🚀🔴 Who's applying?",
+      "body": "NASA is looking for astronauts to live and work on Mars 🚀🔴 Applications are open. Who's in?",
       "quote": null,
       "chart": null,
-      "source_label": null,
+      "source_label": "NPR · Nov 8, 2026",
       "card_style": "headline",
       "tools": [
         "source",
@@ -101,14 +99,14 @@
     {
       "id": "p5",
       "author": {
-        "name": "NPR",
-        "handle": "@NPR",
-        "kind": "outlet",
-        "verified": true,
-        "avatar_color": "#1D4ED8"
+        "name": "Launch Pad Lounge",
+        "handle": "@launchpadlounge",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#9333EA"
       },
-      "posted_at": "2026-11-08T23:36:47Z",
-      "body": "The applicant process is extremely competitive. Out of more than 8,000 applicants for NASA's last astronaut class, only 10 candidates were selected.",
+      "posted_at": "2026-11-09T02:10:00Z",
+      "body": "8,000+ applied. TEN got in. 😳🚀 \"Out of more than 8,000 applicants for NASA's last astronaut class, only 10 candidates were selected.\"",
       "quote": null,
       "chart": null,
       "source_label": "NPR · Nov 8, 2026",

@@ -1,20 +1,20 @@
 {
   "p1": {
     "source": {
-      "outlet": "NPR",
-      "date": "2026-11-09",
-      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
-      "before": "Brain scientists set up \"gladiator style\" cage matches for mice — and found that simply observing fighting matches can rewire a mouse's brain to resemble those who actually fought.",
-      "highlight": "We set this up to look a little bit like a gladiator arena, so the mouse is kind of above the two mice fighting on a platform.",
-      "after": "Annegret Falkner is an associate professor at the Princeton Neuroscience Institute. … The paper is published in the journal Nature."
+      "outlet": "Texas Public Radio",
+      "date": "2026-09-22",
+      "url": "https://www.tpr.org/2026-09-22/this-fire-amoeba-pushes-the-limit-of-whats-possible-for-complex-life",
+      "before": "",
+      "highlight": "This 'fire amoeba' pushes the limit of what's possible for complex life",
+      "after": "Introducing Incendiamoeba cascadensis, which translates to \"fire amoeba of the Cascade mountain range.\" This single-celled organism can replicate at temperatures up to 145°F, a new record for a complex organism."
     },
     "account": {
-      "name": "NPR",
-      "handle": "@NPR",
+      "name": "Texas Public Radio",
+      "handle": "@TPRNews",
       "created": null,
       "followers": null,
       "verified": true,
-      "bio": "News outlet · npr.org",
+      "bio": "Public radio · tpr.org",
       "recent_posts": []
     }
   },
@@ -25,7 +25,7 @@
       "url": "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
       "before": "",
       "highlight": "Scientists think they've found ancient remnants of dinosaur blood",
-      "after": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood. … GRICE: So I'm quietly confident that these may be red blood cells. ROTT: Other scientists are not as sure."
+      "after": "GRICE: So I'm quietly confident that these may be red blood cells. ROTT: Other scientists are not as sure."
     },
     "account": {
       "name": "Fossil Fever",
@@ -45,7 +45,7 @@
       "outlet": "NPR",
       "date": "2026-09-29",
       "url": "https://www.npr.org/2026/09/29/nx-s1-5984674/noreaster-exposes-part-of-a-schooner-wrecked-on-nantucket",
-      "before": "That's David Robinson. He's the director of Massachusetts Board of Underwater Archaeological Resources. Part of the Warren Sawyer wreck was exposed back in 2022, and based on what he's seen in photos and on video, he says the new Nantucket wreckage could be more of that schooner. Keywords there, could be.",
+      "before": "Part of the Warren Sawyer wreck was exposed back in 2022, and based on what he's seen in photos and on video, he says the new Nantucket wreckage could be more of that schooner. Keywords there, could be.",
       "highlight": "ROBINSON: Well, I can with 100% confidence tell you that I wouldn't be 100% confident.",
       "after": "And that's because the way that the Warren Sawyer was built, lots of ships were built like that."
     },
@@ -66,7 +66,7 @@
       "url": "https://www.npr.org/2026/11/08/nx-s1-6034002/nasa-astronaut-class-applications-2026",
       "before": "",
       "highlight": "NASA is looking for astronauts to live and work on the Moon",
-      "after": "If you have dreams of going to the moon, you now have a chance. NASA is accepting applications for those interested in becoming an astronaut. The candidates selected to be astronauts would not only test spacecraft but would also live and work on the moon in a future moon base, said NASA Administrator Jared Isaacman in a statement released on Saturday."
+      "after": "The candidates selected to be astronauts would not only test spacecraft but would also live and work on the moon in a future moon base, said NASA Administrator Jared Isaacman in a statement released on Saturday."
     },
     "account": {
       "name": "Orbit Daily",
@@ -91,13 +91,16 @@
       "after": "While any U.S. citizen can apply and there is no official age restriction, applicants will need to have a master's degree in a STEM-related field such as engineering or math."
     },
     "account": {
-      "name": "NPR",
-      "handle": "@NPR",
-      "created": null,
-      "followers": null,
-      "verified": true,
-      "bio": "News outlet · npr.org",
-      "recent_posts": []
+      "name": "Launch Pad Lounge",
+      "handle": "@launchpadlounge",
+      "created": "August 2026",
+      "followers": 2900,
+      "verified": false,
+      "bio": "Space hype. All caps. Zero chill. 🚀",
+      "recent_posts": [
+        "THE MOON IS SO BACK 🌕",
+        "Rate tonight's launch 1-10 🚀"
+      ]
     }
   }
 }

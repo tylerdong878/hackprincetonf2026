@@ -7,13 +7,18 @@ doctored posts are built only by the allowed operations on bank text (crop = del
 one number/date/place in a real headline, cherry-picked stat = drop context, misleading chart = axis/window on
 real data), and they are always posted by made-up accounts (author.kind "person").
 
+Sunday 2026-11-15 (judging day) is the "HackPrinceton Special". So that the poster never gives the answer away,
+every day also has at least one REAL post from a made-up account (a verbatim excerpt or exact public numbers,
+with a correct source_label), and the fakes don't share one voice.
+
 Run:
   uv run python scripts/build_daily_cases.py            # write data/cases/<daily ids>/ and data/fool_deck/*.json
   uv run python scripts/build_daily_cases.py --verify   # also re-fetch every source URL and confirm each
                                                        # excerpt is still on the page (needs network)
 
-The script also runs offline self-checks (deletion-only crops, detail swaps, axis/data consistency, tools vs.
-evidence, 0-3 doctored per day, ...) and refuses to write anything if one fails.
+The script also runs offline self-checks (deletion-only crops, detail swaps, honest chart diffs whose months the
+tell names, axis/data consistency, tools vs. evidence, 0-3 doctored per day, a real made-up-account post per day,
+excerpt length, ellipsis fairness, the case notice, ...) and refuses to write anything if one fails.
 """
 
 from __future__ import annotations
@@ -35,6 +40,10 @@ DECK = ROOT / "data" / "fool_deck"
 CREATED_AT = "2026-11-14T08:00:00Z"
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 ALL_TRICKS = ["out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail"]
+# Case-level notice (CONTRACT §2.1 extra field). Same text on every case, clean or not, so it reveals nothing.
+NOTICE = "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal."
+# Earlier builds of this script wrote these folders; they are removed so no stale daily is served.
+STALE_CASE_DIRS = ["2026-11-15-daily-your-bills"]
 
 
 # ======================================================================================
@@ -57,8 +66,6 @@ S = {
     "njm_1112": Src("New Jersey Monitor", "2026-11-12", "2026-11-12T20:18:21Z",
                     "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
                     "New Jersey Monitor · Nov 12, 2026"),
-    "bpu_0813": Src("NJ Board of Public Utilities", "2026-08-13", "2026-08-13T16:00:00Z",
-                    "https://nj.gov/bpu/newsroom/2026/approved/20260813.html", "NJBPU press release · Aug 13, 2026"),
     "npr_mice": Src("NPR", "2026-11-09", "2026-11-09T21:39:35Z",
                     "https://www.npr.org/2026/11/09/nx-s1-6027938/"
                     "mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds", "NPR · Nov 9, 2026"),
@@ -88,17 +95,29 @@ S = {
     "npr_marathon": Src("NPR", "2026-11-01", "2026-11-01T17:33:21Z",
                         "https://www.npr.org/2026/11/01/nx-s1-6025437/new-york-marathon-almgren-chepkirui-win",
                         "NPR · Nov 1, 2026"),
+    # NPR story as published by member station Texas Public Radio (byline "NPR | By Ari Daniel"; the page shows
+    # "Published September 22, 2026 at 11:17 AM CDT", used as posted_at).
+    "tpr_amoeba": Src("Texas Public Radio", "2026-09-22", "2026-09-22T16:17:00Z",
+                      "https://www.tpr.org/2026-09-22/"
+                      "this-fire-amoeba-pushes-the-limit-of-whats-possible-for-complex-life",
+                      "NPR via Texas Public Radio · Sept 22, 2026"),
+    # Associated Press story as published by OPB (we never fetch apnews.com, which refuses scripted fetching).
+    "opb_owls": Src("OPB", "2026-10-16", "2026-10-16T19:40:07Z",
+                    "https://www.opb.org/article/2026/10/16/"
+                    "a-rare-family-of-barn-owls-moved-into-manhattan-captivating-new-yorkers/",
+                    "OPB (AP) · Oct 16, 2026"),
     "nj1015_boss": Src("New Jersey 101.5", "2026-11-13", "2026-11-13T21:08:49Z",
                        "https://nj1015.com/bruce-springsteen-jaws-grievance/", "New Jersey 101.5 · Nov 13, 2026"),
-    "nj1015_bridge": Src("New Jersey 101.5", "2026-11-12", "2026-11-12T20:49:22Z",
-                         "https://nj1015.com/ixp/942/p/tacony-palmyra-bridge-closed-ship-crash/",
-                         "New Jersey 101.5 · Nov 12, 2026"),
     "nj1015_seals": Src("New Jersey 101.5", "2026-11-12", "2026-11-12T14:56:26Z",
                         "https://nj1015.com/ixp/393/p/jon-stewart-seals/", "New Jersey 101.5 · Nov 12, 2026"),
     "nj1015_drivers": Src("New Jersey 101.5", "2026-11-13", "2026-11-14T00:43:04Z",
                           "https://nj1015.com/new-jersey-worst-drivers-2/", "New Jersey 101.5 · Nov 13, 2026"),
     "whyy_victor": Src("WHYY", "2026-11-02", "2026-11-02T10:00:04Z",
                        "https://whyy.org/articles/new-jersey-music-recording-camden-rca-victor/", "WHYY · Nov 2, 2026"),
+    # Associated Press story as published by WHYY.
+    "whyy_microbe": Src("WHYY", "2019-05-11", "2019-05-11T18:00:18Z",
+                        "https://whyy.org/articles/new-jersey-gets-official-state-microbe-streptomyces-griseus/",
+                        "WHYY (AP) · May 11, 2019"),
 }
 
 EIA_URL = "https://www.eia.gov/electricity/data/browser/"
@@ -144,13 +163,6 @@ BANK: dict[str, tuple[str, str]] = {
                              "Charge components and lost sales related to energy efficiency and conservation "
                              "programs, leaving the average monthly bill 5 cents cheaper than before."),
     # --- New Jersey Monitor, Nov 12, 2026 ---
-    "VPP_HEADLINE": ("njm_1112", "NJ regulators approve virtual power plant, battery storage programs"),
-    "VPP_LEDE": ("njm_1112", "The Board of Public Utilities on Thursday unanimously approved the launch of an "
-                             "interim virtual power plant program and the next phase of the state's energy storage "
-                             "program."),
-    "VPP_EXPLAIN": ("njm_1112", "Virtual power plants seek to remotely reduce the power draw of certain devices, like "
-                                "smart thermostats or electric vehicle chargers, during the parts of the day that grid "
-                                "demand is highest and compensate ratepayers for their reduced electricity use."),
     "REBHORN": ("njm_1112", "I don't know if everyone in New Jersey understands, but it is the most expensive hours of "
                             "the year that are driving the really unsustainable price hikes in the utility and "
                             "electricity bills that we saw in the last few years"),
@@ -162,14 +174,6 @@ BANK: dict[str, tuple[str, str]] = {
                                    "electric distribution companies."),
     "REBHORN_AFTER": ("njm_1112", "The order approved by the BPU Thursday requires the state's four regulated "
                                   "utilities to stand up their interim virtual power plant programs by Oct. 1, 2027."),
-    # --- NJ Board of Public Utilities press release, Aug 13, 2026 ---
-    "BPU_20PCT": ("bpu_0813", "New Jersey electricity bills jumped roughly 20 percent last year, driven in large part "
-                              "by rising costs in PJM's capacity market."),
-    "BPU_20PCT_BEFORE": ("bpu_0813", "The report, required by the New Jersey Legislature and delivered to Governor "
-                                     "Sherrill and lawmakers, comes as"),
-    "BPU_20PCT_AFTER": ("bpu_0813", "PJM Interconnection is the regional transmission organization responsible for "
-                                    "coordinating the movement of wholesale electricity and managing grid reliability "
-                                    "across 13 states, including New Jersey and the District of Columbia."),
     # --- NPR, Nov 9, 2026: mice ---
     "MICE_HEADLINE": ("npr_mice", "Mice can learn to fight by watching tiny rodent cage matches, study finds"),
     "MICE_SUMMARY": ("npr_mice", "Brain scientists set up \"gladiator style\" cage matches for mice — and found that "
@@ -188,14 +192,10 @@ BANK: dict[str, tuple[str, str]] = {
                                       "behaviors, like they had learned tactics from both sides."),
     # --- NPR, Nov 9, 2026: dinosaur blood ---
     "DINO_HEADLINE": ("npr_dino", "Scientists think they've found ancient remnants of dinosaur blood"),
-    "DINO_SUMMARY": ("npr_dino", "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some "
-                                 "think they've found their strongest evidence yet of dinosaur blood."),
     "DINO_DOUBT": ("npr_dino", "GRICE: So I'm quietly confident that these may be red blood cells. ROTT: Other "
                                "scientists are not as sure."),
     # --- NPR, Nov 8, 2026: NASA astronauts ---
     "MOON_HEADLINE": ("npr_moon", "NASA is looking for astronauts to live and work on the Moon"),
-    "MOON_LEDE": ("npr_moon", "If you have dreams of going to the moon, you now have a chance. NASA is accepting "
-                              "applications for those interested in becoming an astronaut."),
     "MOON_BASE": ("npr_moon", "The candidates selected to be astronauts would not only test spacecraft but would also "
                               "live and work on the moon in a future moon base, said NASA Administrator Jared Isaacman "
                               "in a statement released on Saturday."),
@@ -204,20 +204,25 @@ BANK: dict[str, tuple[str, str]] = {
                                "astronauts, according to the agency."),
     "NASA_8000": ("npr_moon", "The applicant process is extremely competitive. Out of more than 8,000 applicants for "
                               "NASA's last astronaut class, only 10 candidates were selected."),
+    "NASA_ODDS": ("npr_moon", "Out of more than 8,000 applicants for NASA's last astronaut class, only 10 candidates "
+                              "were selected."),
     "NASA_AFTER": ("npr_moon", "While any U.S. citizen can apply and there is no official age restriction, applicants "
                                "will need to have a master's degree in a STEM-related field such as engineering or "
                                "math."),
     # --- NPR, Sept 29, 2026: Nantucket schooner ---
     "SCHOONER_HEADLINE": ("npr_schooner", "Nor'easter exposes part of a schooner wrecked on Nantucket"),
-    "ROBINSON_BEFORE": ("npr_schooner", "That's David Robinson. He's the director of Massachusetts Board of Underwater "
-                                        "Archaeological Resources. Part of the Warren Sawyer wreck was exposed back in "
-                                        "2022, and based on what he's seen in photos and on video, he says the new "
-                                        "Nantucket wreckage could be more of that schooner. Keywords there, could be."),
+    "ROBINSON_WRECK": ("npr_schooner", "Part of the Warren Sawyer wreck was exposed back in 2022, and based on what "
+                                       "he's seen in photos and on video, he says the new Nantucket wreckage could be "
+                                       "more of that schooner. Keywords there, could be."),
     "ROBINSON": ("npr_schooner", "Well, I can with 100% confidence tell you that I wouldn't be 100% confident."),
     "ROBINSON_AFTER": ("npr_schooner", "And that's because the way that the Warren Sawyer was built, lots of ships were "
                                        "built like that."),
     # --- NPR, Oct 20, 2026: five grocery items ---
     "GROCERY_HEADLINE": ("npr_grocery", "Why these 5 everyday items fluctuate in price at the grocery store"),
+    "BEEF_RISE": ("npr_grocery", "The cost of ground beef has been on the rise for years, largely due to weather and "
+                                 "financial pressures on producers."),
+    "BEEF_STAT": ("npr_grocery", "A typical pound of ground beef last month cost $6.79, an 85% jump from a decade "
+                                 "earlier, according to the Bureau of Labor Statistics."),
     "BUTTER": ("npr_grocery", "A pound of butter averaged $3.96 in September. That was down 17.3% since last year, "
                               "bucking the trend of rising food prices."),
     "BUTTER_AFTER": ("npr_grocery", "Interest in butter has spread recently, nourishing a strong demand for the dairy "
@@ -253,13 +258,14 @@ BANK: dict[str, tuple[str, str]] = {
     "CAMEL_SUMMARY": ("npr_camel", "Back in the 1950s, a newspaper editor in Nevada wrote a fake story about a camel "
                                    "race happening in his town as a joke. Eventually, he helped make it a real thing "
                                    "and the annual Virginia City Camel Race was born, which continues to this day."),
-    "CAMEL_KICKER": ("npr_camel", "Bob Richards lied the thing right into existence."),
     # --- NPR, Nov 1, 2026: NYC Marathon ---
     "MARATHON_BEFORE": ("npr_marathon", "It was the 50th time that the race has run through all five boroughs of the "
                                         "city."),
     "MARATHON_STAT": ("npr_marathon", "There were just over 2,000 competitors in 1976, the seventh running of the "
                                       "race, including only 88 women. About 60,000 runners stepped up to the starting "
                                       "line Sunday, with nearly half of them women."),
+    "MARATHON_1976": ("npr_marathon", "There were just over 2,000 competitors in 1976, the seventh running of the "
+                                      "race, including only 88 women."),
     "MARATHON_AFTER": ("npr_marathon", "There were runners from more than 140 countries competing Sunday, including "
                                        "defending men's Kipruto."),
     # --- New Jersey 101.5 ---
@@ -274,11 +280,6 @@ BANK: dict[str, tuple[str, str]] = {
     "BOSS_QUOTE_PARA": ("nj1015_boss", "“In June of 1975 I went to a small theater directly across from the Atlantic "
                                        "Ocean and I saw 'Jaws.' I was 25 years old and one of the great pleasures on "
                                        "the Jersey shore in 1975 was night swimming,” Bruce said."),
-    "BRIDGE_HEADLINE": ("nj1015_bridge", "Cargo Ship Crashes Into Tacony-Palmyra Bridge Causing It to Be Stuck Open"),
-    "BRIDGE_REPORT": ("nj1015_bridge", "There are very early reports that a cargo ship has crashed into the "
-                                       "Tacony-Palmyra Bridge this afternoon. As a result of the crash the bridge is "
-                                       "unable to close, officials say."),
-    "BRIDGE_SAFE": ("nj1015_bridge", "The good news is that there were no reported injuries in the incident."),
     "SEALS_HEADLINE": ("nj1015_seals", "Jon Stewart Heralds the Return of the Sandy Hook Seals"),
     "SEALS_QUOTE": ("nj1015_seals", "New pal alert!! Jersey Shore Novembers!!!"),
     "SEALS_PARA": ("nj1015_seals", "Comedian and New Jersey native Jon Stewart shared a video on Instagram Wednesday "
@@ -287,11 +288,10 @@ BANK: dict[str, tuple[str, str]] = {
                                    "the clip may be shot."),
     "SEALS_AFTER": ("nj1015_seals", "Clearly, Jon Stewart spotted one of the Sandy Hook seals, and we can head back "
                                     "home for Thanksgiving with joy in our hearts."),
-    "DRIVERS_STAT": ("nj1015_drivers", "A new study from LendingTree ranks New Jersey number one for the worst drivers "
-                                       "in the country. According to the study, New Jersey drivers recorded 56.9 "
-                                       "driving incidents per 1,000 drivers through August 2026."),
-    "DRIVERS_AFTER": ("nj1015_drivers", "That includes accidents, DUIs, speeding-related incidents and other traffic "
-                                        "citations."),
+    "DRIVERS_RANK": ("nj1015_drivers", "A new study from LendingTree ranks New Jersey number one for the worst drivers "
+                                       "in the country."),
+    "DRIVERS_RATE": ("nj1015_drivers", "According to the study, New Jersey drivers recorded 56.9 driving incidents per "
+                                       "1,000 drivers through August 2026."),
     "DRIVERS_CAVEAT": ("nj1015_drivers", "To be fair, LendingTree's study is based on insurance inquiry data from "
                                          "QuoteWizard, not some nationwide experiment in which researchers actually "
                                          "put drivers behind the wheel and watched them attempt to navigate the "
@@ -303,7 +303,28 @@ BANK: dict[str, tuple[str, str]] = {
                                    "few miles from where the stereo and TV equipment maker was born in Camden."),
     "VICTOR_PIANO": ("whyy_victor", "The museum also has one of the earliest electric pianos from the 1930s, which "
                                     "sort of works."),
+    # --- WHYY (Associated Press), May 11, 2019: state microbe. The page's "discovered ... in 1916" line is left
+    # out on purpose (the discovery history is disputed). ---
+    "MICROBE_HEADLINE": ("whyy_microbe", "New Jersey gets official state microbe: Streptomyces griseus"),
+    "MICROBE_LEDE": ("whyy_microbe", "A microorganism that played a role in treating tuberculosis is now officially "
+                                     "recognized as New Jersey's state microbe."),
+    "MICROBE_SIGNED": ("whyy_microbe", "Gov. Phil Murphy signed a bill Friday giving the distinction to Streptomyces "
+                                       "griseus."),
+    # --- NPR via Texas Public Radio, Sept 22, 2026: fire amoeba ---
+    "AMOEBA_HEADLINE": ("tpr_amoeba", "This 'fire amoeba' pushes the limit of what's possible for complex life"),
+    "AMOEBA_LEDE": ("tpr_amoeba", "Introducing Incendiamoeba cascadensis, which translates to \"fire amoeba of the "
+                                  "Cascade mountain range.\" This single-celled organism can replicate at temperatures "
+                                  "up to 145°F, a new record for a complex organism."),
+    # --- OPB (Associated Press), Oct 16, 2026: barn owls. Residents named in the story are left out. ---
+    "OWLS_HEADLINE": ("opb_owls", "A rare family of barn owls moved into Manhattan's Upper West Side. New Yorkers are "
+                                  "captivated"),
+    "OWLS_LEDE": ("opb_owls", "Manhattan's Upper West Side has been reveling in the company of its latest celebrities: "
+                              "A family of barn owls nested in a water tower atop a building near Central Park."),
+    "OWLS_FIRST": ("opb_owls", "This is the first documented instance of barn owls nesting in Manhattan in modern "
+                               "history, according to one expert, and the owls have attracted nightly crowds of "
+                               "people in the street eager to get a glimpse of the elusive birds."),
 }
+HEADLINE_KEYS = {k for k in BANK if k.endswith("_HEADLINE")}
 
 
 def t(key: str) -> str:
@@ -368,6 +389,8 @@ OUTLETS = {
     "NPR": ("@NPR", "outlet", "#1D4ED8", "News outlet · npr.org"),
     "New Jersey 101.5": ("@nj1015", "outlet", "#DC2626", "Radio news · nj1015.com"),
     "WHYY": ("@WHYY", "outlet", "#7C3AED", "Public media · whyy.org"),
+    "Texas Public Radio": ("@TPRNews", "outlet", "#B45309", "Public radio · tpr.org"),
+    "OPB": ("@OPB", "outlet", "#0369A1", "Public media · opb.org"),
     "U.S. Energy Information Administration": ("@EIAgov", "official", "#0E7490",
                                                "Federal energy statistics agency · eia.gov"),
     "U.S. Bureau of Labor Statistics": ("@BLS_gov", "official", "#0F766E", "Federal statistics agency · bls.gov"),
@@ -405,30 +428,49 @@ class Persona:
                 "verified": False, "bio": self.bio, "recent_posts": list(self.recent)}
 
 
-P_BILLWATCH = Persona("Jersey Bill Watch", "@jerseybills", "#E3A42B", "October 2026", 1840,
+# Account age, follower count and voice are deliberately mixed between fakes and real posts, so none of them
+# gives the answer away. Names are invented handles, never realistic personal names.
+# --- accounts that post doctored cards ---
+P_BILLWATCH = Persona("Jersey Bill Watch", "@jerseybills", "#E3A42B", "October 2026", 1840,     # alarmist
                       "Exposing what they don't want you to know about your bills.",
                       ("Your utility bill is a SCAM. Thread \U0001F9F5", "Share before they delete this!"))
-P_RATERELIEF = Persona("Rate Relief NJ", "@ratereliefnj", "#65A30D", "September 2026", 5120,
-                       "Good news about your bills, every day. \u2600\ufe0f",
-                       ("Your bills are going DOWN. Here's proof \U0001F447", "Thank us later."))
-P_FOSSIL = Persona("Fossil Fever", "@fossilfever", "#EA580C", "September 2026", 2310,
+P_CHECKOUT = Persona("Checkout Lane", "@checkoutlane", "#475569", "February 2020", 15300,       # plain, newsy
+                     "Grocery news, no fluff. 🛒",
+                     ("Unit price beats sticker price. Every time.", "This week's store-brand swaps 🧵"))
+P_FOSSIL = Persona("Fossil Fever", "@fossilfever", "#EA580C", "September 2026", 2310,           # jokey
                    "Dinosaurs, daily. Mostly vibes. \U0001F996",
                    ("T. rex could outrun your car. Probably.", "Like if you'd ride a raptor \U0001F996"))
-P_ORBIT = Persona("Orbit Daily", "@orbitdaily_", "#4F46E5", "June 2019", 48200,
+P_ORBIT = Persona("Orbit Daily", "@orbitdaily_", "#4F46E5", "June 2019", 48200,                 # calm, established
                   "Space news, fast. Launch alerts and sky-watching tips.",
                   ("Starship update thread \U0001F9F5", "Moon, Venus and Spica tonight. Look up!"))
-P_CLUCK = Persona("Cluck Report", "@cluckreport", "#DB2777", "October 2026", 912,
+P_CLUCK = Persona("Cluck Report", "@cluckreport", "#DB2777", "October 2026", 912,                # alarmist
                   "Exposing Big Egg. \U0001F95A",
                   ("They don't want you to know what's in the carton.", "Share before the price goes up again!"))
-P_TRICKCHEAT = Persona("Trick or Cheat", "@trickorcheat", "#E3A42B", "October 2026", 3400,
-                       "Halloween is a scam and I can prove it \U0001F383",
-                       ("Full-size bars are a myth now.", "Retweet if your bag was 50% raisins."))
-P_AISLE7 = Persona("Aisle Seven Alex", "@aisle7alex", "#0891B2", "May 2018", 640,
-                   "Grocery data nerd. Every number links to BLS.",
-                   ("BLS average price data drops monthly. Mark your calendar.", "Unit prices or it didn't happen."))
-P_SHELF = Persona("Shelf Life", "@shelflifereads", "#8B5CF6", "April 2021", 12800,
+P_SPOOKY = Persona("Spooky Budget", "@spookybudget", "#7C2D12", "August 2023", 6300,             # calm, practical
+                   "Holiday shopping on a budget. Lists, deals, receipts. \U0001F383",
+                   ("Costumes under $20: a thread \U0001F9F5", "Buy the candy on Nov 1. Trust me."))
+P_SHELF = Persona("Shelf Life", "@shelflifereads", "#8B5CF6", "April 2021", 12800,              # cozy
                   "Book news & library lore \U0001F4DA",
                   ("Your library card is a superpower.", "Name a book you never returned. I'll wait."))
+P_FINISH = Persona("Finish Line Feed", "@finishlinefeed", "#0F766E", "March 2020", 9700,         # trivia
+                   "Running trivia and race-day numbers. \U0001F3C3",
+                   ("Marathon pace math: a thread \U0001F9F5", "What's your race-day breakfast?"))
+# --- accounts that post REAL cards (verbatim excerpts or exact public numbers, with a correct source_label) ---
+P_LAUNCHPAD = Persona("Launch Pad Lounge", "@launchpadlounge", "#9333EA", "August 2026", 2900,   # hype
+                      "Space hype. All caps. Zero chill. \U0001F680",
+                      ("THE MOON IS SO BACK \U0001F315", "Rate tonight's launch 1-10 \U0001F680"))
+P_GRILL = Persona("Grill Sergeant", "@grillsergeant", "#B91C1C", "July 2026", 1150,             # hype
+                  "Burgers, briskets and loud opinions. \U0001F525",
+                  ("Ketchup on a hot dog? Absolutely not.", "Who's grilling this weekend? \U0001F525"))
+P_BREW = Persona("Brew Ha-Ha", "@brewhaha_daily", "#92400E", "October 2026", 310,                # hype, brand new
+                 "Coffee facts that sound fake. \u2615",
+                 ("Rate my latte art. Be gentle. \u2615", "Coffee math thread tonight \U0001F9F5"))
+P_JUGHANDLE = Persona("Jughandle Jury", "@jughandlejury", "#CA8A04", "September 2026", 780,      # sassy
+                      "Jersey roads, judged. \U0001F697",
+                      ("Left turn from the right lane. Only in Jersey.", "Rate your commute 1-10. Mine's a 2."))
+P_COUCH = Persona("Couch Coach", "@couchcoach_", "#2563EB", "January 2022", 5400,               # playful
+                  "Sports takes from the sofa. \U0001F6CB\ufe0f\U0001F3C8",
+                  ("Fantasy lineup locked. Snacks loaded.", "Halftime is a sport."))
 
 
 # ======================================================================================
@@ -455,6 +497,11 @@ def outlet_post(pid: str, skey: str, card_style: str, before: str, highlight: st
     return post(pid, outlet_author(s.outlet), s.published, card_style, ev, source_label=s.label, **kw)
 
 
+def made_up(pid: str, who: Persona, posted_at: str, card_style: str, ev: dict, **kw) -> tuple[dict, dict]:
+    """A post from a made-up account (real or doctored). `ev` holds source and/or data; the account card is added."""
+    return post(pid, who.author(), posted_at, card_style, dict(ev, account=who.account()), **kw)
+
+
 def real(explanation: str, false_alarm: str, suspicious: bool = False) -> dict:
     return {"doctored": False, "suspicious_real": suspicious, "explanation": explanation,
             "con_line_false_alarm": false_alarm}
@@ -474,8 +521,8 @@ def assemble(cid: str, number: int, date: str, theme: str, title: str, topic: st
         evidence[p["id"]] = ev
         keys[p["id"]] = ans
     doctored = [a for a in keys.values() if a["doctored"]]
-    case = {"id": cid, "number": number, "title": title, "topic": topic, "briefing": briefing, "clue_budget": 3,
-            "trick_options": ALL_TRICKS, "posts": posts}
+    case = {"id": cid, "number": number, "title": title, "topic": topic, "briefing": briefing, "notice": NOTICE,
+            "clue_budget": 3, "trick_options": ALL_TRICKS, "posts": posts}
     answer_key = {"clean_case": not doctored, "posts": keys, "con_line_clean": con_line_clean}
     urls = []
     for ev in evidence.values():
@@ -496,50 +543,55 @@ def day_science() -> tuple:
     moon_shown = "NASA is looking for astronauts to live and work on Mars"
     dino_shown = "Scientists found ancient remnants of dinosaur blood"
     items = [
-        (outlet_post("p1", "npr_mice", "quote", t("MICE_SUMMARY"), t("FALKNER_ARENA"),
-                     cat("FALKNER_ROLE", "MICE_NATURE"), body=t("MICE_HEADLINE"),
-                     quote={"text": t("FALKNER_ARENA"), "speaker": "Annegret Falkner, Princeton Neuroscience Institute"}),
-         real("Sounds like a parody, but it's word for word from NPR. Princeton neuroscientists really staged "
-              "'gladiator style' mouse fights, and the paper is in Nature.",
-              "Real. Princeton built a mouse colosseum, and I didn't have to invent a thing.", suspicious=True)),
-        (post("p2", P_FOSSIL.author(), "2026-11-10T14:05:00Z", "headline",
-              {"source": src_ev("npr_dino", "", t("DINO_HEADLINE"), cat("DINO_SUMMARY", "DINO_DOUBT")),
-               "account": P_FOSSIL.account()},
-              body=f"NPR: \"{dino_shown}\" \U0001F996\U0001FA78 Jurassic Park was a documentary."),
+        (outlet_post("p1", "tpr_amoeba", "headline", "", t("AMOEBA_HEADLINE"), t("AMOEBA_LEDE"),
+                     body=t("AMOEBA_HEADLINE")),
+         real("Real, word for word from NPR's story as published by Texas Public Radio. Researchers named it "
+              "Incendiamoeba cascadensis, the 'fire amoeba,' and it can replicate at up to 145°F, a new record for a "
+              "complex organism.",
+              "Real. A blob that thrives at 145°F. I couldn't invent that, and I'd love the credit.", suspicious=True)),
+        (made_up("p2", P_FOSSIL, "2026-11-10T14:05:00Z", "headline",
+                 {"source": src_ev("npr_dino", "", t("DINO_HEADLINE"), t("DINO_DOUBT"))},
+                 body=f"NPR: \"{dino_shown}\" \U0001F996\U0001FA78 Jurassic Park was a documentary.",
+                 source_label=S["npr_dino"].label),
          fake("out-of-context-quote",
               "NPR's headline says scientists think they've found dinosaur blood. Two words were cut, and the doubt "
               "went with them.",
-              "The real headline is 'Scientists think they've found ancient remnants of dinosaur blood.' The lead "
-              "researcher is 'quietly confident,' and other scientists 'are not as sure.' Delete 'think they've' and "
-              "a maybe becomes a fact.",
-              "Two words. That was all the doubt there was, and I deleted it.",
-              "You noticed the missing 'think.' Scientists would be proud. I'm annoyed.",
+              "The real headline is 'Scientists think they've found ancient remnants of dinosaur blood.' In the "
+              "story, the lead researcher is 'quietly confident' and other scientists 'are not as sure.' Delete "
+              "'think they've' and a maybe becomes a fact.",
+              "Two words. I deleted 'think they've' and kept the dinosaur. I'm framing this.",
+              "You noticed 'think they've' was gone, and the doubt with it. Scientists would be proud. "
+              "I'm merely impressed.",
               {"type": "quote", "shown": dino_shown, "original": t("DINO_HEADLINE"), "removed": ["think they've"]})),
-        (outlet_post("p3", "npr_schooner", "quote", t("ROBINSON_BEFORE"), "ROBINSON: " + t("ROBINSON"),
+        (outlet_post("p3", "npr_schooner", "quote", t("ROBINSON_WRECK"), "ROBINSON: " + t("ROBINSON"),
                      t("ROBINSON_AFTER"), body=t("SCHOONER_HEADLINE"),
                      quote={"text": t("ROBINSON"),
                             "speaker": "David Robinson, Massachusetts Board of Underwater Archaeological Resources"}),
-         real("It sounds like a joke someone wrote for him, but it's word for word from NPR. He's an underwater "
-              "archaeologist being honest about how hard it is to name a 19th-century wreck from photos.",
-              "Real. An expert admitting doubt is a good sign, not a con.", suspicious=True)),
-        (post("p4", P_ORBIT.author(), "2026-11-09T13:30:00Z", "headline",
-              {"source": src_ev("npr_moon", "", t("MOON_HEADLINE"), f"{t('MOON_LEDE')} {t('MOON_BASE')}"),
-               "account": P_ORBIT.account()},
-              body=f"{moon_shown} \U0001F680\U0001F534 Who's applying?"),
+         real("It sounds like a line someone wrote for him, but it's word for word from NPR. He's an underwater "
+              "archaeologist being honest about how hard it is to identify a wreck from photos and video.",
+              "Real. An expert admitting doubt is the opposite of my whole act. Get your own material.",
+              suspicious=True)),
+        (made_up("p4", P_ORBIT, "2026-11-09T13:30:00Z", "headline",
+                 {"source": src_ev("npr_moon", "", t("MOON_HEADLINE"), t("MOON_BASE"))},
+                 body=f"{moon_shown} \U0001F680\U0001F534 Applications are open. Who's in?",
+                 source_label=S["npr_moon"].label),
          fake("edited-detail",
               "NPR's headline says the Moon, not Mars. One place was swapped.",
               "The real story: NASA wants astronauts who 'would also live and work on the moon in a future moon "
               "base.' Swapping one place name turns a real job posting into science fiction, and the old, busy "
               "account makes it look trustworthy.",
-              "Same headline, one swapped world. The Moon is so last century.",
-              "Fine, it's the Moon. I was aiming higher.",
+              "One word. Moon became Mars. Same job, longer commute. I'm framing this.",
+              "Mars, caught. NASA said the Moon. I was aiming higher; you were aiming correctly.",
               {"type": "detail", "shown": moon_shown, "original": t("MOON_HEADLINE"),
                "changed": [{"from": "the Moon", "to": "Mars"}]})),
-        (outlet_post("p5", "npr_moon", "stat", t("NASA_CORPS"), t("NASA_8000"), t("NASA_AFTER"),
-                     body=t("NASA_8000")),
-         real("Word for word from NPR. More than 8,000 people applied for NASA's last astronaut class and 10 were "
-              "picked, roughly 1 in 800.",
-              "Real. A big number with a clear 'out of' is the honest kind.")),
+        (made_up("p5", P_LAUNCHPAD, "2026-11-09T02:10:00Z", "stat",
+                 {"source": src_ev("npr_moon", t("NASA_CORPS"), t("NASA_8000"), t("NASA_AFTER"))},
+                 body=f"8,000+ applied. TEN got in. \U0001F633\U0001F680 \"{t('NASA_ODDS')}\"",
+                 source_label=S["npr_moon"].label),
+         real("Real. The account is new and very loud, but the sentence is word for word from NPR, with the source "
+              "linked: out of more than 8,000 applicants for NASA's last astronaut class, 10 were picked.",
+              "That one was real. All caps, zero chill, every number correct. Doubting the truth is my job.",
+              suspicious=True)),
     ]
     return assemble("2026-11-13-daily-science-says", 3, "2026-11-13", "Science Says", "Lab Coats and Tall Tales",
                     "Weird science news",
@@ -547,31 +599,33 @@ def day_science() -> tuple:
                     "medium", items)
 
 
-def day_food(eggs: dict, coffee: dict, beef: dict, butter: dict) -> tuple:
+def day_food(eggs: dict, beef: dict, butter: dict) -> tuple:
     jun26, oct26, sep25, sep26 = eggs["2026-06"], eggs["2026-10"], eggs["2025-09"], eggs["2026-09"]
     record = max((v, k) for k, v in eggs.items() if k >= "2024-01")
     rise, yoy = pct(jun26, oct26), pct(sep25, sep26)
     assert record == (6.227, "2025-03") and rise == 8.4 and yoy == -34.9, (record, rise, yoy)
     egg_shown = bars("Average price, a dozen eggs", "$/dozen", [(label("2026-06"), jun26), (label("2026-10"), oct26)],
                      y_min=2.1, y_max=2.35)
-    egg_honest = bars("Same month, one year apart", "$/dozen", [(label("2025-09"), sep25), (label("2026-09"), sep26)])
+    # The honest comparison the tell names: the same month a year apart, axis from zero.
+    egg_honest = bars("Same month a year apart, axis from $0", "$/dozen",
+                      [(label("2025-09"), sep25), (label("2026-09"), sep26)])
     egg_rows = series(eggs, "2024-01", "2026-10")
     egg_data = {"title": "Average price: eggs, grade A, large, per dozen, U.S. city average (BLS, via FRED)",
                 "unit": "$/dozen", "url": FRED["eggs"][1], "table": egg_rows,
                 "honest_chart": line("Eggs, monthly average price (BLS)", "$/dozen", series(eggs, "2023-01", "2026-10")),
-                "note": (f"Record: ${record[0]} in Mar 2025. September to September, a dozen fell from ${sep25} to "
+                "note": (f"Record: ${record[0]} in Mar 2025. Sep 2025 to Sep 2026, a dozen fell from ${sep25} to "
                          f"${sep26} ({yoy}%). BLS published no Oct 2025 value.")}
-    # Coffee vs. ground beef: an honest chart from a made-up but careful account.
-    c10, b10 = coffee["2026-10"], beef["2026-10"]
-    always = all(coffee[m] > beef[m] for m in beef if m >= "2022-01" and m in coffee)
-    assert always and (c10, b10) == (9.249, 6.755)
-    cb_chart = bars("Average price per pound, Oct 2026", "$/lb", [("Coffee", c10), ("Ground beef", b10)])
-    cb_table = ([{"label": f"Coffee {m}", "value": coffee[m]} for m in ("2026-08", "2026-09", "2026-10")]
-                + [{"label": f"Ground beef {m}", "value": beef[m]} for m in ("2026-08", "2026-09", "2026-10")])
-    cb_data = {"title": "BLS average prices per pound, U.S. city average (via FRED)", "unit": "$/lb",
-               "url": FRED["coffee"][1], "table": cb_table, "honest_chart": cb_chart,
-               "note": ("Coffee = 100% ground roast; ground beef = 100% beef (FRED series APU0000717311 and "
-                        "APU0000703112). Coffee has cost more per pound than ground beef every month since Jan 2022.")}
+    # Ground beef: a real NPR sentence posted by a loud made-up account; BLS data backs every number.
+    b16, b26 = beef["2016-09"], beef["2026-09"]
+    beef_pct = pct(b16, b26)
+    assert round(b26, 2) == 6.79 and 85 <= beef_pct < 86, (b16, b26, beef_pct)
+    beef_data = {"title": "Average price: ground beef, 100% beef, per pound, U.S. city average (BLS, via FRED)",
+                 "unit": "$/lb", "url": FRED["beef"][1],
+                 "table": [{"label": m, "value": beef[m]} for m in ("2016-09", "2025-09", "2026-09")],
+                 "honest_chart": bars("Ground beef, Sep 2016 vs. Sep 2026", "$/lb",
+                                      [(label("2016-09"), b16), (label("2026-09"), b26)]),
+                 "note": (f"Sep 2016 to Sep 2026: ${b16} to ${b26} a pound (+{beef_pct}%). NPR's 'last month' is "
+                          "September 2026; it rounds the rise to 85%.")}
     bsep25, bsep26 = butter["2025-09"], butter["2026-09"]
     assert pct(bsep25, bsep26) == -17.3 and round(bsep26, 2) == 3.96
     butter_data = {"title": "Average price: butter, stick, per pound, U.S. city average (BLS, via FRED)",
@@ -584,50 +638,52 @@ def day_food(eggs: dict, coffee: dict, beef: dict, butter: dict) -> tuple:
     butter_post[1]["data"] = butter_data
     butter_post[0]["tools"] = ["source", "data", "account"]
     items = [
-        (post("p1", P_CLUCK.author(), "2026-11-13T16:40:00Z", "chart",
-              {"data": egg_data, "account": P_CLUCK.account()},
-              body="Egg prices are SPIKING again \U0001F4C8\U0001F95A Stock up before it's 2025 all over again.",
-              chart=egg_shown),
+        (made_up("p1", P_CLUCK, "2026-11-13T16:40:00Z", "chart", {"data": egg_data},
+                 body="Egg prices are SPIKING again \U0001F4C8\U0001F95A Stock up before it's 2025 all over again.",
+                 chart=egg_shown, source_label="Data: BLS average prices (via FRED)"),
          fake("misleading-chart",
-              f"The axis starts at $2.10, so an 18-cent rise looks like a rocket. Last September a dozen cost "
-              f"${sep25:.2f}; this September, ${sep26:.2f}. Eggs are down {abs(yoy):.0f}% on the year.",
-              f"Real BLS prices, framed to scare. June to October did rise {rise:.0f}%, but the cropped axis makes "
-              "the October bar five times taller, and the four-month window hides the fall from the $6.23 record "
-              "in March 2025.",
-              "Real prices, my axis. I just started it where it hurts.",
-              f"You checked the carton. Down {abs(yoy):.0f}% on the year. Fine.",
+              f"Jun to Oct 2026 on an axis that starts at $2.10 makes an 18-cent rise look like a rocket. Same month "
+              f"a year apart, Sep 2025 vs. Sep 2026, a dozen fell from ${sep25:.2f} to ${sep26:.2f} ({yoy:.0f}%).",
+              f"Real BLS prices, framed to scare. June to October 2026 did rise {rise:.0f}%, but the axis from $2.10 "
+              "makes the October bar about five times taller, and the four-month window hides the fall from the "
+              "$6.23 record in March 2025.",
+              "Real prices, my axis. I started it at $2.10 and picked June to October. Two choices, one panic. "
+              "I'm framing this.",
+              "An axis at $2.10 and a four-month window, and you didn't flinch. My egg rocket is grounded.",
               {"type": "chart", "shown": egg_shown, "original": egg_honest})),
         (butter_post,
          real(f"Real and word for word from NPR, and BLS data backs it: butter fell from ${bsep25} to ${bsep26} a "
               "pound, September to September. Not everything goes up.",
-              "Real. Prices can fall too. Doubting good news is still doubting the truth.", suspicious=True)),
-        (post("p3", P_TRICKCHEAT.author(), "2026-10-31T13:15:00Z", "stat",
-              {"source": src_ev("npr_candy", t("CANDY_BEFORE"), t("CANDY_STAT"), t("CANDY_AFTER")),
-               "account": P_TRICKCHEAT.account()},
-              body=f"{candy_shown}. \U0001F383\U0001F631 Federal data. Look it up."),
+              "Real. Butter got cheaper. Doubting good news is still doubting the truth, and that's my job.",
+              suspicious=True)),
+        (made_up("p3", P_SPOOKY, "2026-10-31T13:15:00Z", "stat",
+                 {"source": src_ev("npr_candy", t("CANDY_BEFORE"), t("CANDY_STAT"), t("CANDY_AFTER"))},
+                 body=f"Halloween budget check \U0001F383 \"{candy_shown}.\" Plan accordingly.",
+                 source_label=S["npr_candy"].label),
          fake("cherry-picked-stat",
-              "The 18% is over two years. NPR's same sentence says candy rose 7.7% in one year.",
+              "The 18% is over two years. NPR's same sentence says candy and gum rose 7.7% in one year.",
               "The number is real; its time window was dropped. 'Up more than 18%' reads like this year's damage, "
               "but it's two years of increases stacked together. Candy did rise faster than food overall, which is "
-              "why the claim feels right.",
-              "I didn't change the number. I just lost the 'in two years.'",
-              "You read the whole sentence. Most people stop at the scary number.",
+              "why the claim feels right, and the calm, helpful voice makes it feel safe.",
+              "I didn't touch the 18%. I deleted 'in two years' and the 7.7% beside it. I'm framing this.",
+              "You noticed the 18% had lost its 'in two years.' The number was real; my timeline wasn't.",
               {"type": "stat", "shown": candy_shown, "original": t("CANDY_STAT"),
                "missing": "The time window: the 18% is over two years. Over one year, candy and gum rose 7.7%."})),
-        (post("p4", P_AISLE7.author(), "2026-11-13T19:05:00Z", "chart",
-              {"data": cb_data, "account": P_AISLE7.account()},
-              body=("Grocery math that sounds fake: a pound of ground coffee costs more than a pound of ground beef. "
-                    f"BLS average prices, Oct 2026: ${c10} vs. ${b10}."),
-              chart=cb_chart),
-         real("Real. Both numbers match BLS average prices exactly, the axis starts at zero, and the account cites "
-              "its source. Per pound, coffee has out-priced ground beef every month since at least 2022.",
-              "Real, and honestly charted. Absurd isn't the same as false.", suspicious=True)),
+        (made_up("p4", P_GRILL, "2026-10-21T00:30:00Z", "stat",
+                 {"source": src_ev("npr_grocery", t("BEEF_RISE"), t("BEEF_STAT"), ""), "data": beef_data},
+                 body=f"AN 85% JUMP. \U0001F969\U0001F624 \"{t('BEEF_STAT')}\"",
+                 source_label=S["npr_grocery"].label),
+         real(f"Real. The account is loud, but the sentence is word for word from NPR, and BLS data backs it: "
+              f"${b16} a pound in Sep 2016, ${b26} in Sep 2026, up {beef_pct:.0f}%. The ten-year window is stated "
+              "right in the sentence, so nothing is hidden.",
+              "Real. 85% over a decade, and it says 'a decade' right there. Shouting isn't lying. Get your own tricks.",
+              suspicious=True)),
         (outlet_post("p5", "npr_grocery", "quote", t("VOLPE_BEFORE"), t("VOLPE_PARA"), "",
                      body=t("GROCERY_HEADLINE"),
                      quote={"text": t("VOLPE"), "speaker": "Ricky Volpe, Cal Poly San Luis Obispo"}),
          real("Word for word from NPR. Grocery prices are rising more slowly than in 2022, but on top of a much "
               "higher base.",
-              "Real. Not every gloomy quote is a crop.")),
+              "That one was real. Not every gloomy quote is a crop. Doubting the truth is my job.")),
     ]
     return assemble("2026-11-14-daily-food-prices", 4, "2026-11-14", "Food Prices", "Check the Receipt",
                     "Grocery prices",
@@ -635,68 +691,108 @@ def day_food(eggs: dict, coffee: dict, beef: dict, butter: dict) -> tuple:
                     "hard", items)
 
 
-def day_bills(prices: dict[str, float]) -> tuple:
+def day_hackprinceton(prices: dict[str, float], coffee: dict, beef: dict) -> tuple:
+    """Sunday 2026-11-15, judging day: fun first, civic second. 3 of 5 doctored."""
     apr25, jul25, jul26 = prices["2025-04"], prices["2025-07"], prices["2026-07"]
     shown_pct, yoy = pct(apr25, jul26), pct(jul25, jul26)
     assert (apr25, jul25, jul26, shown_pct, yoy) == (19.91, 25.11, 25.19, 26.5, 0.3)
     shown_chart = bars("NJ residential electricity price", "¢/kWh",
                        [(label("2025-04"), apr25), (label("2026-07"), jul26)], y_min=19, y_max=26)
-    honest_bars = bars("Same month, one year apart", "¢/kWh", [(label("2025-07"), jul25), (label("2026-07"), jul26)])
+    # The honest comparison the tell names: the same month a year apart, axis from zero.
+    honest_bars = bars("Same month a year apart, axis from 0", "¢/kWh",
+                       [(label("2025-07"), jul25), (label("2026-07"), jul26)])
     data_ev = {"title": "NJ residential average electricity price (EIA)", "unit": "¢/kWh", "url": EIA_URL,
                "table": series(prices, "2025-01", max(prices)),
                "honest_chart": line("NJ residential electricity price, monthly (EIA)", "¢/kWh",
                                     series(prices, "2023-01", max(prices))),
-               "note": f"Prices jumped in summer 2025. July to July, they went from {jul25} to {jul26}¢ (+{yoy}%)."}
-    hs_full = t("HS_QUOTE") + "."
-    hs_shown = "…these actions will result in no increase in electricity rates."
+               "note": f"Prices jumped in summer 2025. Jul 2025 to Jul 2026: {jul25} to {jul26}¢ (+{yoy}%)."}
+    # Coffee vs. ground beef: real BLS numbers, honestly charted, posted by a brand-new hype account.
+    c10, b10 = coffee["2026-10"], beef["2026-10"]
+    always = all(coffee[m] > beef[m] for m in beef if m >= "2022-01" and m in coffee)
+    assert always and (c10, b10) == (9.249, 6.755)
+    cb_chart = bars("Average price per pound, Oct 2026", "$/lb", [("Coffee", c10), ("Ground beef", b10)])
+    cb_table = ([{"label": f"Coffee {m}", "value": coffee[m]} for m in ("2026-08", "2026-09", "2026-10")]
+                + [{"label": f"Ground beef {m}", "value": beef[m]} for m in ("2026-08", "2026-09", "2026-10")])
+    cb_data = {"title": "BLS average prices per pound, U.S. city average (via FRED)", "unit": "$/lb",
+               "url": FRED["coffee"][1], "table": cb_table, "honest_chart": cb_chart,
+               "note": ("Coffee = 100% ground roast; ground beef = 100% beef (FRED series APU0000717311 and "
+                        "APU0000703112). Coffee has cost more per pound than ground beef every month since Jan 2022.")}
+    lib_shown = "Overdue library magazine returned after 32 years"
+    # Ground beef: NPR's real sentence with its time window ("from a decade earlier") deleted. Citable (NPR), so
+    # the card carries a source label like every other card; the NJ Monitor "net" crop lives on in the Fool Deck.
+    b16, b25, b26 = beef["2016-09"], beef["2025-09"], beef["2026-09"]
+    beef_decade, beef_year = pct(b16, b26), pct(b25, b26)
+    assert round(b26, 2) == 6.79 and 85 <= beef_decade < 86 and beef_year == 7.4, (beef_decade, beef_year)
+    beef_shown = t("BEEF_STAT").replace(" from a decade earlier", "")
+    beef_data = {"title": "Average price: ground beef, 100% beef, per pound, U.S. city average (BLS, via FRED)",
+                 "unit": "$/lb", "url": FRED["beef"][1],
+                 "table": [{"label": m, "value": beef[m]} for m in ("2016-09", "2025-09", "2026-09")],
+                 "honest_chart": bars("Ground beef: a year apart vs. a decade apart", "$/lb",
+                                      [(label("2016-09"), b16), (label("2025-09"), b25), (label("2026-09"), b26)]),
+                 "note": (f"Sep 2025 to Sep 2026: ${b25} to ${b26} (+{beef_year}%). Sep 2016 to Sep 2026: ${b16} to "
+                          f"${b26} (+{beef_decade}%). NPR's 'last month' is September 2026.")}
     items = [
-        (outlet_post("p1", "njm_1112", "headline", "", t("VPP_HEADLINE"), cat("VPP_LEDE", "VPP_EXPLAIN"),
-                     body=t("VPP_HEADLINE")),
-         real("A 'virtual power plant' sounds invented, but the BPU approved one on Nov 12: smart thermostats, EV "
-              "chargers and home batteries cut power use at peak hours, and their owners get paid for it.",
-              "Real. 'Virtual power plant' sounds like my work, but the BPU got there first.", suspicious=True)),
-        (post("p2", P_BILLWATCH.author(), "2026-11-14T15:20:00Z", "chart",
-              {"data": data_ev, "account": P_BILLWATCH.account()},
-              body="NJ power prices are up 27% in ONE YEAR. Share before your next bill hits.", chart=shown_chart),
+        (outlet_post("p1", "npr_mice", "quote", t("MICE_SUMMARY"), t("FALKNER_ARENA"),
+                     cat("FALKNER_ROLE", "MICE_NATURE"), body=t("MICE_HEADLINE"),
+                     quote={"text": t("FALKNER_ARENA"), "speaker": "Annegret Falkner, Princeton Neuroscience Institute"}),
+         real("Sounds like a parody, but it's word for word from NPR. Princeton neuroscientists really staged "
+              "'gladiator style' mouse fights, and the paper is in Nature.",
+              "Real. Princeton built a mouse colosseum, and I didn't have to invent a thing. Frankly insulting.",
+              suspicious=True)),
+        (made_up("p2", P_BILLWATCH, "2026-11-14T15:20:00Z", "chart", {"data": data_ev},
+                 body="NJ power prices are up 27% in ONE YEAR. Share before your next bill hits.", chart=shown_chart,
+                 source_label="Data: U.S. EIA"),
          fake("misleading-chart",
-              f"The axis starts at 19¢, and the bars compare April 2025, before the summer spike, with July 2026, "
-              f"15 months later. July to July, prices rose {yoy}%.",
-              f"Real EIA numbers, framed to mislead. A cropped axis makes a {shown_pct}% gap look like a cliff, and "
-              "cherry-picked months turn an old jump into a 'one year' rise. Prices did jump in 2025. Over the past "
-              "year they've been nearly flat.",
-              "Real numbers, honest-looking bars. I just picked where they start.",
-              "Fine. You checked the data. I'll crop it better next time.",
+              f"The bars compare Apr 2025, before the summer spike, with Jul 2026, 15 months later, on an axis that "
+              f"starts at 19¢. Same month a year apart, Jul 2025 vs. Jul 2026, prices went from {jul25} to {jul26}¢ "
+              f"(+{yoy}%).",
+              f"Real EIA numbers, framed to mislead. Comparing a spring month with a summer month 15 months later "
+              f"turns the 2025 jump into a 'one year' rise, and the axis from 19¢ makes a {shown_pct}% gap look like "
+              "a cliff. Over the past year, prices have been nearly flat.",
+              "Real EIA numbers. I put April 2025 next to July 2026 and started the axis at 19¢. Two choices. "
+              "I'm framing this.",
+              "April 2025 to July 2026 is fifteen months, not one year, and my 19¢ axis didn't fool you either. Rude.",
               {"type": "chart", "shown": shown_chart, "original": honest_bars})),
-        (post("p3", P_RATERELIEF.author(), "2026-11-13T22:10:00Z", "quote",
-              {"source": src_ev("njm_0924", t("NJM_0924_BEFORE"), t("HS_PARA"), f"… {t('ACE_BEFORE')} {t('ACE_PASSAGE')}"),
-               "account": P_RATERELIEF.account()},
-              body="Your electric rates are frozen. Straight from the BPU president \U0001F447",
-              quote={"text": hs_shown, "speaker": "Ben Hertz-Shargel, NJBPU President"}),
-         fake("out-of-context-quote",
-              "He said 'no NET increase.' Some charges go up and others go down: Atlantic City Electric's bill rises "
-              "$4.09 and falls $4.14.",
-              "One deleted word changes the promise. 'No net increase' means increases are offset by cuts elsewhere, "
-              "not that nothing goes up. The crop also drops the start of the sentence, which ties it to items "
-              "voted on earlier that month.",
-              "Three letters: n, e, t. That's all I took.",
-              "You found the 'net.' I'll have to cut bigger words.",
-              {"type": "quote", "shown": hs_shown, "original": hs_full,
-               "removed": ["Taken together with the items on the agenda earlier this month,", "net",
-                           "and a slight decrease in gas rates"]})),
-        (outlet_post("p4", "bpu_0813", "stat", t("BPU_20PCT_BEFORE"), t("BPU_20PCT"), t("BPU_20PCT_AFTER"),
-                     body="…" + t("BPU_20PCT")),
-         real("Startling, but true: it's straight from the BPU's own press release. Bills jumped in 2025, which is "
-              "the rise the doctored chart smuggled into its 'one year' window.",
-              "Surprising isn't the same as fake. A grain of salt, not the whole shaker.", suspicious=True)),
-        (outlet_post("p5", "njm_1112", "quote", t("REBHORN_BEFORE"), t("REBHORN_PARA"), t("REBHORN_AFTER"),
-                     quote={"text": t("REBHORN") + ".", "speaker": "Emma Rebhorn, BPU Commissioner"}),
-         real("Real and word for word, from New Jersey Monitor's coverage of the Nov 12 BPU vote. Peak hours drive "
-              "prices, which is why the board is paying people to use less power then.",
-              "Real. Not everything that sounds dramatic is a trick.")),
+        (made_up("p3", P_BREW, "2026-11-14T16:05:00Z", "chart", {"data": cb_data},
+                 body=("WAIT. A pound of ground coffee costs MORE than a pound of ground beef?! ☕\U0001F969 "
+                       f"BLS average prices, Oct 2026: ${c10} vs. ${b10}."),
+                 chart=cb_chart, source_label="Data: BLS average prices (via FRED)"),
+         real("Real. The account is brand new and very excited, but both numbers match BLS average prices exactly, "
+              "the axis starts at zero, and per pound, coffee has cost more than ground beef every month since at "
+              "least Jan 2022.",
+              "Real. Every number is straight from BLS. Caps lock isn't a crime. Doubting the truth is my job.",
+              suspicious=True)),
+        (made_up("p4", P_SHELF, "2026-09-20T15:00:00Z", "headline",
+                 {"source": src_ev("npr_library", "", t("LIBRARY_HEADLINE"), cat("LIBRARY_SUMMARY", "LIBRARY_1894"))},
+                 body=f"{lib_shown} \U0001F4DA Imagine the late fees.", source_label=S["npr_library"].label),
+         fake("edited-detail",
+              "NPR's headline says 132 years, not 32. The magazine was published in 1894.",
+              "One number was swapped, and it made the story less weird. The real magazine, from 1894, came back "
+              "about 132 years overdue after a New Hampshire library announced a fine freeze. A believable number "
+              "is still a wrong number.",
+              "One number. 132 became 32. I made the truth less weird and you relaxed. I'm framing this.",
+              "132 years, not 32. The truth was weirder than my lie, and you knew it.",
+              {"type": "detail", "shown": lib_shown, "original": t("LIBRARY_HEADLINE"),
+               "changed": [{"from": "132", "to": "32"}]})),
+        (made_up("p5", P_CHECKOUT, "2026-10-22T13:00:00Z", "stat",
+                 {"source": src_ev("npr_grocery", t("BEEF_RISE"), t("BEEF_STAT"), ""), "data": beef_data},
+                 body=f"Grocery check 🛒 \"{beef_shown}\"", source_label=S["npr_grocery"].label),
+         fake("cherry-picked-stat",
+              f"The 85% is over a decade: NPR's sentence says 'from a decade earlier.' Over one year, Sep 2025 to "
+              f"Sep 2026, ground beef rose {beef_year}%.",
+              "Every number is real, but four words are gone. 'An 85% jump' now reads like this year's price shock; "
+              f"NPR's sentence measures it from a decade earlier. BLS: ${b16} a pound in Sep 2016, ${b25} in Sep "
+              f"2025, ${b26} in Sep 2026.",
+              "I deleted 'from a decade earlier.' Four words, ten years. I'm framing this.",
+              "The 85% lost 'from a decade earlier,' and you noticed. Ten years squeezed into one post, unsqueezed. Rude.",
+              {"type": "stat", "shown": beef_shown, "original": t("BEEF_STAT"),
+               "missing": (f"The time window: the 85% is from a decade earlier (Sep 2016 ${b16} to Sep 2026 ${b26}). "
+                           f"Over one year, Sep 2025 to Sep 2026, ground beef rose {beef_year}%.")})),
     ]
-    return assemble("2026-11-15-daily-your-bills", 5, "2026-11-15", "Your Bills", "The Bill Comes Due",
-                    "NJ electricity bills",
-                    "Your power bill. Five posts, 0–3 doctored today. I never make up a number. I don't have to.",
+    return assemble("2026-11-15-daily-hackprinceton", 5, "2026-11-15", "HackPrinceton Special",
+                    "Mice, Magazines and Megawatts", "Princeton science, odd news, prices and power bills",
+                    "HackPrinceton Special. Five posts, 0–3 doctored today. Princeton mice, a very overdue magazine, "
+                    "your groceries and your power bill. I never make up a number. I don't have to.",
                     "medium", items)
 
 
@@ -707,71 +803,85 @@ def day_jersey() -> tuple:
                      quote={"text": t("BOSS_QUOTE") + ".", "speaker": "Bruce Springsteen, at the 2026 MoMA film benefit"}),
          real("Real. New Jersey 101.5 reports Springsteen told a MoMA film benefit that seeing 'Jaws' in 1975 spoiled "
               "night swimming at the Jersey Shore.",
-              "Real. The Boss vs. a rubber shark. I couldn't write that.", suspicious=True)),
-        (outlet_post("p2", "nj1015_bridge", "headline", "", t("BRIDGE_HEADLINE"), cat("BRIDGE_REPORT", "BRIDGE_SAFE"),
-                     body=t("BRIDGE_HEADLINE")),
-         real("Real, from New Jersey 101.5 on Nov 12: a cargo ship struck the Tacony-Palmyra Bridge and left it "
-              "unable to close. No injuries were reported.",
-              "Real. A drawbridge stuck open is very Jersey, and very true.", suspicious=True)),
+              "Real. The Boss vs. a rubber shark. I couldn't write that, and I tried.", suspicious=True)),
+        (outlet_post("p2", "whyy_microbe", "headline", "", t("MICROBE_HEADLINE"),
+                     f"{t('MICROBE_LEDE')} {t('MICROBE_SIGNED')}", body=t("MICROBE_HEADLINE")),
+         real("Real. New Jersey has an official state microbe: the governor signed the bill in May 2019 (WHYY, from "
+              "the Associated Press). Streptomyces griseus played a role in treating tuberculosis.",
+              "Real. New Jersey has an official state microbe, signed into law. I've never been so jealous of a "
+              "bacterium.", suspicious=True)),
         (outlet_post("p3", "whyy_victor", "headline", "", t("VICTOR_HEADLINE"), cat("VICTOR_LEDE", "VICTOR_PIANO"),
                      body=t("VICTOR_HEADLINE")),
          real("Real. It's Berlin, New Jersey, a few miles from Camden, where RCA-Victor was born. A Victor Museum "
               "opened there, electric piano that 'sort of works' included.",
-              "Real. Berlin is in South Jersey. The headline just let you assume Germany.", suspicious=True)),
-        (outlet_post("p4", "nj1015_drivers", "stat", "", t("DRIVERS_STAT"), cat("DRIVERS_AFTER", "DRIVERS_CAVEAT"),
-                     body=t("DRIVERS_STAT")),
-         real("Real, and the rate comes with its denominator: 56.9 incidents per 1,000 drivers. The columnist even "
-              "points out the study is built on insurance-quote data.",
-              "Real. I'd never insult Jersey drivers. They'd find me.", suspicious=True)),
+              "Real. Berlin, New Jersey. The headline let you picture Germany. That's geography, not me.",
+              suspicious=True)),
+        (made_up("p4", P_JUGHANDLE, "2026-11-14T02:15:00Z", "stat",
+                 {"source": src_ev("nj1015_drivers", "", t("DRIVERS_RANK"), cat("DRIVERS_RATE", "DRIVERS_CAVEAT"))},
+                 body=f"Called it. \U0001F697\U0001F4A5 \"{t('DRIVERS_RANK')}\"",
+                 source_label=S["nj1015_drivers"].label),
+         real("Real. The account is loud, but the sentence is word for word from New Jersey 101.5, with the source "
+              "linked. The story even gives the fine print: 56.9 incidents per 1,000 drivers, from insurance-quote "
+              "data.",
+              "Real. A loud account quoting a real story word for word. Loud isn't fake. Doubting the truth is my job.",
+              suspicious=True)),
         (outlet_post("p5", "nj1015_seals", "quote", "", t("SEALS_PARA"), t("SEALS_AFTER"),
                      body=t("SEALS_HEADLINE"), quote={"text": t("SEALS_QUOTE"), "speaker": "Jon Stewart, on Instagram"}),
          real("Real. New Jersey 101.5 quotes the caption on the seal video Jon Stewart posted, then matches the "
               "spot to the waters near Sandy Hook.",
-              "Real. Three exclamation points and still true.")),
+              "Real. Three exclamation points and still true. Jon Stewart did my job for me.")),
     ]
     return assemble("2026-11-16-daily-jersey-weird", 6, "2026-11-16", "Jersey Weird", "Only in Jersey",
                     "New Jersey oddities",
                     "Jersey weirdness. Five posts, 0–3 doctored today. Some of this can't possibly be true. Can it?",
                     "easy", items,
-                    con_line_clean="Nothing doctored today. Jersey did all the work. All you had to do was believe it.")
+                    con_line_clean="Zero fakes. Jersey did all the work. I took the day off and watched you "
+                                   "interrogate the truth. Restful.")
 
 
 def day_strange() -> tuple:
-    lib_shown = "Overdue library magazine returned after 32 years"
+    marathon_shown = "There were just over 2,000 competitors, including only 88 women."
     items = [
         (outlet_post("p1", "npr_socks", "headline", "", t("SOCKS_HEADLINE"), cat("SOCKS_SUMMARY", "SOCKS_FLIES"),
                      body=t("SOCKS_HEADLINE")),
          real("Real. Arsenal sent dozens of used match socks to a horse and donkey sanctuary in England, where they "
               "protect the animals' legs from biting flies.",
               "Real. Donkeys in Arsenal socks. I have limits. Reality doesn't.", suspicious=True)),
-        (post("p2", P_SHELF.author(), "2026-09-20T15:00:00Z", "headline",
-              {"source": src_ev("npr_library", "", t("LIBRARY_HEADLINE"), cat("LIBRARY_SUMMARY", "LIBRARY_1894")),
-               "account": P_SHELF.account()},
-              body=f"{lib_shown} \U0001F4DA Imagine the late fees."),
-         fake("edited-detail",
-              "NPR's headline says 132 years. The magazine was published in 1894.",
-              "This fake made the story less weird. The real magazine, from 1894, came back about 132 years overdue "
-              "after a New Hampshire library announced a fine freeze. A believable number is still a wrong number.",
-              "I knocked a century off and you relaxed. Plausible is my favorite disguise.",
-              "132 years. You checked. The truth was weirder than my lie.",
-              {"type": "detail", "shown": lib_shown, "original": t("LIBRARY_HEADLINE"),
-               "changed": [{"from": "132", "to": "32"}]})),
-        (outlet_post("p3", "npr_camel", "headline", "", t("CAMEL_HEADLINE"), cat("CAMEL_SUMMARY", "CAMEL_KICKER"),
+        (outlet_post("p2", "opb_owls", "headline", "", t("OWLS_HEADLINE"), f"{t('OWLS_LEDE')} {t('OWLS_FIRST')}",
+                     body=t("OWLS_HEADLINE")),
+         real("Real, from the Associated Press via OPB. A family of barn owls nested in a water tower near Central "
+              "Park, the first documented barn owl nest in Manhattan in modern history, according to one expert.",
+              "Real. Barn owls in a Manhattan water tower. I'd never pitch anything that adorable.", suspicious=True)),
+        (outlet_post("p3", "npr_camel", "headline", "", t("CAMEL_HEADLINE"), t("CAMEL_SUMMARY"),
                      body=t("CAMEL_HEADLINE")),
-         real("Real. In the 1950s a Nevada newspaper editor wrote a joke story about a camel race. A few years later "
-              "the race really happened, and it still runs every year: fake news that came true.",
+         real("Real. In the 1950s a Nevada newspaper editor wrote a joke story about a camel race. Then the race "
+              "really happened, and it still runs every year: fake news that came true.",
               "Real, and it's my origin story: a fake headline so good it came true.", suspicious=True)),
-        (outlet_post("p4", "npr_marathon", "stat", t("MARATHON_BEFORE"), t("MARATHON_STAT"), t("MARATHON_AFTER"),
-                     body=t("MARATHON_STAT")),
-         real("Word for word from NPR's New York City Marathon story: just over 2,000 runners in 1976, about 60,000 "
-              "this year.",
-              "Real. 88 women in 1976, nearly half of 60,000 now. Some numbers just grow.")),
-        (outlet_post("p5", "npr_mice", "quote", t("FALKNER_NFL_BEFORE"), "FALKNER: " + t("FALKNER_NFL"),
-                     t("FALKNER_NFL_AFTER"), body=t("FALKNER_NFL_BEFORE"),
-                     quote={"text": t("FALKNER_NFL"), "speaker": "Annegret Falkner, Princeton Neuroscience Institute"}),
-         real("Real and word for word from NPR. Read all of it: she isn't saying watching makes you a pro, just that "
-              "watching beats never watching.",
-              "Real. Watching sports counts as practice now. You're welcome, couch.", suspicious=True)),
+        (made_up("p4", P_FINISH, "2026-11-02T14:00:00Z", "stat",
+                 {"source": src_ev("npr_marathon", t("MARATHON_BEFORE"), t("MARATHON_STAT"), t("MARATHON_AFTER"))},
+                 body=f"The NYC Marathon is smaller than you'd think \U0001F3C3 \"{marathon_shown}\"",
+                 source_label=S["npr_marathon"].label),
+         fake("cherry-picked-stat",
+              "Those numbers are from 1976, the seventh running of the race. NPR's next sentence: about 60,000 "
+              "runners started on Sunday.",
+              "Every number is real, but the year was deleted. In 1976 the race had just over 2,000 runners, "
+              "including 88 women. This year about 60,000 stepped up to the starting line, nearly half of them women.",
+              "I deleted 'in 1976, the seventh running of the race.' Eight words, fifty years. I'm framing this.",
+              "You noticed the missing 1976. Just over 2,000 then, about 60,000 now. My shrink ray failed.",
+              {"type": "stat", "shown": marathon_shown, "original": t("MARATHON_1976"),
+               "missing": ("The year: those numbers are from 1976, the seventh running of the race. About 60,000 "
+                           "runners started on Sunday, nearly half of them women.")})),
+        (made_up("p5", P_COUCH, "2026-11-10T01:30:00Z", "quote",
+                 {"source": src_ev("npr_mice", t("FALKNER_NFL_BEFORE"), "FALKNER: " + t("FALKNER_NFL"),
+                                   t("FALKNER_NFL_AFTER"))},
+                 body=("A Princeton neuroscientist, on whether watching sports makes you better at them. My couch and "
+                       "I feel seen. \U0001F6CB️\U0001F3C8"),
+                 quote={"text": t("FALKNER_NFL"), "speaker": "Annegret Falkner, Princeton Neuroscience Institute"},
+                 source_label=S["npr_mice"].label),
+         real("Real. The account is a sofa with opinions, but the quote is word for word from NPR, and it's the whole "
+              "quote: she isn't saying watching makes you a pro, just that watching beats never watching.",
+              "Real. A couch account quoting a Princeton neuroscientist word for word. Comfy, not crooked.",
+              suspicious=True)),
     ]
     return assemble("2026-11-17-daily-strange-but-true", 7, "2026-11-17", "Strange But True", "Stranger Than Fiction",
                     "Odd news",
@@ -798,6 +908,13 @@ def quote_deck(did: str, skey: str, quote_key: str, para_key: str, speaker: str,
     return deck_item(did, "quote", pe, ["crop"], quote_words=text.split())
 
 
+def headline_deck(did: str, skey: str, headline_key: str, after: str) -> dict:
+    """A real headline the player may crop, shown as the outlet quoting its own headline (no added period)."""
+    text = t(headline_key)
+    pe = outlet_post("p1", skey, "quote", "", text, after, quote={"text": text, "speaker": f"{S[skey].outlet} headline"})
+    return deck_item(did, "quote", pe, ["crop"], quote_words=text.split())
+
+
 # Deck charts are drawn by us from public data, and the caption is ours, so the poster must NOT be the
 # agency (that would put our words in EIA's/BLS's mouth). A made-up data account posts them and cites the source.
 DATA_DESK_AUTHOR = {"name": "Chart Desk", "handle": "@chartdesk", "kind": "person", "verified": False,
@@ -820,12 +937,18 @@ def chart_deck(did: str, data_source: str, rows: list[dict], title: str, unit: s
 def build_deck(prices: dict, eggs: dict, coffee: dict) -> list[dict]:
     deck = [
         quote_deck("hs-net-increase", "njm_0924", "HS_QUOTE", "HS_PARA", "Ben Hertz-Shargel, NJBPU President",
-                   t("NJM_0924_BEFORE"), f"… {t('ACE_BEFORE')} {t('ACE_PASSAGE')}", body=t("NJM_0924_DESC")),
+                   t("NJM_0924_BEFORE"), "… " + t("ACE_PASSAGE"), body=t("NJM_0924_DESC")),
         quote_deck("rebhorn-peak-hours", "njm_1112", "REBHORN", "REBHORN_PARA", "Emma Rebhorn, BPU Commissioner",
                    t("REBHORN_BEFORE"), t("REBHORN_AFTER")),
         quote_deck("falkner-watching-sports", "npr_mice", "FALKNER_NFL", "FALKNER: " + t("FALKNER_NFL"),
                    "Annegret Falkner, Princeton Neuroscience Institute", t("FALKNER_NFL_BEFORE"),
                    t("FALKNER_NFL_AFTER"), body=t("MICE_HEADLINE")),
+        # crop-friendly: delete "think they've" and a maybe becomes a fact
+        headline_deck("dino-blood-headline", "npr_dino", "DINO_HEADLINE", t("DINO_DOUBT")),
+        # crop-friendly: keep "I can with 100% confidence tell you" and lose the punchline
+        quote_deck("robinson-100-percent", "npr_schooner", "ROBINSON", "ROBINSON: " + t("ROBINSON"),
+                   "David Robinson, Massachusetts Board of Underwater Archaeological Resources",
+                   t("ROBINSON_WRECK"), t("ROBINSON_AFTER"), body=t("SCHOONER_HEADLINE")),
     ]
     ace = outlet_post("p1", "njm_0924", "stat", t("ACE_BEFORE"), t("ACE_PASSAGE"), "", body=t("ACE_PASSAGE"))
     deck.append(deck_item("ace-offset", "stat", ace, ["drop"], stat={
@@ -901,31 +1024,90 @@ def check_post(p: dict, ev: dict, where: str) -> None:
                 assert pt["value"] in table.values(), f"{where}: chart value {pt} not in data table"
 
 
+_ABBREV = re.compile(r"\b(Gov|Dr|Mr|Mrs|Ms|St|Jan|Feb|Aug|Sept|Oct|Nov|Dec|vs|U\.S)\.")
+
+
+def n_sentences(s: str) -> int:
+    """Rough sentence count for the excerpt-length rule (abbreviations and short embedded quotes don't split)."""
+    s = normalize(s).replace("...", " ")
+    s = re.sub(r'"[^"]{0,60}"', " ", s)
+    s = _ABBREV.sub(lambda m: m.group(1).replace(".", ""), s)
+    return len([x for x in re.split(r"(?<=[.!?])[\"')]*\s+(?=[\"('(]?[A-Z])", s) if re.search(r"\w", x)])
+
+
+def card_text(p: dict) -> str:
+    return " ".join(x for x in (p["body"], (p["quote"] or {}).get("text") or "") if x)
+
+
+def card_excerpt_sentences(p: dict) -> int:
+    """Sentences of verbatim bank text shown on the card (headlines don't count; overlapping excerpts once)."""
+    text = squash(card_text(p))
+    found = [k for k in BANK if k not in HEADLINE_KEYS and squash(t(k)) in text]
+    found = [k for k in found if not any(j != k and squash(t(k)) in squash(t(j)) for j in found)]
+    return sum(n_sentences(t(k)) for k in found)
+
+
+def check_excerpts(p: dict, ev: dict, where: str) -> None:
+    """Licensing: short excerpts only (<= 2 sentences on the card and in each evidence passage)."""
+    assert card_excerpt_sentences(p) <= 2, f"{where}: card excerpt longer than 2 sentences"
+    if "source" in ev:
+        for part in ("before", "highlight", "after"):
+            assert n_sentences(ev["source"][part]) <= 2, f"{where}: evidence {part} longer than 2 sentences"
+
+
 def check_case(cid: str, case: dict, evidence: dict, key: dict, meta: dict) -> None:
     posts = case["posts"]
     assert len(posts) == 5 and case["clue_budget"] == 3, cid
     assert "0–3 doctored today" in case["briefing"], cid
+    assert case.get("notice") == NOTICE, f"{cid}: case notice"
     assert {p["id"] for p in posts} == set(evidence) == set(key["posts"]), cid
     doctored = [pid for pid, a in key["posts"].items() if a["doctored"]]
     assert 0 <= len(doctored) <= 3 and key["clean_case"] == (not doctored), cid
     assert any(a.get("suspicious_real") for a in key["posts"].values()), f"{cid}: needs a real-but-suspicious post"
+    assert any(not key["posts"][p["id"]]["doctored"] and p["author"]["kind"] == "person" for p in posts), \
+        f"{cid}: needs a REAL post from a made-up account, so the poster doesn't give the answer away"
     assert len({p["card_style"] for p in posts}) >= 2, f"{cid}: vary card_style"
+    unlabeled = [key["posts"][p["id"]]["doctored"] for p in posts if not p["source_label"]]
+    assert not unlabeled or not all(unlabeled),         f"{cid}: a missing source_label only appears on doctored posts, so it gives the answer away"
     assert (key["con_line_clean"] is not None) == key["clean_case"], cid
     assert meta["tricks"] == sorted({key["posts"][d]["trick"] for d in doctored}), cid
+    lines = [a.get(k) for a in key["posts"].values()
+             for k in ("con_line_fooled", "con_line_caught", "con_line_false_alarm") if a.get(k)]
+    assert len(lines) == len(set(lines)), f"{cid}: repeated Con line"
     for p in posts:
         ev, a, where = evidence[p["id"]], key["posts"][p["id"]], f"{cid}/{p['id']}"
         check_post(p, ev, where)
+        check_excerpts(p, ev, where)
+        shown = normalize(card_text(p))
+        assert not shown.startswith("..."), f"{where}: don't open a post with an ellipsis"
         if not a["doctored"]:
             assert a["explanation"] and a["con_line_false_alarm"], where
+            assert p["source_label"], f"{where}: real posts carry a correct source_label"
+            if "..." in shown:
+                assert "ellipsis" in a["explanation"], f"{where}: the reveal must say an ellipsis only marks an excerpt"
+            if p["author"]["kind"] == "person":  # real post from a made-up account: verbatim or exact numbers
+                if "source" in ev:
+                    src = [k for k in BANK if BANK[k][1] and S[BANK[k][0]].url == ev["source"]["url"]]
+                    assert any(squash(t(k)) in squash(shown) and squash(t(k)) in squash(ev["source"]["highlight"])
+                               for k in src), f"{where}: made-up real post must quote the source verbatim"
+                else:
+                    vals = {r["value"] for r in ev["data"]["table"]}
+                    nums = [float(n) for n in re.findall(r"\$(\d+\.\d+)", p["body"])]
+                    assert nums and all(n in vals for n in nums), f"{where}: numbers must match the data exactly"
             continue
         assert p["author"]["kind"] == "person" and not p["author"]["verified"], f"{where}: fakes need made-up authors"
         assert p["author"]["name"] not in OUTLETS, where
+        assert "..." not in shown, f"{where}: an ellipsis must not become a doctoring tell"
+        assert not re.search(r"\b(opened|checked|clicked)\b", a["con_line_caught"], re.I), \
+            f"{where}: caught lines name the edit, not a check the player may not have made"
         d = a["diff"]
         assert d["type"] == {"out-of-context-quote": "quote", "misleading-chart": "chart",
                              "cherry-picked-stat": "stat", "edited-detail": "detail"}[a["trick"]], where
+        if d["type"] != "chart":
+            assert n_sentences(d["original"]) <= 2, f"{where}: original excerpt longer than 2 sentences"
         if d["type"] == "quote":
             assert is_deletion(d["shown"], d["original"]), f"{where}: crop must only delete words"
-            assert normalize(d["shown"]).strip("….") in normalize(p["body"] + " " + (p["quote"] or {}).get("text", "")), where
+            assert normalize(d["shown"]).strip("….") in normalize(card_text(p)), where
             assert normalize(d["original"]).rstrip(".") in normalize(json.dumps(ev["source"], ensure_ascii=False)), where
         elif d["type"] == "detail":
             orig = d["original"]
@@ -942,13 +1124,24 @@ def check_case(cid: str, case: dict, evidence: dict, key: dict, meta: dict) -> N
             check_chart(d["shown"], where + " diff.shown")
             check_chart(d["original"], where + " diff.original")
             assert d["shown"] == p["chart"], where
+            # diff.original is the HONEST comparison the tell describes (same months a year apart, axis from 0),
+            # not the doctored months with the axis fixed
+            o = d["original"]
+            assert o["y_min"] == 0 and o["y_max"] is None, f"{where}: honest chart starts at 0"
+            assert [x["label"] for x in o["points"]] != [x["label"] for x in d["shown"]["points"]], \
+                f"{where}: diff.original must use the honest months"
+            vals = {r["value"] for r in ev["data"]["table"]}
+            for x in o["points"]:
+                assert x["value"] in vals, f"{where}: honest value {x} not in data table"
+                assert x["label"] in a["tell"], f"{where}: tell must name {x['label']}"
 
 
 def check_deck(deck: list[dict]) -> None:
-    assert 6 <= len(deck) <= 8 and len({d["id"] for d in deck}) == len(deck)
+    assert 6 <= len(deck) <= 10 and len({d["id"] for d in deck}) == len(deck)
     for d in deck:
         p, ev, ed, where = d["post"], d["evidence"], d["editable"], f"deck/{d['id']}"
         check_post(p, ev, where)
+        check_excerpts(p, ev, where)
         if d["kind"] == "chart":
             # charts are drawn by us from public data with our caption: posted by the made-up data account
             assert p["author"] == DATA_DESK_AUTHOR and ev["account"] == DATA_DESK_ACCOUNT, where
@@ -1032,11 +1225,22 @@ def write_json(path: Path, obj) -> None:
 def main() -> int:
     prices = load_eia()
     eggs, coffee, beef, butter = (load_fred(n) for n in ("eggs", "coffee", "beef", "butter"))
-    days = [day_science(), day_food(eggs, coffee, beef, butter), day_bills(prices), day_jersey(), day_strange()]
+    days = [day_science(), day_food(eggs, beef, butter), day_hackprinceton(prices, coffee, beef), day_jersey(),
+            day_strange()]
     deck = build_deck(prices, eggs, coffee)
     for cid, case, ev, key, meta in days:
         check_case(cid, case, ev, key, meta)
+    unlabeled = [key["posts"][p["id"]]["doctored"] for _, case, _, key, _ in days for p in case["posts"]
+                 if not p["source_label"]]
+    assert not unlabeled or not all(unlabeled), "across the dailies, only doctored posts lack a source_label"
     check_deck(deck)
+    for stale in STALE_CASE_DIRS:
+        folder = CASES / stale
+        if folder.is_dir():
+            for f in folder.iterdir():
+                f.unlink()
+            folder.rmdir()
+            print(f"removed stale data/cases/{stale}")
     for cid, case, ev, key, meta in days:
         for name, obj in [("case.json", case), ("evidence.json", ev), ("answer_key.json", key), ("meta.json", meta)]:
             write_json(CASES / cid / name, obj)

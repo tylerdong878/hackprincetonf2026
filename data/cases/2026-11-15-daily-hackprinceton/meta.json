@@ -1,0 +1,24 @@
+{
+  "status": "approved",
+  "origin": "seed",
+  "daily": false,
+  "difficulty": "medium",
+  "created_at": "2026-11-14T08:00:00Z",
+  "tricks": [
+    "cherry-picked-stat",
+    "edited-detail",
+    "misleading-chart"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+    "https://www.eia.gov/electricity/data/browser/",
+    "https://fred.stlouisfed.org/series/APU0000717311",
+    "https://www.npr.org/2026/09/18/nx-s1-5971268/overdue-library-magazine-returned-after-132-years",
+    "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
+    "https://fred.stlouisfed.org/series/APU0000703112"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-15",
+  "theme": "HackPrinceton Special"
+}

@@ -1,0 +1,69 @@
+{
+  "id": "robinson-100-percent",
+  "kind": "quote",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#1D4ED8"
+    },
+    "posted_at": "2026-09-29T20:53:52Z",
+    "body": "Nor'easter exposes part of a schooner wrecked on Nantucket",
+    "quote": {
+      "text": "Well, I can with 100% confidence tell you that I wouldn't be 100% confident.",
+      "speaker": "David Robinson, Massachusetts Board of Underwater Archaeological Resources"
+    },
+    "chart": null,
+    "source_label": "NPR · Sept 29, 2026",
+    "card_style": "quote",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-29",
+      "url": "https://www.npr.org/2026/09/29/nx-s1-5984674/noreaster-exposes-part-of-a-schooner-wrecked-on-nantucket",
+      "before": "Part of the Warren Sawyer wreck was exposed back in 2022, and based on what he's seen in photos and on video, he says the new Nantucket wreckage could be more of that schooner. Keywords there, could be.",
+      "highlight": "ROBINSON: Well, I can with 100% confidence tell you that I wouldn't be 100% confident.",
+      "after": "And that's because the way that the Warren Sawyer was built, lots of ships were built like that."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": [
+      "Well,",
+      "I",
+      "can",
+      "with",
+      "100%",
+      "confidence",
+      "tell",
+      "you",
+      "that",
+      "I",
+      "wouldn't",
+      "be",
+      "100%",
+      "confident."
+    ],
+    "chart_series": null,
+    "stat": null
+  },
+  "tools": [
+    "crop"
+  ]
+}

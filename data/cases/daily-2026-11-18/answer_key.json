@@ -1,0 +1,57 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": true,
+      "trick": "edited-detail",
+      "tell": "The Rockland decrease is 67 cents, not $67. One swapped detail turns pocket change into a windfall.",
+      "explanation": "The real New Jersey Monitor article said Rockland customers would see a 67-cent decrease. The Con swapped 'cents' for '$', turning a trivial change into a headline-grabbing $67. Every other word matches the source, which is why it looks familiar.",
+      "con_line_fooled": "One little number. Nobody ever checks the little number.",
+      "con_line_caught": "You compared it word for word. Who does that?",
+      "diff": {
+        "type": "detail",
+        "shown": "The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by $67, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month.",
+        "original": "The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by 67 cents, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month.",
+        "changed": [
+          {
+            "from": "67 cents",
+            "to": "$67"
+          }
+        ]
+      }
+    },
+    "p2": {
+      "doctored": true,
+      "trick": "cherry-picked-stat",
+      "tell": "The 24% jump cherry-picks June 2024→June 2025; the latest year-over-year (Aug 2025→Aug 2026) is essentially flat at -0.4%.",
+      "explanation": "EIA data shows NJ residential prices did rise 23.9% from June 2024 (19.9¢) to June 2025 (24.65¢), but that window captures the post-capacity-auction spike. By August 2026 prices had fallen back to 24.61¢, making the most recent year-over-year change -0.4%. The post presents a stale peak as the current trend.",
+      "con_line_fooled": "Every number I used was true. I just left one out.",
+      "con_line_caught": "You went looking for the other half of the story. Rude.",
+      "diff": {
+        "type": "stat",
+        "shown": "NJ residential electricity prices surged 24% in one year — from 19.9¢ to 24.65¢ per kWh.",
+        "original": "EIA: Jun 2024 19.9 → Jun 2025 24.65 ¢/kWh (+23.9%). Latest year: Aug 2025 24.7 → Aug 2026 24.61 (-0.4%).",
+        "missing": "The most recent year: Aug 2025 to Aug 2026 prices changed -0.4%."
+      }
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real and word for word, from New Jersey Monitor (Nov 12, 2026).",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real and word for word: the New Jersey Monitor headline from Sept 24, 2026. A random account shared it, but the words match the source exactly.",
+      "con_line_false_alarm": "Unknown account, real headline. Check the words, not the avatar."
+    },
+    "p5": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from NJ Board of Public Utilities (Aug 13, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    }
+  },
+  "con_line_clean": null
+}

@@ -13,7 +13,7 @@
     "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
     "https://fred.stlouisfed.org/series/APU0000FS1101",
     "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
-    "https://fred.stlouisfed.org/series/APU0000717311"
+    "https://fred.stlouisfed.org/series/APU0000703112"
   ],
   "rejection_reason": null,
   "mode": "daily",

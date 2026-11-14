@@ -1,0 +1,411 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "Among the state’s four electric distribution companies, Rockland Electric Company will see the largest monthly decrease, though overall bills will remain roughly unchanged at each of the utilities.",
+      "highlight": "The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by 67 cents, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month.",
+      "after": "The average Jersey Central Power and Light customer will see their bill drop by 8 cents. Average monthly electric bills with PSE&G were expected to rise by 2 cents as a result of transmission rates flowing from the Federal Energy Regulatory Commission, but board staff said state offsets would eliminate the increase. Gas rates will decline further."
+    },
+    "account": {
+      "name": "Garden State Savings",
+      "handle": "@gs_savings_daily",
+      "created": "October 2026",
+      "followers": 2100,
+      "verified": false,
+      "bio": "Tips to save on your bills. Mostly.",
+      "recent_posts": [
+        "5 ways to cut your bill this winter",
+        "RT if your bill made you gasp"
+      ]
+    }
+  },
+  "p2": {
+    "data": {
+      "title": "NJ residential average electricity price (EIA)",
+      "unit": "¢/kWh",
+      "url": "https://www.eia.gov/electricity/data/browser/",
+      "table": [
+        {
+          "label": "2024-03",
+          "value": 18.01
+        },
+        {
+          "label": "2024-04",
+          "value": 18.46
+        },
+        {
+          "label": "2024-05",
+          "value": 18.57
+        },
+        {
+          "label": "2024-06",
+          "value": 19.9
+        },
+        {
+          "label": "2024-07",
+          "value": 20.7
+        },
+        {
+          "label": "2024-08",
+          "value": 20.63
+        },
+        {
+          "label": "2024-09",
+          "value": 19.32
+        },
+        {
+          "label": "2024-10",
+          "value": 19.56
+        },
+        {
+          "label": "2024-11",
+          "value": 19.58
+        },
+        {
+          "label": "2024-12",
+          "value": 19.41
+        },
+        {
+          "label": "2025-01",
+          "value": 19.7
+        },
+        {
+          "label": "2025-02",
+          "value": 19.7
+        },
+        {
+          "label": "2025-03",
+          "value": 19.65
+        },
+        {
+          "label": "2025-04",
+          "value": 19.91
+        },
+        {
+          "label": "2025-05",
+          "value": 20.24
+        },
+        {
+          "label": "2025-06",
+          "value": 24.65
+        },
+        {
+          "label": "2025-07",
+          "value": 25.11
+        },
+        {
+          "label": "2025-08",
+          "value": 24.7
+        },
+        {
+          "label": "2025-09",
+          "value": 23.32
+        },
+        {
+          "label": "2025-10",
+          "value": 22.49
+        },
+        {
+          "label": "2025-11",
+          "value": 22.68
+        },
+        {
+          "label": "2025-12",
+          "value": 22.92
+        },
+        {
+          "label": "2026-01",
+          "value": 23.13
+        },
+        {
+          "label": "2026-02",
+          "value": 23.12
+        },
+        {
+          "label": "2026-03",
+          "value": 23.48
+        },
+        {
+          "label": "2026-04",
+          "value": 23.53
+        },
+        {
+          "label": "2026-05",
+          "value": 23.27
+        },
+        {
+          "label": "2026-06",
+          "value": 24.95
+        },
+        {
+          "label": "2026-07",
+          "value": 25.19
+        },
+        {
+          "label": "2026-08",
+          "value": 24.61
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "NJ residential electricity price, monthly (EIA)",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Jan 2023",
+            "value": 16.89
+          },
+          {
+            "label": "Feb 2023",
+            "value": 16.97
+          },
+          {
+            "label": "Mar 2023",
+            "value": 17.12
+          },
+          {
+            "label": "Apr 2023",
+            "value": 17.37
+          },
+          {
+            "label": "May 2023",
+            "value": 17.13
+          },
+          {
+            "label": "Jun 2023",
+            "value": 18.19
+          },
+          {
+            "label": "Jul 2023",
+            "value": 18.42
+          },
+          {
+            "label": "Aug 2023",
+            "value": 18.51
+          },
+          {
+            "label": "Sep 2023",
+            "value": 17.97
+          },
+          {
+            "label": "Oct 2023",
+            "value": 17.46
+          },
+          {
+            "label": "Nov 2023",
+            "value": 17.47
+          },
+          {
+            "label": "Dec 2023",
+            "value": 17.56
+          },
+          {
+            "label": "Jan 2024",
+            "value": 17.82
+          },
+          {
+            "label": "Feb 2024",
+            "value": 17.65
+          },
+          {
+            "label": "Mar 2024",
+            "value": 18.01
+          },
+          {
+            "label": "Apr 2024",
+            "value": 18.46
+          },
+          {
+            "label": "May 2024",
+            "value": 18.57
+          },
+          {
+            "label": "Jun 2024",
+            "value": 19.9
+          },
+          {
+            "label": "Jul 2024",
+            "value": 20.7
+          },
+          {
+            "label": "Aug 2024",
+            "value": 20.63
+          },
+          {
+            "label": "Sep 2024",
+            "value": 19.32
+          },
+          {
+            "label": "Oct 2024",
+            "value": 19.56
+          },
+          {
+            "label": "Nov 2024",
+            "value": 19.58
+          },
+          {
+            "label": "Dec 2024",
+            "value": 19.41
+          },
+          {
+            "label": "Jan 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Feb 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Mar 2025",
+            "value": 19.65
+          },
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "May 2025",
+            "value": 20.24
+          },
+          {
+            "label": "Jun 2025",
+            "value": 24.65
+          },
+          {
+            "label": "Jul 2025",
+            "value": 25.11
+          },
+          {
+            "label": "Aug 2025",
+            "value": 24.7
+          },
+          {
+            "label": "Sep 2025",
+            "value": 23.32
+          },
+          {
+            "label": "Oct 2025",
+            "value": 22.49
+          },
+          {
+            "label": "Nov 2025",
+            "value": 22.68
+          },
+          {
+            "label": "Dec 2025",
+            "value": 22.92
+          },
+          {
+            "label": "Jan 2026",
+            "value": 23.13
+          },
+          {
+            "label": "Feb 2026",
+            "value": 23.12
+          },
+          {
+            "label": "Mar 2026",
+            "value": 23.48
+          },
+          {
+            "label": "Apr 2026",
+            "value": 23.53
+          },
+          {
+            "label": "May 2026",
+            "value": 23.27
+          },
+          {
+            "label": "Jun 2026",
+            "value": 24.95
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          },
+          {
+            "label": "Aug 2026",
+            "value": 24.61
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Latest year: Aug 2025 24.7 → Aug 2026 24.61 ¢/kWh (-0.4%)."
+    },
+    "account": {
+      "name": "Chart Crusader",
+      "handle": "@chartcrusader",
+      "created": "January 2022",
+      "followers": 8800,
+      "verified": false,
+      "bio": "Charts. Hot takes. Sometimes both.",
+      "recent_posts": [
+        "Chart of the day 📈",
+        "Prices, explained in one picture"
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-11-12",
+      "url": "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
+      "before": "The state is seeking an overall reduction of 547.1 megawatts across the four electric distribution companies.",
+      "highlight": "“I don’t know if everyone in New Jersey understands, but it is the most expensive hours of the year that are driving the really unsustainable price hikes in the utility and electricity bills that we saw in the last few years,” Board of Public Utilities Commissioner Emma Rebhorn said Thursday.",
+      "after": "The order approved by the BPU Thursday requires the state’s four regulated utilities to stand up their interim virtual power plant programs by Oct. 1, 2027. Those programs would run until Sept. 30, 2029, after which they would be replaced by more permanent versions. By approving PowerUP New Jersey, the board also approved the first block of the second phase of the state’s energy storage program, which seeks to stand up new capacity by expanding residential battery storage in New Jersey."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "",
+      "highlight": "NJ utilities board votes to keep electricity rates level",
+      "after": "The Board of Public Utilities approved a series of rate changes Thursday that will keep rates roughly level for residential electric ratepayers while shaving dollars off most residential gas customers’ monthly bills."
+    },
+    "account": {
+      "name": "Shore Commuter",
+      "handle": "@shore_commuter_",
+      "created": "May 2019",
+      "followers": 214,
+      "verified": false,
+      "bio": "Long commute, short posts. Links to sources when I have them.",
+      "recent_posts": [
+        "Train was late again. Shocking.",
+        "Sharing the actual article this time."
+      ]
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NJ Board of Public Utilities",
+      "date": "2026-08-13",
+      "url": "https://nj.gov/bpu/newsroom/2026/approved/20260813.html",
+      "before": "That requires replacing PJM's unpredictable price spikes with modern rules that attract long-term investment while protecting customers. States must be allowed an active role in PJM governance to ensure wholesale market structures serve the public interest.”",
+      "highlight": "The report, required by the New Jersey Legislature and delivered to Governor Sherrill and lawmakers, comes as New Jersey electricity bills jumped roughly 20 percent last year, driven in large part by rising costs in PJM's capacity market.",
+      "after": "PJM Interconnection is the regional transmission organization responsible for coordinating the movement of wholesale electricity and managing grid reliability across 13 states, including New Jersey and the District of Columbia. While capacity charges currently account for approximately 15 to 20 percent of a typical customer’s electric bill, they represent the single largest cost component that state utility commissions like the NJBPU cannot directly set, regulate, or change."
+    },
+    "account": {
+      "name": "NJ Board of Public Utilities",
+      "handle": "@NJBPU",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "State utility regulator · nj.gov/bpu",
+      "recent_posts": []
+    }
+  }
+}

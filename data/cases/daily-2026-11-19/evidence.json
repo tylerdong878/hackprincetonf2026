@@ -1,0 +1,100 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "Thursday’s votes come months after Gov. Mikie Sherrill signed an executive order that directed New Jersey’s energy regulator to modify components of ratepayers’ monthly bills in an effort to keep costs from soaring amid steep increases in electricity demand. Sherrill signed the order during her inauguration as governor in January.",
+      "highlight": "“Taken together with the items on the agenda earlier this month, these actions will result in no net increase in electricity rates and a slight decrease in gas rates,” said Ben Hertz-Shargel, the board’s president.",
+      "after": "Among the state’s four electric distribution companies, Rockland Electric Company will see the largest monthly decrease, though overall bills will remain roughly unchanged at each of the utilities. The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by 67 cents, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month. The average Jersey Central Power and Light customer will see their bill drop by 8 cents."
+    },
+    "account": {
+      "name": "GridWatcher99",
+      "handle": "@GridWatcher99",
+      "created": "October 2026",
+      "followers": 3527,
+      "verified": false,
+      "bio": "Saying what they won't tell you about your bills.",
+      "recent_posts": [
+        "Share before they delete this!",
+        "Do your own research."
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NJ Board of Public Utilities",
+      "date": "2026-08-13",
+      "url": "https://nj.gov/bpu/newsroom/2026/approved/20260813.html",
+      "before": "That requires replacing PJM's unpredictable price spikes with modern rules that attract long-term investment while protecting customers. States must be allowed an active role in PJM governance to ensure wholesale market structures serve the public interest.”",
+      "highlight": "The report, required by the New Jersey Legislature and delivered to Governor Sherrill and lawmakers, comes as New Jersey electricity bills jumped roughly 20 percent last year, driven in large part by rising costs in PJM's capacity market.",
+      "after": "PJM Interconnection is the regional transmission organization responsible for coordinating the movement of wholesale electricity and managing grid reliability across 13 states, including New Jersey and the District of Columbia. While capacity charges currently account for approximately 15 to 20 percent of a typical customer’s electric bill, they represent the single largest cost component that state utility commissions like the NJBPU cannot directly set, regulate, or change."
+    },
+    "account": {
+      "name": "NJ Board of Public Utilities",
+      "handle": "@NJBPU",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "State utility regulator · nj.gov/bpu",
+      "recent_posts": []
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "",
+      "highlight": "NJ utilities board votes to keep electricity rates level",
+      "after": "The Board of Public Utilities approved a series of rate changes Thursday that will keep rates roughly level for residential electric ratepayers while shaving dollars off most residential gas customers’ monthly bills."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "Among the state’s four electric distribution companies, Rockland Electric Company will see the largest monthly decrease, though overall bills will remain roughly unchanged at each of the utilities.",
+      "highlight": "The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by 67 cents, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month.",
+      "after": "The average Jersey Central Power and Light customer will see their bill drop by 8 cents. Average monthly electric bills with PSE&G were expected to rise by 2 cents as a result of transmission rates flowing from the Federal Energy Regulatory Commission, but board staff said state offsets would eliminate the increase. Gas rates will decline further."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-11-12",
+      "url": "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
+      "before": "",
+      "highlight": "NJ regulators approve virtual power plant, battery storage programs",
+      "after": "The Board of Public Utilities on Thursday unanimously approved the launch of an interim virtual power plant program and the next phase of the state’s energy storage program. The approved programs make up PowerUp New Jersey, the state’s bid to tap into smart devices and smaller-scale battery projects to soften the impact peak demand has on power prices by paying for reductions in power use or stored energy transmitted to the grid."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  }
+}
