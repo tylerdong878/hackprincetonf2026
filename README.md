@@ -38,7 +38,7 @@ Earlier fake-news games mostly trained suspicion. A [2023 reanalysis](https://pu
 
 ## How the puzzles get made
 
-Every puzzle is built ahead of time by a team of **LangChain Deep Agents** and approved by a human puzzle editor. The game never shows unreviewed AI output.
+New puzzles are built ahead of time by a team of **LangChain Deep Agents** and approved by a human puzzle editor. The game never shows unreviewed AI output. (Launch week's dailies were curated by the team with a scripted builder that checks every excerpt against its source, under the same rules.)
 
 ```mermaid
 flowchart LR

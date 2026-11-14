@@ -30,7 +30,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 | 0:10–0:45 | **Judge plays 2 cards. A** reacts. | Let them tap. After each instant reveal, point at one thing: the stamp, the side-by-side, or the crowd line ("Only 8% caught this… *One in a shaker*, +100"). If they false-alarm: "Real! Doubting the truth costs points here." |
 | 0:45–1:20 | **B** | "Now flip it. **Con the Con**: you doctor a post, and a live AI agent decides whether it's real." *Judge picks one edit (crop the quote, drop the axis, cut the window).* "The Con gets one evidence check, the same tools you had…" *Verdict lands.* **FOOLED THE CON** → "You beat it." **BUSTED** → "It checked the source. Want to try Master Con?" |
 | 1:20–1:40 | **C** | *Point at the Gullible ↔ Paranoid meter.* "Earlier fake-news games had a hidden flaw. A 2023 reanalysis found they mostly made players doubt *everything*, true news included. So in our game, paranoia loses points too. A grain of salt, not the whole shaker." |
-| 1:40–2:00 | **C** | "Every puzzle is built by LangChain Deep Agents: a researcher, a forger and a blind solver that has to crack it fairly. Then a human editor approves it. All on free models. Tomorrow's puzzle is sitting in the editor's queue right now." *Optional last line:* "New Jersey now requires news literacy in every school. This is the version people actually want to play." |
+| 1:40–2:00 | **C** | "New puzzles come from LangChain Deep Agents: a researcher, a forger and a blind solver that has to crack it fairly. Then a human editor approves it. All on free models. There's one waiting in the editor's queue right now." *Optional last line:* "New Jersey now requires news literacy in every school. This is the version people actually want to play." |
 
 **Delivery notes:**
 - **The judge plays, not us.** Their reaction is the pitch. If they won't touch it, A plays and asks, "Which one would you flag?"
@@ -48,7 +48,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 ---
 
 ## 30-second version
-"Grain of Salt is a daily game. An AI con artist doctors real news, and you catch the fakes. But doubting a true post costs points too, because earlier games just taught people to distrust everything. Then you flip it and try to fool the Con, a live AI agent. Every puzzle is built by Deep Agents and approved by a human editor."
+"Grain of Salt is a daily game. An AI con artist doctors real news, and you catch the fakes. But doubting a true post costs points too, because earlier games just taught people to distrust everything. Then you flip it and try to fool the Con, a live AI agent. New puzzles are built by Deep Agents and approved by a human editor."
 
 ---
 
@@ -58,7 +58,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 - **Say:** "Building one puzzle is a long job with checks. The orchestrator plans with todos. Three sub-agents, each with its own context, do the research, the forging and the blind solving. Each trick is a `SKILL.md` that loads only when it's needed. Everything lands as files. A human-in-the-loop interrupt holds the puzzle for the editor."
 - **Show, in order:**
   1. The LangSmith trace "Grain of Salt · build daily-2026-11-18": sub-agent spans, skill loads and the blind-solver verdict.
-  2. **Approve that puzzle live** in the Editor's Desk. This is the interrupt resuming.
+  2. **Approve the queued AI-built Case File live** in the Editor's Desk, then open Case Files and play it straight away. (Dailies only go live on their date; Case Files go live when they're approved.)
   3. The "Con the Con · live judge" trace from the round they just played.
 - **If asked about rejection:** 11-19 went through a reject-and-revise loop, and its trace shows the second pass.
 
@@ -79,6 +79,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 | **"Aren't you making misinformation?"** | "The tricks only reframe real material: a cropped quote, a truncated axis, a cherry-picked window. We never invent quotes from real people. Doctored posts come only from made-up accounts, every one gets stamped at the reveal, share cards hold no content, and a human approves every puzzle." |
 | **"How do you know the real posts are real?"** | "The researcher can only save word-for-word text with a source link, and every real card links to its source." |
 | **"What about AI images and deepfakes?"** | "A Google study of about 136,000 fact-checks found that the most common media misinformation is real images in a false context. We start there. AI-written posts are on the roadmap." |
+| **"Was the puzzle I just played built by the AI?"** | "Not today's. Launch week was curated by us with a scripted builder that checks every quote against its source page. The Deep Agents pipeline builds the new ones, and each waits for a human editor. Here's one it built tonight." *Show the trace, approve the queued Case File, and play it.* |
 | **"Why Deep Agents instead of one prompt?"** | "Each job has its own context, the blind solver gives a validation loop, the files can be audited, and a human approves the result. One prompt can't check its own fairness." |
 | **"What does it cost to run?"** | "Nothing right now. It uses free open models through OpenRouter. A puzzle is built once and played by everyone, so cost doesn't grow with players. Live Con rounds are capped per day and per player." |
 | **"What's the business?"** | "It's a free daily game that grows through share grids. Later, sponsored themed weeks with newsrooms, and an editor tool that libraries and schools can use to make their own puzzles." |
@@ -94,7 +95,7 @@ Tagline: *Don't believe everything. Don't doubt everything.*
 | **Creativity** | The two-way twist: you catch the Con, then you con the Con. Paranoia costs points. | Con the Con, and the meter. |
 | **Utility** | It's a polished, replayable daily game that works on a phone. | A live round, the share grid, the Editor's Desk. |
 | **Charity** | It trains the real skill (discernment), and it's designed safety-first. | The research line, plus the safety answers above. |
-| **Avidity** | The whole team is in it, the Con has personality, there's a roadmap. | Everyone speaks, the Con's taunts, "tomorrow's puzzle is in the queue." |
+| **Avidity** | The whole team is in it, the Con has personality, there's a roadmap. | Everyone speaks, the Con's taunts, "an AI-built puzzle is waiting in the editor's queue." |
 
 ---
 
