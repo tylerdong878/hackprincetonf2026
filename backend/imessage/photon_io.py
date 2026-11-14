@@ -70,8 +70,6 @@ class PhotonIO:
                 sender, agent, space = m.sentBy.root, m.receivedBy.root, m.space.root
                 if sender.kind != "human" or agent.kind != "agent" or sender.id == agent.id:
                     continue
-                if self.agent_handle and agent.handle != self.agent_handle:
-                    continue
                 if getattr(space, "kind", "direct") != "direct":
                     continue
                 content = m.content

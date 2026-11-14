@@ -2,7 +2,8 @@
 
 Env (.env is loaded):
   PHOTON_API_KEY, PHOTON_PROJECT_ID   required (Photon 2.0 project, key with project:read + project:write)
-  PHOTON_AGENT_HANDLE                 the bot's iMessage number; texts to other lines are ignored (optional)
+  PHOTON_AGENT_HANDLE                 your bot number, only for the startup log line (optional). Every line
+                                      assigned in the project is answered: each sender can get a different one.
   GOS_API_URL                         the game server (default http://127.0.0.1:8000)
   GOS_NUDGE_HOUR                      ET hour for the daily reminder (default 9; -1 turns reminders off)
   GOS_POLL_SECONDS                    how often to check for new texts (default 2)
@@ -61,7 +62,8 @@ def main() -> int:
     engine = Engine(GameAPI(http), Sessions(state_dir / "sessions.json"))
     io = PhotonIO(os.environ["PHOTON_API_KEY"], os.environ["PHOTON_PROJECT_ID"],
                   os.environ.get("PHOTON_AGENT_HANDLE") or None, state_dir / "cursor.json")
-    log.info("🧂 Grain of Salt is listening on %s. Text it!", os.environ.get("PHOTON_AGENT_HANDLE") or "your line")
+    log.info("🧂 Grain of Salt is listening on every line in the project (yours: %s). Text it!",
+             os.environ.get("PHOTON_AGENT_HANDLE") or "see the dashboard")
     next_nudge_check = 0.0
     try:
         while True:
