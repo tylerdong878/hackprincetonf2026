@@ -1,17 +1,21 @@
-"""Con the Con (CONTRACT §7.3, §7.4): the player doctors a real Fool Deck post, the Con judges it live.
+"""Con the Con (CONTRACT §7.3, §7.4, §8): the player doctors a real Fool Deck post, the Con judges it live.
 
     apply_edit(deck_item, edit) -> {"edited_post", "changed", "trick", "diff"}     deterministic, no model
-    judge_post(edited_post, evidence) -> con dict                                  2 model calls, or ConAsleep
+    edited_author(deck_item) -> author                                             the made-up account (§8.3)
+    judge_post(edited_post, evidence, level=3) -> con dict                         1-2 model calls, or ConAsleep
+
+Con levels (§8.1): 1 = Rookie Con (no evidence, one verdict call), 2 = Street Con (one evidence check on the fast
+fallback model), 3 = Master Con (one evidence check on the full models).
 
 The judge is the pipeline's blind solver in miniature, with the same isolation:
 - It only gets the post's player-visible content and the evidence kit, never the deck item, the edit, `changed`,
   `trick` or `diff`.
-- It is ALSO blind to who posted it. apply_edit swaps a changed post to a made-up account (§7.4) while an untouched
+- It is ALSO blind to who posted it. apply_edit swaps a changed post to a made-up account (§8.3) while an untouched
   post keeps its real outlet, so the author would give the answer away. The judge sees every post as shared by
   the same neutral reposter, with no source label and the same account card, and must decide from the content
   versus the evidence.
-- Exactly one open_evidence call: only the first requested tool is opened, and the verdict call has no evidence
-  tool at all.
+- At most one open_evidence call: only the first requested tool is opened, and the verdict call has no evidence
+  tool at all. At level 1 there is no evidence call.
 """
 
 from __future__ import annotations
@@ -38,15 +42,20 @@ EDIT_TYPES = ("none", "crop", "axis", "window", "drop")
 EDIT_TRICK = {"crop": "out-of-context-quote", "axis": "misleading-chart", "window": "misleading-chart",
               "drop": "cherry-picked-stat"}
 
-# Made-up accounts a doctored deck post is re-posted from (checked against real entities before use).
-MADE_UP_ACCOUNTS = [
-    ("Jersey Bill Watch", "@jerseybills", "#E3A42B"),
-    ("Turnpike Tea", "@turnpiketea", "#8B5CF6"),
-    ("Shore Thing Daily", "@shorethingdaily", "#DB2777"),
-    ("Exit 9 Insider", "@exit9insider", "#0891B2"),
-    ("Pine Barrens Pundit", "@pinebarrenspundit", "#65A30D"),
-    ("Diner Booth Takes", "@dinerbooth", "#EA580C"),
+# The made-up accounts a changed deck post is re-posted from (§8.3): invented handles, never realistic personal
+# names. Each deck item gets ONE of these, picked by its id (and checked against real entities), so the editor's
+# preview and the verdict always show the same account.
+PERSONAS = [
+    ("Garden State Savings", "@gs_savings_daily", "#16A34A"),
+    ("Chart Crusader", "@chartcrusader", "#7C3AED"),
+    ("Rate Relief Now", "@raterelief_now", "#DC2626"),
+    ("Shelf Life", "@shelflife_news", "#EA580C"),
+    ("Bill Shock Alerts", "@billshock_alerts", "#DB2777"),
+    ("Kitchen Table Economics", "@kitchentable_econ", "#0891B2"),
+    ("Receipts Rundown", "@receipts_rundown", "#CA8A04"),
+    ("Pocketbook Pulse", "@pocketbookpulse", "#4F46E5"),
 ]
+MADE_UP_ACCOUNTS = PERSONAS  # older name
 
 # What the judge sees as the poster, for every post (edited or not).
 NEUTRAL_AUTHOR = {"name": "Feed Reposter", "handle": "@feed_reposter", "kind": "person", "verified": False,
@@ -65,17 +74,22 @@ class ConAsleep(RuntimeError):
 # ======================================================================================
 
 
-def _made_up_author(deck_item: dict) -> dict:
+def edited_author(deck_item: dict) -> dict:
+    """The made-up account a changed version of this deck item shows (CONTRACT §8.3). Deterministic per deck id."""
     post = deck_item.get("post") or {}
-    ents = known_entities([RealEntity(post.get("author", {}).get("name", ""), post.get("author", {}).get("handle"))])
+    author = post.get("author") or {}
+    ents = known_entities([RealEntity(author.get("name", ""), author.get("handle"))])
     if post.get("quote") and post["quote"].get("speaker"):
         ents.append(RealEntity(person_name_part(post["quote"]["speaker"]), None, is_person=True))
-    start = int(hashlib.sha1(str(deck_item.get("id", "")).encode()).hexdigest(), 16) % len(MADE_UP_ACCOUNTS)
-    for k in range(len(MADE_UP_ACCOUNTS)):
-        name, handle, color = MADE_UP_ACCOUNTS[(start + k) % len(MADE_UP_ACCOUNTS)]
+    start = int(hashlib.sha1(str(deck_item.get("id", "")).encode()).hexdigest(), 16) % len(PERSONAS)
+    for k in range(len(PERSONAS)):
+        name, handle, color = PERSONAS[(start + k) % len(PERSONAS)]
         if not fictional_author_problems(name, handle, ents):
             return {"name": name, "handle": handle, "kind": "person", "verified": False, "avatar_color": color}
     raise ValueError("no made-up account is available for this post")  # pragma: no cover
+
+
+_made_up_author = edited_author  # older name
 
 
 def _number(v: Any, what: str) -> float:
@@ -112,20 +126,41 @@ def _edit_crop(post: dict, editable: dict, edit: dict) -> tuple[dict, bool, dict
 
 
 def _axis_top(values: list[float], y_min: float) -> float | None:
+    """A tight, round axis top for a truncated axis (None = auto when the axis starts at 0).
+
+    Rounded up on a step that fits the visible span (not always to a whole unit), so a chart of 25.11 vs 25.19
+    starting at 25 tops out at 25.2, not 26: the bars fill the frame and the truncation looks dramatic.
+    """
     if y_min <= 0:
         return None
-    top = float(math.ceil(max(values)))
-    return top + 1 if top <= max(values) else top
+    top_value = max(values)
+    span = top_value - y_min
+    step = 10.0 ** math.floor(math.log10(span)) if span > 0 else 1.0
+    if span / step < 2:  # e.g. span 0.19 -> step 0.1 would leave the frame half empty; 0.05 is snugger
+        step /= 2
+    top = round(math.ceil(round(top_value / step, 9)) * step, 9)
+    return round(top + step, 9) if top <= top_value else top
+
+
+def _shown_values(chart: dict) -> list[float]:
+    """The values the chart actually displays (its points), not the whole editable series behind it."""
+    values = [float(p["value"]) for p in chart.get("points") or []]
+    if not values:
+        raise ValueError("the chart has no points")
+    return values
 
 
 def _edit_axis(post: dict, edit: dict) -> tuple[dict, bool, dict | None]:
+    """Move the y-axis start. Allowed anywhere in [0, the lowest value shown in this chart): just below the
+    lowest displayed bar/point, so the truncation can be as dramatic as the real numbers allow, but no value is
+    ever cut off. The bound is the displayed points, not editable.chart_series (which may cover more months)."""
     chart = post.get("chart")
     if not chart:
         raise ValueError("axis needs a chart post")
     y_min = _number(edit.get("y_min"), "y_min")
-    values = [float(p["value"]) for p in chart["points"]]
+    values = _shown_values(chart)
     if not 0 <= y_min < min(values):
-        raise ValueError(f"y_min must be in [0, {min(values):g}) so no bar is cut off")
+        raise ValueError(f"y_min must be in [0, {min(values):g}): below the lowest value shown, so nothing is cut off")
     if y_min == float(chart.get("y_min") or 0):
         return post, False, None
     original = copy.deepcopy(chart)
@@ -202,7 +237,7 @@ def apply_edit(deck_item: dict, edit: dict) -> dict:
         post, changed, diff = _edit_drop(post, editable, edit)
     if not changed:
         return {"edited_post": copy.deepcopy(deck_item["post"]), "changed": False, "trick": None, "diff": None}
-    post["author"] = _made_up_author(deck_item)  # §8: a doctored post never appears as the real outlet
+    post["author"] = edited_author(deck_item)  # §8.3: a doctored post never appears as the real outlet
     post["source_label"] = None
     return {"edited_post": post, "changed": True, "trick": EDIT_TRICK[etype], "diff": diff}
 
@@ -211,19 +246,34 @@ def apply_edit(deck_item: dict, edit: dict) -> dict:
 # judge_post (the Con, live)
 # ======================================================================================
 
-JUDGE_SYSTEM = """\
+LEVELS = {1: "Rookie Con", 2: "Street Con", 3: "Master Con"}  # CONTRACT §8.1
+
+_JUDGE_INTRO = """\
 You are the Con from Grain of Salt: a smug, playful con artist who knows every trick, never cruel. A player took \
 a REAL post from a news deck and either doctored it with one trick or bluffed and left it exactly as published:
 - out-of-context-quote: words cut out of a real quote so it means something else;
 - misleading-chart: the y-axis start moved, or two months picked to compare;
 - cherry-picked-stat: an offsetting number or denominator dropped from a true statistic.
-Everyone here reposts, so who posted it tells you nothing. Compare the post with the evidence. You get to open \
-exactly ONE evidence tool, then you rule."""
+Everyone here reposts, so who posted it tells you nothing."""
+JUDGE_SYSTEM = (_JUDGE_INTRO + " Compare the post with the evidence. You get to open exactly ONE evidence tool, "
+                "then you rule.")
+JUDGE_SYSTEM_NO_EVIDENCE = (_JUDGE_INTRO + " This round you get NO evidence at all: judge the post as shown, from "
+                            "its content alone, then rule.")
 
 STEP1 = "Pick the ONE evidence tool most likely to expose a trick: call open_evidence now."
 STEP2 = ("Rule now: call con_verdict. Say 'doctored' only if the evidence shows the post misrepresents it. "
          "reasoning = 2 or 3 short lines (under 15 words each) in your smug, playful voice. "
          "trick_guess only if doctored.")
+STEP_NO_EVIDENCE = ("Rule now: call con_verdict. You have no evidence, so judge the post itself: say 'doctored' only "
+                    "if it shows signs of a trick. reasoning = 2 or 3 short lines (under 15 words each) in your smug, "
+                    "playful voice; don't claim you checked anything. trick_guess only if doctored.")
+
+
+def judge_level(level: Any) -> int:
+    """1, 2 or 3 (CONTRACT §8.1). Raises ValueError otherwise."""
+    if isinstance(level, bool) or not isinstance(level, int) or level not in LEVELS:
+        raise ValueError(f"level must be one of {sorted(LEVELS)}")
+    return int(level)
 
 
 def blind_view(edited_post: dict) -> dict:
@@ -241,9 +291,13 @@ def blind_evidence(view: dict, evidence: dict) -> dict[str, Any]:
     return kit
 
 
-def judge_briefing(view: dict) -> str:
-    lines = ["The post:", *post_lines(view, with_time=False),
-             f"You may open one of: {', '.join(view['tools'])}."]
+def judge_briefing(view: dict, *, with_evidence: bool = True) -> str:
+    lines = ["The post:", *post_lines(view, with_time=False)]
+    if with_evidence:
+        lines.append(f"You may open one of: {', '.join(view['tools'])}.")
+    else:  # level 1: no evidence, so don't list tools it can't use
+        lines = [ln for ln in lines if not ln.strip().startswith("evidence tools:")]
+        lines.append("No evidence this round.")
     return "\n".join(lines)
 
 
@@ -292,11 +346,11 @@ def _reasoning_lines(raw: Any) -> list[str]:
     return lines[:3]
 
 
-def _judge_models() -> list[tuple[BaseChatModel, str, bool]]:
+def _judge_models(level: int = 3) -> list[tuple[BaseChatModel, str, bool]]:
     from pipeline.models import NoModelConfigured, make_judge_models
 
     try:
-        return make_judge_models()
+        return make_judge_models(level=level)
     except NoModelConfigured as exc:
         raise ConAsleep(str(exc)) from exc
 
@@ -328,59 +382,96 @@ class _Chain:
         raise ConAsleep("the model call failed (" + "; ".join(self.errors) + ")")
 
 
-def judge_post(edited_post: dict, evidence: dict, *, model: BaseChatModel | None = None,
+TRACE_NAME = "Con the Con · live judge"
+
+try:  # group the judge's model calls under one named LangSmith trace (a no-op when tracing is off)
+    from langsmith import traceable as _traceable
+
+    _TRACED = True
+except ImportError:  # pragma: no cover
+    _TRACED = False
+
+    def _traceable(**_kw):  # type: ignore[no-redef]
+        return lambda fn: fn
+
+
+def judge_post(edited_post: dict, evidence: dict, *, level: int = 3, model: BaseChatModel | None = None,
                model_name: str | None = None, vision: bool = False, fallback: BaseChatModel | None = None,
                deadline_s: float | None = None) -> dict:
-    """The Con rules on one post: exactly one evidence check, then a verdict (2 model calls).
+    """The Con rules on one post (CONTRACT §7.4, §8.1).
+
+    level 3 (Master Con): one evidence check, then a verdict, on the full judge models (2 model calls).
+    level 2 (Street Con): the same, with the fast fallback model (nemotron-3.5-lightning:free) as the primary.
+    level 1 (Rookie Con): no evidence; one verdict call on the post as shown. `checked` is [].
 
     Returns {checked, verdict, trick_guess, reasoning, confidence, model}. Raises ConAsleep when there is no key or
-    the models fail. Each call has a hard deadline (PIPELINE_JUDGE_DEADLINE_S, default 20 s); on a timeout or error
-    the judge switches once to the fallback model (default nvidia/nemotron-3.5-lightning:free), then gives up.
-    `model` / `fallback` / `model_name` / `vision` / `deadline_s` are for tests and callers managing their own models.
+    the models fail, ValueError on a bad level. Each call has a hard deadline (PIPELINE_JUDGE_DEADLINE_S, default
+    20 s); on a timeout or error the judge switches once to the next model in the chain, then gives up.
+    `model` / `fallback` / `model_name` / `vision` / `deadline_s` are for tests and callers managing their own models
+    (used as given, whatever the level). Traced in LangSmith as "Con the Con · live judge", tagged with the level.
     """
+    level = judge_level(level)
+    kwargs = {"level": level, "model": model, "model_name": model_name, "vision": vision, "fallback": fallback,
+              "deadline_s": deadline_s}
+    if not _TRACED:  # pragma: no cover
+        return _judge(edited_post, evidence, **kwargs)
+    extra = {"metadata": {"con_level": level, "con_level_name": LEVELS[level]}, "tags": [f"con-level-{level}"]}
+    return _judge_traced(edited_post, evidence, langsmith_extra=extra, **kwargs)
+
+
+def _judge(edited_post: dict, evidence: dict, *, level: int, model: BaseChatModel | None,
+           model_name: str | None, vision: bool, fallback: BaseChatModel | None, deadline_s: float | None) -> dict:
     from pipeline.models import judge_deadline_s
 
+    with_evidence = level >= 2
     view = blind_view(edited_post)
     kit = blind_evidence(view, evidence)
-    if not kit:
+    if with_evidence and not kit:
         raise ValueError("the post has no evidence the Con could check")
-    view["tools"] = [t for t in view["tools"] if t in kit]
+    view["tools"] = [t for t in view["tools"] if t in kit] if with_evidence else []
     if model is not None:
         name = model_name or getattr(model, "model_name", None) or type(model).__name__
         candidates = [(model, name, vision)]
         if fallback is not None:
             candidates.append((fallback, getattr(fallback, "model_name", None) or type(fallback).__name__, False))
     else:
-        candidates = _judge_models()
+        candidates = _judge_models(level)
     chain = _Chain(candidates, deadline_s if deadline_s is not None else judge_deadline_s())
-    text = judge_briefing(view)
+    text = judge_briefing(view, with_evidence=with_evidence)
     png = render_chart_png(view["chart"]) if view.get("chart") and any(c[2] for c in candidates) else None
+    system = JUDGE_SYSTEM if with_evidence else JUDGE_SYSTEM_NO_EVIDENCE
 
     def opening(vis: bool) -> list[Any]:
         content: Any = text
         if vis and png:
             content = [{"type": "text", "text": text}, *image_blocks(view, png)]
-        return [SystemMessage(content=JUDGE_SYSTEM), HumanMessage(content=content), HumanMessage(STEP1)]
+        msgs: list[Any] = [SystemMessage(content=system), HumanMessage(content=content)]
+        return [*msgs, HumanMessage(STEP1)] if with_evidence else msgs
 
-    # Call 1: choose ONE evidence tool.
-    first = chain.invoke(_choose_schema(view["tools"]), opening)
-    call = _first_call(first, "open_evidence")
-    if call is not None:
-        choice = str((call.get("args") or {}).get("tool", ""))
-    else:  # some free models answer in text; accept exactly one tool name
-        named = [t for t in view["tools"] if re.search(rf"\b{t}\b", first.text or "", re.IGNORECASE)]
-        choice = named[0] if len(named) == 1 else ""
-    if choice not in kit:
-        raise ConAsleep(f"the Con didn't pick one of {view['tools']}")
-    payload = json.dumps(_compact_evidence(choice, kit[choice]), ensure_ascii=False, indent=1)
-    if call is not None:  # only the first requested tool is opened, whatever else the model asked for
-        looked = [AIMessage(content=first.text or "", tool_calls=[{**call, "args": {"tool": choice}}]),
-                  ToolMessage(content=payload, tool_call_id=call["id"])]
-    else:
-        looked = [AIMessage(content=first.text or choice), HumanMessage(f"Evidence ({choice}):\n{payload}")]
+    checked: list[str] = []
+    looked: list[Any] = []
+    final_step = STEP_NO_EVIDENCE
+    if with_evidence:
+        # Call 1: choose ONE evidence tool.
+        first = chain.invoke(_choose_schema(view["tools"]), opening)
+        call = _first_call(first, "open_evidence")
+        if call is not None:
+            choice = str((call.get("args") or {}).get("tool", ""))
+        else:  # some free models answer in text; accept exactly one tool name
+            named = [t for t in view["tools"] if re.search(rf"\b{t}\b", first.text or "", re.IGNORECASE)]
+            choice = named[0] if len(named) == 1 else ""
+        if choice not in kit:
+            raise ConAsleep(f"the Con didn't pick one of {view['tools']}")
+        payload = json.dumps(_compact_evidence(choice, kit[choice]), ensure_ascii=False, indent=1)
+        if call is not None:  # only the first requested tool is opened, whatever else the model asked for
+            looked = [AIMessage(content=first.text or "", tool_calls=[{**call, "args": {"tool": choice}}]),
+                      ToolMessage(content=payload, tool_call_id=call["id"])]
+        else:
+            looked = [AIMessage(content=first.text or choice), HumanMessage(f"Evidence ({choice}):\n{payload}")]
+        checked, final_step = [choice], STEP2
 
-    # Call 2: the verdict. Only the verdict tool is offered, so a second look is impossible.
-    second = chain.invoke(VERDICT_SCHEMA, lambda vis: [*opening(vis), *looked, HumanMessage(STEP2)])
+    # The verdict (level 1: the only call). Only the verdict tool is offered, so a(nother) look is impossible.
+    second = chain.invoke(VERDICT_SCHEMA, lambda vis: [*opening(vis), *looked, HumanMessage(final_step)])
     model_name = chain.current[1]
     vcall = _first_call(second, "con_verdict")
     args = (vcall or {}).get("args") or _json_in(second.text or "") or {}
@@ -396,8 +487,11 @@ def judge_post(edited_post: dict, evidence: dict, *, model: BaseChatModel | None
         confidence = min(1.0, max(0.0, float(args.get("confidence", 0.5))))
     except (TypeError, ValueError):
         confidence = 0.5
-    return {"checked": [choice], "verdict": verdict, "trick_guess": guess, "reasoning": reasoning,
+    return {"checked": checked, "verdict": verdict, "trick_guess": guess, "reasoning": reasoning,
             "confidence": round(confidence, 2), "model": model_name}
+
+
+_judge_traced = _traceable(name=TRACE_NAME, run_type="chain", tags=["grain-of-salt", "con-the-con"])(_judge)
 
 
 # ======================================================================================

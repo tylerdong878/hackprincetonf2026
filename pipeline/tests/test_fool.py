@@ -10,11 +10,15 @@ import pytest
 from langchain_core.messages import ToolMessage
 
 from pipeline.fakes import ScriptedChatModel, ai, tool_call
+import pipeline.fool as fool_mod
 from pipeline.fool import (
     NEUTRAL_ACCOUNT,
+    PERSONAS,
+    TRACE_NAME,
     ConAsleep,
     apply_edit,
     blind_view,
+    edited_author,
     judge_post,
     outcome_for,
 )
@@ -147,7 +151,8 @@ def test_axis_truncation():
     out = apply_edit(item, {"type": "axis", "y_min": 25})
     assert out["changed"] and out["trick"] == "misleading-chart"
     diff = ChartDiff.model_validate(out["diff"])
-    assert diff.shown.y_min == 25 and diff.shown.y_max == 26 and diff.original.y_min == 0
+    # The top hugs the data (25.2, not 26), so a 0.08 difference fills the frame.
+    assert diff.shown.y_min == 25 and diff.shown.y_max == 25.2 and diff.original.y_min == 0
     assert out["edited_post"]["body"] == item["post"]["body"]
     assert_made_up(out["edited_post"])
     assert apply_edit(item, {"type": "axis", "y_min": 0})["changed"] is False
@@ -333,3 +338,135 @@ def test_judge_models_default_chain(monkeypatch):
     assert [(n, v) for _, n, v in chain] == [("nvidia/nemotron-3.5-super-vl:free", True),
                                             ("nvidia/nemotron-3.5-lightning:free", False)]
     assert all(m.max_retries == 0 for m, _, _ in chain)
+
+
+# ======================================================================================
+# v2.1 (CONTRACT §8): made-up account per deck item, dramatic axis, Con levels
+# ======================================================================================
+
+
+def test_edited_author_is_fixed_per_deck_item_and_used_by_apply_edit():
+    item = quote_item()
+    author = edited_author(item)
+    assert author == edited_author(copy.deepcopy(item))  # deterministic
+    assert (author["name"], author["handle"], author["avatar_color"]) in PERSONAS
+    out = apply_edit(item, {"type": "crop", "keep_word_indices": no_net_indices()})
+    assert out["edited_post"]["author"] == author  # exactly the account the editor previews
+    for fn, edit in ((chart_item, {"type": "axis", "y_min": 25}), (stat_item, {"type": "drop", "drop": "offset"})):
+        assert apply_edit(fn(), edit)["edited_post"]["author"] == edited_author(fn())
+    # Different deck ids spread over the persona list.
+    picks = {edited_author(dict(item, id=f"deck-{i}"))["handle"] for i in range(40)}
+    assert len(picks) >= 4
+
+
+def test_personas_are_invented_handles():
+    ents = known_entities()
+    for name, handle, color in PERSONAS:
+        assert handle.startswith("@") and color.startswith("#")
+        assert not fictional_author_problems(name, handle, ents), name
+
+
+def test_edited_author_skips_a_persona_that_collides_with_the_real_poster():
+    item = quote_item()
+    first = edited_author(item)
+    item["post"]["author"] = dict(NJM, name=first["name"], handle=first["handle"])  # pretend it's real
+    other = edited_author(item)
+    assert other["handle"] != first["handle"]
+    assert not fictional_author_problems(other["name"], other["handle"], known_entities())
+
+
+def test_axis_bound_is_the_lowest_value_shown_not_the_whole_series():
+    item = chart_item()
+    series = item["editable"]["chart_series"]
+    assert min(s["value"] for s in series) < 20  # the series dips to ~19.6 in early 2025...
+    shown = [{"label": "Jul 2026", "value": 25.19}, {"label": "Aug 2026", "value": 25.4}]
+    item["post"]["chart"] = dict(item["post"]["chart"], points=shown)  # ...but the post only shows two months
+    out = apply_edit(item, {"type": "axis", "y_min": 25.1})  # far above the series minimum: allowed
+    chart = out["edited_post"]["chart"]
+    assert out["changed"] and chart["y_min"] == 25.1 and chart["points"] == shown
+    assert 25.4 < chart["y_max"] <= 25.5  # a tight top: the bars fill the frame
+    ChartDiff.model_validate(out["diff"])
+    for bad in (25.19, 25.3):  # at or above the lowest bar shown would cut it off
+        with pytest.raises(ValueError, match="25.19"):
+            apply_edit(item, {"type": "axis", "y_min": bad})
+
+
+def test_axis_top_on_the_real_deck_scale():
+    from pipeline.fool import _axis_top
+
+    assert _axis_top([19.65, 25.19], 19.5) == 26
+    assert _axis_top([2.141, 6.227], 2.0) == 7
+    assert _axis_top([25.11, 25.19], 25) == 25.2
+    assert _axis_top([1, 5], 0) is None  # an honest axis stays auto
+
+
+class RecordingModel(ScriptedChatModel):
+    bound: list = []
+
+    def bind_tools(self, tools, **kwargs):  # noqa: ANN001
+        self.bound.append([getattr(t, "__name__", str(t)) for t in tools])
+        return self
+
+
+def test_level1_rookie_con_gets_no_evidence_and_one_verdict_call():
+    edited = apply_edit(quote_item(), {"type": "crop", "keep_word_indices": no_net_indices()})["edited_post"]
+    model = RecordingModel(script=[verdict_call(verdict="real", trick=None)], model_name="scripted-con")
+    con = judge_post(edited, quote_item()["evidence"], level=1, model=model)
+    assert model.calls == 1 and model.bound == [["con_verdict"]]  # verdict schema only
+    assert con["checked"] == [] and con["verdict"] == "real" and con["model"] == "scripted-con"
+    prompt = json.dumps([m.content for m in model.seen[0]], default=str)
+    assert not [m for m in model.seen[0] if isinstance(m, ToolMessage)]
+    for leak in ("said the board", "open_evidence", "evidence tools:", "You may open"):
+        assert leak not in prompt, leak
+    assert "NO evidence" in prompt
+    # Level 1 doesn't need an evidence kit at all.
+    model = RecordingModel(script=[verdict_call()])
+    assert judge_post(edited, {}, level=1, model=model)["checked"] == []
+
+
+def test_level3_is_the_default_and_level2_still_checks_once():
+    for level in (2, 3):
+        model = RecordingModel(script=[ai("", tool_call("open_evidence", {"tool": "source"})), verdict_call()])
+        con = judge_post(quote_item()["post"], quote_item()["evidence"], level=level, model=model)
+        assert con["checked"] == ["source"] and model.calls == 2
+        assert model.bound == [["open_evidence"], ["con_verdict"]]
+
+
+@pytest.mark.parametrize("level", [0, 4, "2", None, True, 2.5])
+def test_bad_level(level):
+    with pytest.raises(ValueError):
+        judge_post(quote_item()["post"], quote_item()["evidence"], level=level,
+                   model=ScriptedChatModel(script=[verdict_call()]))
+
+
+def test_level2_uses_the_fast_model_first(monkeypatch):
+    from pipeline.models import make_judge_models
+
+    monkeypatch.setattr("pipeline.models.load_env", lambda: None)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-test-not-real")
+    for k in ("PIPELINE_PROVIDER", "PIPELINE_JUDGE_MODEL", "PIPELINE_JUDGE_FALLBACK_MODEL", "PIPELINE_SOLVER_MODEL"):
+        monkeypatch.delenv(k, raising=False)
+    names = lambda lv: [n for _, n, _ in make_judge_models(level=lv)]  # noqa: E731
+    full, fast = "nvidia/nemotron-3.5-super-vl:free", "nvidia/nemotron-3.5-lightning:free"
+    assert names(3) == names(1) == [full, fast]
+    assert names(2) == [fast, full]
+    seen = []
+    monkeypatch.setattr(fool_mod, "_judge_models", lambda level=3: seen.append(level) or [
+        (ScriptedChatModel(script=[ai("", tool_call("open_evidence", {"tool": "source"})), verdict_call()],
+                           model_name="lightning"), "lightning", False)])
+    con = judge_post(quote_item()["post"], quote_item()["evidence"], level=2)
+    assert seen == [2] and con["model"] == "lightning"
+
+
+def test_trace_keeps_its_name_and_is_tagged_with_the_level(monkeypatch):
+    assert TRACE_NAME == "Con the Con · live judge"
+    got = {}
+
+    def fake_traced(edited_post, evidence, *, langsmith_extra, **kwargs):  # noqa: ANN001
+        got.update(extra=langsmith_extra, kwargs=kwargs)
+        return {"checked": [], "verdict": "real"}
+
+    monkeypatch.setattr(fool_mod, "_judge_traced", fake_traced)
+    judge_post(quote_item()["post"], quote_item()["evidence"], level=1)
+    assert got["extra"]["metadata"] == {"con_level": 1, "con_level_name": "Rookie Con"}
+    assert "con-level-1" in got["extra"]["tags"] and got["kwargs"]["level"] == 1

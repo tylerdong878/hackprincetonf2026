@@ -252,7 +252,14 @@ def run(agent: Any, ctx: RunContext, request: str, mode: str, read: Callable[[st
     from langchain_core.messages import HumanMessage
     from langgraph.types import Command
 
-    config = {"configurable": {"thread_id": ctx.case_id}}
+    # Named, tagged run so it's easy to find and show in LangSmith (ignored when tracing is off).
+    config = {
+        "configurable": {"thread_id": ctx.case_id},
+        "run_name": f"Grain of Salt · build {ctx.case_id}",
+        "tags": ["grain-of-salt", "case-builder", ctx.mode],
+        "metadata": {"case_id": ctx.case_id, "topic": ctx.topic, "mode": ctx.mode,
+                     "daily_date": ctx.daily_date, "theme": ctx.theme},
+    }
     payload: Any = {"messages": [HumanMessage(content=request)]}
     while True:
         for _chunk in agent.stream(payload, config, stream_mode="updates"):

@@ -363,12 +363,14 @@ def judge_deadline_s() -> float:
     return float(os.environ.get("PIPELINE_JUDGE_DEADLINE_S", "20"))
 
 
-def make_judge_models() -> list[tuple[BaseChatModel, str, bool]]:
-    """[(model, name, vision), ...] for the live Con judge: the blind-solver model, then ONE fallback.
+def make_judge_models(level: int = 3) -> list[tuple[BaseChatModel, str, bool]]:
+    """[(model, name, vision), ...] for the live Con judge: a primary model, then ONE fallback.
 
-    OpenRouter: PIPELINE_JUDGE_MODEL (default the solver model, vision) then PIPELINE_JUDGE_FALLBACK_MODEL
-    (default nvidia/nemotron-3.5-lightning:free, text only). Gemini-only: GEMINI_MODEL. All with max_retries=0
-    (failed requests count against the free daily cap). Raises NoModelConfigured without a key.
+    OpenRouter, level 3 (and 1): PIPELINE_JUDGE_MODEL (default the solver model, vision) then
+    PIPELINE_JUDGE_FALLBACK_MODEL (default nvidia/nemotron-3.5-lightning:free, text only).
+    Level 2 (Street Con, CONTRACT §8.1): the same two, swapped, so the fast fallback model is the primary.
+    Gemini-only: GEMINI_MODEL at every level. All with max_retries=0 (failed requests count against the free
+    daily cap). Raises NoModelConfigured without a key.
     """
     provider = detect_provider()
     if provider is None:
@@ -381,6 +383,12 @@ def make_judge_models() -> list[tuple[BaseChatModel, str, bool]]:
     vision = os.environ.get("PIPELINE_SOLVER_VISION", "1") != "0" and "vl" in primary.lower()
     out = [(make_openrouter(primary, http_timeout_ms), primary, vision)]
     fb = os.environ.get("PIPELINE_JUDGE_FALLBACK_MODEL", DEFAULT_FALLBACK_MODEL).strip()
+    if level == 2:  # Street Con: the fast model judges; the full model is only the fallback
+        fb = fb or DEFAULT_FALLBACK_MODEL
+        if fb == primary:
+            return out
+        fb_vision = os.environ.get("PIPELINE_SOLVER_VISION", "1") != "0" and "vl" in fb.lower()
+        return [(make_openrouter(fb, http_timeout_ms), fb, fb_vision), *out]
     if fb and fb != primary:
         out.append((make_openrouter(fb, http_timeout_ms), fb, False))
     return out

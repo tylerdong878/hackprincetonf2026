@@ -85,6 +85,7 @@ class Case(_Strict):
     title: str = Field(min_length=1)
     topic: str = Field(min_length=1)
     briefing: str = Field(min_length=1)
+    notice: str | None = None  # same text on every case, so it reveals nothing
     clue_budget: int = Field(ge=0)
     trick_options: list[TrickId]
     posts: list[Post] = Field(min_length=1)

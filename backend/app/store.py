@@ -157,6 +157,15 @@ class Store:
             raise ValueError("invalid case id")
         return self.data_dir / "stats" / f"{case_id}.json"
 
+    def case_stats(self, case_id: str) -> dict:
+        """post_id -> {n, said_doctored, correct} for a case (empty if none yet)."""
+        try:
+            stats = read_json(self._stats_path(case_id), {}) or {}
+        except (ValueError, OSError):
+            return {}
+        posts = stats.get("posts") if isinstance(stats, dict) else None
+        return posts if isinstance(posts, dict) else {}
+
     def bump_stats(self, case_id: str, post_id: str, said_doctored: bool, correct: bool) -> dict:
         """Count one real answer and return that post's updated counts."""
         with self.lock:
