@@ -1,0 +1,100 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-06-30",
+      "url": "https://www.npr.org/2026/06/30/nx-s1-5847935/footballers-donate-socks-to-hooves-in-need",
+      "before": "",
+      "highlight": "Footballers donate socks to hooves in need",
+      "after": "The U.K. football club Arsenal have donated dozens of socks — to a donkey and horse sanctuary. … The soccer socks can act as a compression sleeve and hold bandages in place and protect them from flies."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-18",
+      "url": "https://www.npr.org/2026/09/18/nx-s1-5971268/overdue-library-magazine-returned-after-132-years",
+      "before": "",
+      "highlight": "Overdue library magazine returned after 132 years",
+      "after": "After the Concord Public Library in New Hampshire announced a fine freeze, a man has returned an overdue magazine published in 1894. … Well, a magazine from 1894 was just returned to the Concord Public Library in New Hampshire about 132 years overdue."
+    },
+    "account": {
+      "name": "Shelf Life",
+      "handle": "@shelflifereads",
+      "created": "April 2021",
+      "followers": 12800,
+      "verified": false,
+      "bio": "Book news & library lore 📚",
+      "recent_posts": [
+        "Your library card is a superpower.",
+        "Name a book you never returned. I'll wait."
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-14",
+      "url": "https://www.npr.org/2026/09/14/nx-s1-5955652/nevada-camel-race",
+      "before": "",
+      "highlight": "The true fake story behind the annual Virginia City Camel Race",
+      "after": "Back in the 1950s, a newspaper editor in Nevada wrote a fake story about a camel race happening in his town as a joke. Eventually, he helped make it a real thing and the annual Virginia City Camel Race was born, which continues to this day. … Bob Richards lied the thing right into existence."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-01",
+      "url": "https://www.npr.org/2026/11/01/nx-s1-6025437/new-york-marathon-almgren-chepkirui-win",
+      "before": "It was the 50th time that the race has run through all five boroughs of the city.",
+      "highlight": "There were just over 2,000 competitors in 1976, the seventh running of the race, including only 88 women. About 60,000 runners stepped up to the starting line Sunday, with nearly half of them women.",
+      "after": "There were runners from more than 140 countries competing Sunday, including defending men's Kipruto."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+      "before": "Falkner, the Princeton researcher, says humans can also learn physical skills by watching others, like in sports.",
+      "highlight": "FALKNER: The question is not whether you can be a professional athlete by watching the NFL, but are you better at football for watching sports than if you had never watched anything? And the answer is absolutely yes.",
+      "after": "In the study, the observer mice fought with a mix of aggressive and defensive behaviors, like they had learned tactics from both sides."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

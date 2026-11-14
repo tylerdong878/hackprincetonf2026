@@ -1,0 +1,119 @@
+{
+  "id": "2026-11-17-daily-strange-but-true",
+  "number": 7,
+  "title": "Stranger Than Fiction",
+  "topic": "Odd news",
+  "briefing": "Odd news. Five posts, 0–3 doctored today. The truth is weird. I'm only slightly weirder.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-06-30T21:08:38Z",
+      "body": "Footballers donate socks to hooves in need",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · June 30, 2026",
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Shelf Life",
+        "handle": "@shelflifereads",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-09-20T15:00:00Z",
+      "body": "Overdue library magazine returned after 32 years 📚 Imagine the late fees.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-09-14T20:34:16Z",
+      "body": "The true fake story behind the annual Virginia City Camel Race",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 14, 2026",
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-01T17:33:21Z",
+      "body": "There were just over 2,000 competitors in 1976, the seventh running of the race, including only 88 women. About 60,000 runners stepped up to the starting line Sunday, with nearly half of them women.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 1, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-09T21:39:35Z",
+      "body": "Falkner, the Princeton researcher, says humans can also learn physical skills by watching others, like in sports.",
+      "quote": {
+        "text": "The question is not whether you can be a professional athlete by watching the NFL, but are you better at football for watching sports than if you had never watched anything? And the answer is absolutely yes.",
+        "speaker": "Annegret Falkner, Princeton Neuroscience Institute"
+      },
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "id": "falkner-watching-sports",
+  "kind": "quote",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#1D4ED8"
+    },
+    "posted_at": "2026-11-09T21:39:35Z",
+    "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+    "quote": {
+      "text": "The question is not whether you can be a professional athlete by watching the NFL, but are you better at football for watching sports than if you had never watched anything? And the answer is absolutely yes.",
+      "speaker": "Annegret Falkner, Princeton Neuroscience Institute"
+    },
+    "chart": null,
+    "source_label": "NPR · Nov 9, 2026",
+    "card_style": "quote",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+      "before": "Falkner, the Princeton researcher, says humans can also learn physical skills by watching others, like in sports.",
+      "highlight": "FALKNER: The question is not whether you can be a professional athlete by watching the NFL, but are you better at football for watching sports than if you had never watched anything? And the answer is absolutely yes.",
+      "after": "In the study, the observer mice fought with a mix of aggressive and defensive behaviors, like they had learned tactics from both sides."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": [
+      "The",
+      "question",
+      "is",
+      "not",
+      "whether",
+      "you",
+      "can",
+      "be",
+      "a",
+      "professional",
+      "athlete",
+      "by",
+      "watching",
+      "the",
+      "NFL,",
+      "but",
+      "are",
+      "you",
+      "better",
+      "at",
+      "football",
+      "for",
+      "watching",
+      "sports",
+      "than",
+      "if",
+      "you",
+      "had",
+      "never",
+      "watched",
+      "anything?",
+      "And",
+      "the",
+      "answer",
+      "is",
+      "absolutely",
+      "yes."
+    ],
+    "chart_series": null,
+    "stat": null
+  },
+  "tools": [
+    "crop"
+  ]
+}

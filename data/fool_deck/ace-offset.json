@@ -1,0 +1,60 @@
+{
+  "id": "ace-offset",
+  "kind": "stat",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#2F9E6A"
+    },
+    "posted_at": "2026-09-24T19:48:02Z",
+    "body": "Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally. But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before.",
+    "quote": null,
+    "chart": null,
+    "source_label": "New Jersey Monitor · Sept 24, 2026",
+    "card_style": "stat",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "Some customers will see individual components of their bills increase, but those will be offset by drops to other components.",
+      "highlight": "Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally. But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before.",
+      "after": ""
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": null,
+    "chart_series": null,
+    "stat": {
+      "full": "Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally. But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before.",
+      "droppable": [
+        {
+          "id": "offset",
+          "text": "But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before.",
+          "shown_without": "Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally."
+        }
+      ]
+    }
+  },
+  "tools": [
+    "drop"
+  ]
+}

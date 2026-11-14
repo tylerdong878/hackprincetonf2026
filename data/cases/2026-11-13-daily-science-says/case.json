@@ -1,0 +1,122 @@
+{
+  "id": "2026-11-13-daily-science-says",
+  "number": 3,
+  "title": "Lab Coats and Tall Tales",
+  "topic": "Weird science news",
+  "briefing": "Science news. Five posts, 0–3 doctored today. A lab coat makes anything sound true. Or false.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-09T21:39:35Z",
+      "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "quote": {
+        "text": "We set this up to look a little bit like a gladiator arena, so the mouse is kind of above the two mice fighting on a platform.",
+        "speaker": "Annegret Falkner, Princeton Neuroscience Institute"
+      },
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Fossil Fever",
+        "handle": "@fossilfever",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#EA580C"
+      },
+      "posted_at": "2026-11-10T14:05:00Z",
+      "body": "NPR: \"Scientists found ancient remnants of dinosaur blood\" 🦖🩸 Jurassic Park was a documentary.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-09-29T20:53:52Z",
+      "body": "Nor'easter exposes part of a schooner wrecked on Nantucket",
+      "quote": {
+        "text": "Well, I can with 100% confidence tell you that I wouldn't be 100% confident.",
+        "speaker": "David Robinson, Massachusetts Board of Underwater Archaeological Resources"
+      },
+      "chart": null,
+      "source_label": "NPR · Sept 29, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "Orbit Daily",
+        "handle": "@orbitdaily_",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#4F46E5"
+      },
+      "posted_at": "2026-11-09T13:30:00Z",
+      "body": "NASA is looking for astronauts to live and work on Mars 🚀🔴 Who's applying?",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-08T23:36:47Z",
+      "body": "The applicant process is extremely competitive. Out of more than 8,000 applicants for NASA's last astronaut class, only 10 candidates were selected.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 8, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}

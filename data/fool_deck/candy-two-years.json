@@ -1,0 +1,65 @@
+{
+  "id": "candy-two-years",
+  "kind": "stat",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#1D4ED8"
+    },
+    "posted_at": "2026-10-30T09:00:00Z",
+    "body": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+    "quote": null,
+    "chart": null,
+    "source_label": "NPR · Oct 30, 2026",
+    "card_style": "stat",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "For people stocking up on candy this Halloween, it's a spooky season in the grocery store — and not in a fun way.",
+      "highlight": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+      "after": "That's higher than the average rate of food inflation during that time."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": null,
+    "chart_series": null,
+    "stat": {
+      "full": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+      "droppable": [
+        {
+          "id": "window",
+          "text": "have risen 7.7% in one year and … in two years",
+          "shown_without": "Prices for candy, the most popular Halloween purchase, and gum are up more than 18%, according to the latest federal data."
+        },
+        {
+          "id": "one_year",
+          "text": "have risen 7.7% in one year and",
+          "shown_without": "Prices for candy, the most popular Halloween purchase, and gum are up more than 18% in two years, according to the latest federal data."
+        }
+      ]
+    }
+  },
+  "tools": [
+    "drop"
+  ]
+}
