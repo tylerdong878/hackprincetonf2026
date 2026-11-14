@@ -4,6 +4,7 @@
   "title": "Check the Receipt",
   "topic": "Grocery prices",
   "briefing": "Food prices. Five posts, 0–3 doctored today. Check the receipt before you swallow anything.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",
   "clue_budget": 3,
   "trick_options": [
     "out-of-context-quote",
@@ -41,7 +42,7 @@
         "y_min": 2.1,
         "y_max": 2.35
       },
-      "source_label": null,
+      "source_label": "Data: BLS average prices (via FRED)",
       "card_style": "chart",
       "tools": [
         "data",
@@ -72,17 +73,17 @@
     {
       "id": "p3",
       "author": {
-        "name": "Trick or Cheat",
-        "handle": "@trickorcheat",
+        "name": "Spooky Budget",
+        "handle": "@spookybudget",
         "kind": "person",
         "verified": false,
-        "avatar_color": "#E3A42B"
+        "avatar_color": "#7C2D12"
       },
       "posted_at": "2026-10-31T13:15:00Z",
-      "body": "Prices for candy, the most popular Halloween purchase, and gum are up more than 18%. 🎃😱 Federal data. Look it up.",
+      "body": "Halloween budget check 🎃 \"Prices for candy, the most popular Halloween purchase, and gum are up more than 18%.\" Plan accordingly.",
       "quote": null,
       "chart": null,
-      "source_label": null,
+      "source_label": "NPR · Oct 30, 2026",
       "card_style": "stat",
       "tools": [
         "source",
@@ -92,35 +93,20 @@
     {
       "id": "p4",
       "author": {
-        "name": "Aisle Seven Alex",
-        "handle": "@aisle7alex",
+        "name": "Grill Sergeant",
+        "handle": "@grillsergeant",
         "kind": "person",
         "verified": false,
-        "avatar_color": "#0891B2"
+        "avatar_color": "#B91C1C"
       },
-      "posted_at": "2026-11-13T19:05:00Z",
-      "body": "Grocery math that sounds fake: a pound of ground coffee costs more than a pound of ground beef. BLS average prices, Oct 2026: $9.249 vs. $6.755.",
+      "posted_at": "2026-10-21T00:30:00Z",
+      "body": "AN 85% JUMP. 🥩😤 \"A typical pound of ground beef last month cost $6.79, an 85% jump from a decade earlier, according to the Bureau of Labor Statistics.\"",
       "quote": null,
-      "chart": {
-        "type": "bar",
-        "title": "Average price per pound, Oct 2026",
-        "unit": "$/lb",
-        "points": [
-          {
-            "label": "Coffee",
-            "value": 9.249
-          },
-          {
-            "label": "Ground beef",
-            "value": 6.755
-          }
-        ],
-        "y_min": 0,
-        "y_max": null
-      },
-      "source_label": null,
-      "card_style": "chart",
+      "chart": null,
+      "source_label": "NPR · Oct 20, 2026",
+      "card_style": "stat",
       "tools": [
+        "source",
         "data",
         "account"
       ]

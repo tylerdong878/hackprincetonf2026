@@ -77,6 +77,28 @@ export function useTween(from: number, to: number, playKey: number, duration = 8
   return value
 }
 
+/** The live height of an element (e.g. a fixed bottom bar), so content can pad itself clear of it. */
+export function useElementHeight<T extends HTMLElement>(): [(el: T | null) => void, number] {
+  const [height, setHeight] = useState(0)
+  const obs = useRef<ResizeObserver | null>(null)
+  const ref = useCallback((el: T | null) => {
+    obs.current?.disconnect()
+    obs.current = null
+    if (!el) {
+      setHeight(0)
+      return
+    }
+    const measure = () => setHeight(Math.ceil(el.getBoundingClientRect().height))
+    measure()
+    if (typeof ResizeObserver !== 'undefined') {
+      obs.current = new ResizeObserver(measure)
+      obs.current.observe(el)
+    }
+  }, [])
+  useEffect(() => () => obs.current?.disconnect(), [])
+  return [ref, height]
+}
+
 /** Copies text to the clipboard, falling back to a hidden textarea. */
 export async function copyText(text: string): Promise<boolean> {
   try {

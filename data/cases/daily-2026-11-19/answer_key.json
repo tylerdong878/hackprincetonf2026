@@ -1,0 +1,46 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": true,
+      "trick": "out-of-context-quote",
+      "tell": "The full quote says \"no net increase\" — the word \"net\" was removed, which changes the meaning because offsetting increases and decreases can still leave customers paying more in some months.",
+      "explanation": "The original quote from Ben Hertz-Shargel states \"no net increase in electricity rates and a slight decrease in gas rates.\" The doctored post drops \"net,\" turning a statement about the overall balance into a promise of no increase at all.",
+      "con_line_fooled": "One little word. That's all it took.",
+      "con_line_caught": "You read the whole sentence. How thorough. How annoying.",
+      "diff": {
+        "type": "quote",
+        "shown": "Taken together with the items on the agenda earlier this month, these actions will result in no increase in electricity rates and a slight decrease in gas rates.",
+        "original": "Taken together with the items on the agenda earlier this month, these actions will result in no net increase in electricity rates and a slight decrease in gas rates.",
+        "removed": [
+          "net"
+        ]
+      }
+    },
+    "p2": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real and word for word, from NJ Board of Public Utilities (Aug 13, 2026).",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey Monitor (Sept 24, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey Monitor (Sept 24, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p5": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey Monitor (Nov 12, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    }
+  },
+  "con_line_clean": null
+}

@@ -1,0 +1,28 @@
+{
+  "status": "awaiting_approval",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-14T19:15:17Z",
+  "tricks": [
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "sources": [
+    "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+    "https://www.eia.gov/electricity/data/browser/",
+    "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
+    "https://nj.gov/bpu/newsroom/2026/approved/20260813.html"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-18",
+  "theme": "Your Bills",
+  "teacher_edits": [
+    "Title no longer spoils p1 (was '…and a 67-cent surprise').",
+    "p1 tell: removed an unsupported 'largest bill drop in state history' claim.",
+    "p1/p2: made-up accounts renamed from realistic personal names to invented handles.",
+    "p1/p2 account cards: replaced invented claims about real utilities with neutral posts.",
+    "p4: real headline now shared verbatim by a made-up account, so the poster doesn't give the answer away."
+  ]
+}

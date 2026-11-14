@@ -235,7 +235,7 @@ def test_share_text_v2(client, player, daily, data_dir):
     assert body["share_text"] == "Grain of Salt #1 🧂 5/5 🔥1\n🟩🧂🟩🟩🟩\nBalanced detective"
     other = new_player(client)
     v = verdicts(real=["p1", "p2", "p4", "p5"], doctored={"p3": None})
-    assert submit(client, other, daily, v).json()["share_grid"] == "🟩⬛🟥🟩🟩"
+    assert submit(client, other, daily, v).json()["share_grid"] == "🟩🟥🟨🟩🟩"  # §8.2 grid
     case = load(data_dir, daily, "case.json")
     for p in case["posts"]:  # never any post content
         for text in [p["body"], (p.get("quote") or {}).get("text", "")]:
@@ -287,7 +287,11 @@ def fool(monkeypatch):
     class ConAsleep(Exception):
         pass
 
-    mod.ConAsleep, mod.calls, mod.verdict, mod.asleep = ConAsleep, [], "doctored", False
+    mod.ConAsleep, mod.calls, mod.levels, mod.verdict, mod.asleep = ConAsleep, [], [], "doctored", False
+
+    def edited_author(item):
+        return {"name": "Garden State Truths", "handle": "@gstruths", "kind": "person",
+                "verified": False, "avatar_color": "#777777"}
 
     def apply_edit(item, edit):
         post = copy.deepcopy(item["post"])
@@ -298,23 +302,23 @@ def fool(monkeypatch):
             if len(keep) < 4 or keep != sorted(set(keep)) or keep[0] < 0 or keep[-1] >= len(words):
                 raise ValueError("A crop keeps at least 4 words, in order.")
             post["quote"]["text"] = " ".join(words[i] for i in keep)
-            post["author"] = {"name": "Garden State Truths", "handle": "@gstruths", "kind": "person",
-                              "verified": False, "avatar_color": "#777777"}
+            post["author"] = edited_author(item)
             diff = {"type": "quote", "shown": post["quote"]["text"], "original": item["post"]["quote"]["text"],
                     "removed": [w for i, w in enumerate(words) if i not in keep]}
             return {"edited_post": post, "changed": True, "trick": "out-of-context-quote", "diff": diff}
         raise ValueError("unsupported edit")
 
-    def judge_post(edited_post, evidence):
+    def judge_post(edited_post, evidence, level=3):
         mod.calls.append(edited_post)
+        mod.levels.append(level)
         if mod.asleep:
             raise ConAsleep("no key")
-        return {"checked": ["source"], "verdict": mod.verdict,
+        return {"checked": [] if level == 1 else ["source"], "verdict": mod.verdict,
                 "trick_guess": "out-of-context-quote" if mod.verdict == "doctored" else None,
                 "reasoning": ["The source keeps going.", "The cut changes the meaning."],
                 "confidence": 0.8, "model": "test/fake-con"}
 
-    mod.apply_edit, mod.judge_post = apply_edit, judge_post
+    mod.apply_edit, mod.judge_post, mod.edited_author = apply_edit, judge_post, edited_author
     monkeypatch.setitem(sys.modules, "pipeline.fool", mod)
     return mod
 
@@ -329,7 +333,7 @@ def judge(client, edit, deck_id=QUOTE_ID, player="judge01"):
 def test_fool_deck_hides_evidence(client, deck):
     body = client.get("/api/fool/deck").json()
     assert [i["id"] for i in body] == [QUOTE_ID, CHART_ID]
-    assert set(body[0]) == {"id", "kind", "post", "tools", "editable"} and body[0]["tools"] == ["crop"]
+    assert set(body[0]) == {"id", "kind", "post", "tools", "editable", "edited_author"} and body[0]["tools"] == ["crop"]
     assert body[0]["post"]["card_style"] == "quote"
     assert "evidence" not in set(_keys(body))
     text = _dump(body)
@@ -365,7 +369,9 @@ def test_fool_judge_outcomes(client, deck, fool, edit, verdict, expected, win):
     assert body["changed"] is (edit["type"] != "none")
     assert body["con"]["verdict"] == verdict and body["con"]["cached"] is False
     assert body["con"]["model"] == "test/fake-con" and body["con"]["reasoning"]
-    assert body["scoreboard"] == {"fooled": int(win), "played": 1}
+    assert body["level"] == 3 and fool.levels == [3]  # default: Master Con
+    assert body["scoreboard"]["fooled"] == int(win) and body["scoreboard"]["played"] == 1
+    assert body["scoreboard"]["by_level"]["3"] == {"fooled": int(win), "played": 1}
     if edit["type"] == "crop":
         assert body["trick"] == "out-of-context-quote" and body["diff"]["type"] == "quote"
         assert body["edited_post"]["author"]["handle"] == "@gstruths"

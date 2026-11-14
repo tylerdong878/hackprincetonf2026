@@ -1,0 +1,19 @@
+{
+  "status": "awaiting_approval",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T02:03:07Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+    "https://nj.gov/bpu/newsroom/2026/approved/20260813.html",
+    "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-19",
+  "theme": "Your Bills"
+}

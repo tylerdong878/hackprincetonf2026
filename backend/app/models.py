@@ -1,6 +1,8 @@
 """Request bodies (CONTRACT §5 and §7)."""
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from .store import ID_PATTERN
@@ -39,3 +41,4 @@ class FoolJudgeRequest(BaseModel):
     player_id: str = Field(pattern=ID_PATTERN)
     deck_id: str = Field(pattern=ID_PATTERN)
     edit: dict
+    level: Literal[1, 2, 3] | None = None  # CONTRACT §8.1; omitted/null -> 3 (Master Con)

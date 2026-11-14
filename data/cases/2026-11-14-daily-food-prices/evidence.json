@@ -327,7 +327,7 @@
         "y_min": 0,
         "y_max": null
       },
-      "note": "Record: $6.227 in Mar 2025. September to September, a dozen fell from $3.488 to $2.272 (-34.9%). BLS published no Oct 2025 value."
+      "note": "Record: $6.227 in Mar 2025. Sep 2025 to Sep 2026, a dozen fell from $3.488 to $2.272 (-34.9%). BLS published no Oct 2025 value."
     },
     "account": {
       "name": "Cluck Report",
@@ -604,78 +604,74 @@
       "after": "That's higher than the average rate of food inflation during that time."
     },
     "account": {
-      "name": "Trick or Cheat",
-      "handle": "@trickorcheat",
-      "created": "October 2026",
-      "followers": 3400,
+      "name": "Spooky Budget",
+      "handle": "@spookybudget",
+      "created": "August 2023",
+      "followers": 6300,
       "verified": false,
-      "bio": "Halloween is a scam and I can prove it 🎃",
+      "bio": "Holiday shopping on a budget. Lists, deals, receipts. 🎃",
       "recent_posts": [
-        "Full-size bars are a myth now.",
-        "Retweet if your bag was 50% raisins."
+        "Costumes under $20: a thread 🧵",
+        "Buy the candy on Nov 1. Trust me."
       ]
     }
   },
   "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-20",
+      "url": "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
+      "before": "The cost of ground beef has been on the rise for years, largely due to weather and financial pressures on producers.",
+      "highlight": "A typical pound of ground beef last month cost $6.79, an 85% jump from a decade earlier, according to the Bureau of Labor Statistics.",
+      "after": ""
+    },
     "data": {
-      "title": "BLS average prices per pound, U.S. city average (via FRED)",
+      "title": "Average price: ground beef, 100% beef, per pound, U.S. city average (BLS, via FRED)",
       "unit": "$/lb",
-      "url": "https://fred.stlouisfed.org/series/APU0000717311",
+      "url": "https://fred.stlouisfed.org/series/APU0000703112",
       "table": [
         {
-          "label": "Coffee 2026-08",
-          "value": 9.299
+          "label": "2016-09",
+          "value": 3.665
         },
         {
-          "label": "Coffee 2026-09",
-          "value": 9.332
+          "label": "2025-09",
+          "value": 6.323
         },
         {
-          "label": "Coffee 2026-10",
-          "value": 9.249
-        },
-        {
-          "label": "Ground beef 2026-08",
-          "value": 6.923
-        },
-        {
-          "label": "Ground beef 2026-09",
+          "label": "2026-09",
           "value": 6.792
-        },
-        {
-          "label": "Ground beef 2026-10",
-          "value": 6.755
         }
       ],
       "honest_chart": {
         "type": "bar",
-        "title": "Average price per pound, Oct 2026",
+        "title": "Ground beef, Sep 2016 vs. Sep 2026",
         "unit": "$/lb",
         "points": [
           {
-            "label": "Coffee",
-            "value": 9.249
+            "label": "Sep 2016",
+            "value": 3.665
           },
           {
-            "label": "Ground beef",
-            "value": 6.755
+            "label": "Sep 2026",
+            "value": 6.792
           }
         ],
         "y_min": 0,
         "y_max": null
       },
-      "note": "Coffee = 100% ground roast; ground beef = 100% beef (FRED series APU0000717311 and APU0000703112). Coffee has cost more per pound than ground beef every month since Jan 2022."
+      "note": "Sep 2016 to Sep 2026: $3.665 to $6.792 a pound (+85.3%). NPR's 'last month' is September 2026; it rounds the rise to 85%."
     },
     "account": {
-      "name": "Aisle Seven Alex",
-      "handle": "@aisle7alex",
-      "created": "May 2018",
-      "followers": 640,
+      "name": "Grill Sergeant",
+      "handle": "@grillsergeant",
+      "created": "July 2026",
+      "followers": 1150,
       "verified": false,
-      "bio": "Grocery data nerd. Every number links to BLS.",
+      "bio": "Burgers, briskets and loud opinions. 🔥",
       "recent_posts": [
-        "BLS average price data drops monthly. Mark your calendar.",
-        "Unit prices or it didn't happen."
+        "Ketchup on a hot dog? Absolutely not.",
+        "Who's grilling this weekend? 🔥"
       ]
     }
   },

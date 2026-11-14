@@ -1,6 +1,27 @@
 import type { ReactNode } from 'react'
 import { href } from '../lib/router'
+import { play, useMuted } from '../lib/sound'
 import { BrandIcon, Wordmark } from './Art'
+
+/** 🔊 / 🔇 in the header. Sound starts after the first tap; the choice is remembered. */
+export function SoundToggle({ className = '' }: { className?: string }) {
+  const [muted, setMuted] = useMuted()
+  return (
+    <button
+      type="button"
+      aria-pressed={!muted}
+      aria-label={muted ? 'Sound off. Turn sound on' : 'Sound on. Turn sound off'}
+      title={muted ? 'Sound off' : 'Sound on'}
+      onClick={() => {
+        setMuted(!muted)
+        if (muted) window.setTimeout(() => play('tile'), 30)
+      }}
+      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-base text-muted hover:bg-surface-2 hover:text-text ${className}`}
+    >
+      <span aria-hidden="true">{muted ? '🔇' : '🔊'}</span>
+    </button>
+  )
+}
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -28,13 +49,13 @@ const NAV = [
   { to: '/casefiles', label: 'Case Files', short: 'Files', key: 'casefiles' },
   { to: '/casebook', label: 'Casebook', short: 'Casebook', key: 'casebook', wide: true },
   { to: '/dossier', label: 'Dossier', short: 'Dossier', key: 'dossier' },
-  { to: '/teacher', label: 'Teacher', short: 'Teacher', key: 'teacher', wide: true },
+  { to: '/teacher', label: 'Editor’s Desk', short: 'Desk', key: 'teacher', wide: true },
 ]
 
 export function SiteHeader({ active, right }: { active?: string; right?: ReactNode }) {
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-3">
         <Brand />
         <nav aria-label="Main" className="ml-auto flex min-w-0 items-center gap-0.5">
           {NAV.map((n) => (
@@ -52,6 +73,7 @@ export function SiteHeader({ active, right }: { active?: string; right?: ReactNo
           ))}
           {right}
         </nav>
+        <SoundToggle className="-mr-1.5" />
       </div>
     </header>
   )

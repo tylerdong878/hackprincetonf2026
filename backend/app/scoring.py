@@ -15,8 +15,8 @@ POINTS = {"trusted": 100, "caught": 100, "fooled": 0, "false_alarm": -50}
 TRICK_BONUS = 50
 CLUE_BONUS = 20
 RECENT_LIMIT = 30
-# v2 grid (CONTRACT §7.2), used by share_grid and share_text.
-GRID = {"trusted": "🟩", "caught": "🧂", "fooled": "⬛", "false_alarm": "🟥"}
+# Share grid (CONTRACT §8.2, replacing §7.2's mapping), used by share_grid and share_text.
+GRID = {"trusted": "🟩", "caught": "🧂", "false_alarm": "🟨", "fooled": "🟥"}
 
 RANKS = [(90, "Untouchable"), (80, "Chief"), (60, "Inspector"), (40, "Gumshoe"), (0, "Rookie")]
 
@@ -46,7 +46,7 @@ def score_post(post: dict, key: dict, said_doctored: bool, said_trick: str | Non
             "doctored": True, "trick": key.get("trick"), "trick_named_correctly": named,
             "tell": key.get("tell"), "explanation": key.get("explanation"),
             "con_line": key.get("con_line_caught") if outcome == "caught" else key.get("con_line_fooled"),
-            "diff": key.get("diff"),
+            "diff": key.get("diff"), "rarity_bonus": None,
         }
     else:
         outcome = "false_alarm" if said_doctored else "trusted"
@@ -56,16 +56,20 @@ def score_post(post: dict, key: dict, said_doctored: bool, said_trick: str | Non
             "suspicious_real": bool(key.get("suspicious_real")),
             "explanation": key.get("explanation"),
             "con_line": key.get("con_line_false_alarm") if outcome == "false_alarm" else None,
+            "rarity_bonus": None,
         }
     record = {"post_id": pid, "doctored": doctored, "outcome": outcome, "format": post_format(post),
               "trick": key.get("trick") if doctored else None, "named": named}
     return result, record
 
 
-def score_case(case: dict, answer_key: dict, verdicts: dict, clues_used: int) -> dict:
+def score_case(case: dict, answer_key: dict, verdicts: dict, clues_used: int,
+               rarity: dict[str, dict | None] | None = None) -> dict:
     """Score a full set of verdicts.
 
     `verdicts` maps post_id -> object with `.doctored` and `.trick` (the request model).
+    `rarity` maps post_id -> its rarity bonus ({label, points}, CONTRACT §8.7) or None. A bonus only counts for a
+    correct card. It is added to `score`; each result's `points` stays the card's base points.
     Returns the response fields plus `records` (per-post info used to update the profile).
     """
     keys = answer_key.get("posts", {})
@@ -73,6 +77,9 @@ def score_case(case: dict, answer_key: dict, verdicts: dict, clues_used: int) ->
     for post in case.get("posts", []):
         v = verdicts[post["id"]]
         result, record = score_post(post, keys.get(post["id"], {}), v.doctored, v.trick)
+        bonus = (rarity or {}).get(post["id"])
+        if bonus and result["outcome"] in ("trusted", "caught"):
+            result["rarity_bonus"] = bonus
         results.append(result)
         records.append(record)
 
@@ -80,7 +87,7 @@ def score_case(case: dict, answer_key: dict, verdicts: dict, clues_used: int) ->
     clue_bonus = CLUE_BONUS * max(0, budget - clues_used)
     clean = bool(answer_key.get("clean_case"))
     return {
-        "score": sum(r["points"] for r in results) + clue_bonus,
+        "score": sum(r["points"] + (r["rarity_bonus"] or {}).get("points", 0) for r in results) + clue_bonus,
         "clue_bonus": clue_bonus,
         "clean_case": clean,
         "con_line_clean": answer_key.get("con_line_clean") if clean else None,

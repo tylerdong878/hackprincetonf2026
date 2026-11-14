@@ -56,10 +56,10 @@ export function RatingBadge({ profile }: { profile: Profile | null }) {
       {streak > 0 && (
         <span aria-hidden="true">
           <span className="flame">🔥</span>
-          <span className="font-mono">{streak}</span>
+          <span className="num">{streak}</span>
         </span>
       )}
-      <span className="font-mono">{profile.rating}</span>
+      <span className="num">{profile.rating}</span>
       <span className="text-muted">{profile.rank}</span>
     </a>
   )

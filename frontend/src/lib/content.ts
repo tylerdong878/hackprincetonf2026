@@ -19,13 +19,13 @@ export const CON_LINES = {
 /** Fallback quips for a Daily reveal when the server sends no con_line (e.g. a trusted real post). */
 export const CON_QUIPS: Record<string, string[]> = {
   trusted: ['Real. I didn’t lay a finger on that one.', 'You trusted the truth. Annoyingly sensible.', 'Real, and you knew it. Fine.'],
-  caught: ['Caught. I’ll be subtler tomorrow.', 'You checked. I hate it when they check.'],
+  // Honest lines only (CONTRACT §8.4): never claim the player checked evidence they didn't open.
+  caught: ['Caught. I’ll be subtler tomorrow.', 'Good eye. That one was mine.'],
   fooled: ['Got you. It looked so official, didn’t it?', 'Slipped right past. My favorite kind.'],
   false_alarm: ['That one was real. I didn’t even have to lie.', 'A grain of salt, detective. Not the whole shaker.'],
 }
 
-export const LEAN_EXPLAINER =
-  'Too gullible and fakes slip past you. Too paranoid and you accuse the truth, which is exactly what earlier games trained. Both cost points; the sweet spot is the middle.'
+export const LEAN_EXPLAINER = 'Too gullible and fakes slip by. Too paranoid and you doubt the truth. Both cost points.'
 
 export function pick(lines: string[], seed = Math.random()): string {
   return lines[Math.floor(seed * lines.length) % lines.length]

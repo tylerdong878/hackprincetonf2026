@@ -4,6 +4,7 @@
   "title": "Stranger Than Fiction",
   "topic": "Odd news",
   "briefing": "Odd news. Five posts, 0–3 doctored today. The truth is weird. I'm only slightly weirder.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",
   "clue_budget": 3,
   "trick_options": [
     "out-of-context-quote",
@@ -35,17 +36,17 @@
     {
       "id": "p2",
       "author": {
-        "name": "Shelf Life",
-        "handle": "@shelflifereads",
-        "kind": "person",
-        "verified": false,
-        "avatar_color": "#8B5CF6"
+        "name": "OPB",
+        "handle": "@OPB",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#0369A1"
       },
-      "posted_at": "2026-09-20T15:00:00Z",
-      "body": "Overdue library magazine returned after 32 years 📚 Imagine the late fees.",
+      "posted_at": "2026-10-16T19:40:07Z",
+      "body": "A rare family of barn owls moved into Manhattan's Upper West Side. New Yorkers are captivated",
       "quote": null,
       "chart": null,
-      "source_label": null,
+      "source_label": "OPB (AP) · Oct 16, 2026",
       "card_style": "headline",
       "tools": [
         "source",
@@ -75,14 +76,14 @@
     {
       "id": "p4",
       "author": {
-        "name": "NPR",
-        "handle": "@NPR",
-        "kind": "outlet",
-        "verified": true,
-        "avatar_color": "#1D4ED8"
+        "name": "Finish Line Feed",
+        "handle": "@finishlinefeed",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0F766E"
       },
-      "posted_at": "2026-11-01T17:33:21Z",
-      "body": "There were just over 2,000 competitors in 1976, the seventh running of the race, including only 88 women. About 60,000 runners stepped up to the starting line Sunday, with nearly half of them women.",
+      "posted_at": "2026-11-02T14:00:00Z",
+      "body": "The NYC Marathon is smaller than you'd think 🏃 \"There were just over 2,000 competitors, including only 88 women.\"",
       "quote": null,
       "chart": null,
       "source_label": "NPR · Nov 1, 2026",
@@ -95,14 +96,14 @@
     {
       "id": "p5",
       "author": {
-        "name": "NPR",
-        "handle": "@NPR",
-        "kind": "outlet",
-        "verified": true,
-        "avatar_color": "#1D4ED8"
+        "name": "Couch Coach",
+        "handle": "@couchcoach_",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#2563EB"
       },
-      "posted_at": "2026-11-09T21:39:35Z",
-      "body": "Falkner, the Princeton researcher, says humans can also learn physical skills by watching others, like in sports.",
+      "posted_at": "2026-11-10T01:30:00Z",
+      "body": "A Princeton neuroscientist, on whether watching sports makes you better at them. My couch and I feel seen. 🛋️🏈",
       "quote": {
         "text": "The question is not whether you can be a professional athlete by watching the NFL, but are you better at football for watching sports than if you had never watched anything? And the answer is absolutely yes.",
         "speaker": "Annegret Falkner, Princeton Neuroscience Institute"

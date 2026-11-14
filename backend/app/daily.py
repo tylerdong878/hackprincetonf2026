@@ -74,6 +74,26 @@ def streak(days_played: list[str], today: date) -> int:
     return count
 
 
+# Rarity bonus (CONTRACT §8.7): (max correct_pct, label, points), rarest first.
+RARITY_TIERS = ((10, "One in a shaker", 100), (25, "Rare catch", 50))
+
+
+def rarity_bonus(counts_before: dict, crowd_min: int, correct: bool) -> dict | None:
+    """The bonus for a correct card, from the crowd stats BEFORE this answer was counted.
+
+    None for a wrong card, or below crowd_min (never from made-up numbers). correct_pct is rounded the same way the
+    crowd stats are shown.
+    """
+    n = int((counts_before or {}).get("n", 0))
+    if not correct or n == 0 or n < crowd_min:
+        return None
+    pct = round(100 * counts_before.get("correct", 0) / n)
+    for cap, label, points in RARITY_TIERS:
+        if pct <= cap:
+            return {"label": label, "points": points}
+    return None
+
+
 def crowd_view(counts: dict, crowd_min: int) -> tuple[dict | None, dict | None]:
     """(crowd, rarity) from real answer counts; both null below crowd_min. Never invented."""
     n = int(counts.get("n", 0))

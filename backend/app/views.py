@@ -1,7 +1,7 @@
 """Player-facing views. Whitelists, so a stray answer field can never reach the browser."""
 from __future__ import annotations
 
-CASE_KEYS = ("id", "number", "title", "topic", "briefing", "clue_budget", "trick_options", "posts")
+CASE_KEYS = ("id", "number", "title", "topic", "briefing", "notice", "clue_budget", "trick_options", "posts")
 POST_KEYS = ("id", "author", "posted_at", "body", "quote", "chart", "source_label", "tools", "card_style")
 AUTHOR_KEYS = ("name", "handle", "kind", "verified", "avatar_color")
 

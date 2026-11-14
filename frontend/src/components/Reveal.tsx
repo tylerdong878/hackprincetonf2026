@@ -1,30 +1,142 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { formatNumber, outcomeStyle } from '../lib/format'
+import { useState, type ReactNode } from 'react'
+import { formatNumber, outcomeStyle, withUnit } from '../lib/format'
 import { useReducedMotion, useTween } from '../lib/hooks'
-import type { ChartSpec, Diff, Post } from '../lib/types'
+import type { ChartDiff, ChartSpec, Diff, Post } from '../lib/types'
 import { FeedCard } from './PostCard'
-import { PostChart } from './PostChart'
-import { Button, SectionLabel } from './ui'
+import { chartDomain, PostChart } from './PostChart'
+import { SectionLabel } from './ui'
 
-export function OutcomeBadge({ outcome, animate = true, size = 'md' }: { outcome: string; animate?: boolean; size?: 'sm' | 'md' }) {
+/** The outcome stamp (CONTRACT §8.2 colors: green trusted, salt caught, amber false alarm, red fooled). */
+export function OutcomeBadge({ outcome, animate = true, size = 'md' }: { outcome: string; animate?: boolean; size?: 'sm' | 'md' | 'lg' }) {
   const s = outcomeStyle(outcome)
-  const dark = outcome === 'false_alarm'
+  const salt = outcome === 'caught'
+  const sizes = { sm: 'text-xs', md: 'text-sm md:text-base', lg: 'text-lg sm:text-xl' }
   return (
     <span
-      className={`stamp inline-flex items-center gap-1.5 ${animate ? 'stamp-thunk' : ''} ${size === 'sm' ? 'text-xs' : 'text-sm md:text-base'}`}
+      className={`stamp inline-flex items-center gap-1.5 ${animate ? 'stamp-thunk' : ''} ${sizes[size]}`}
       style={{
-        background: s.color,
-        borderColor: s.color,
-        color: dark ? '#1B1B1F' : '#FFFFFF',
+        background: s.fill,
+        borderColor: salt ? s.ink : s.fill,
+        color: s.ink,
+        boxShadow: salt ? 'inset 0 0 0 1.5px var(--salt)' : undefined,
         ['--stamp-rot' as string]: '-2deg',
-        ['--stamp-rot-from' as string]: '-10deg',
+        ['--stamp-rot-from' as string]: '-9deg',
       }}
     >
-      <span aria-hidden="true">{s.icon}</span>
+      <span aria-hidden="true">{salt ? '🧂' : s.icon}</span>
       {s.word}
     </span>
   )
 }
+
+// ---- charts: "What you saw" next to "The honest view" -------------------------------------------
+
+interface ChartPair {
+  shown: ChartSpec
+  honest: ChartSpec
+  /** Where the posted axis starts, and its top. */
+  from: number
+  top: number
+  /** The honest chart's top: the posted top when the honest values fit under it, so heights compare. */
+  sharedTop: number
+  /** Months the post picked that the honest view doesn't use (and vice versa). */
+  picked: string[]
+  honestPicked: string[]
+}
+
+/** The honest chart starts at 0 on the same top as the posted one (when its values fit), so heights compare. */
+function chartPair(diff: ChartDiff, post?: Post): ChartPair | null {
+  const shown = diff.shown ?? post?.chart ?? null
+  const original = diff.original
+  if (!shown || !original?.points?.length) return null
+  const [from, top] = chartDomain(shown)
+  const honestMax = Math.max(...original.points.map((p) => p.value))
+  const sharedTop = honestMax <= top ? top : chartDomain({ ...original, y_min: 0, y_max: null })[1]
+  const honest: ChartSpec = { ...original, y_min: 0, y_max: sharedTop }
+  const sLabels = shown.points.map((p) => p.label)
+  const hLabels = original.points.map((p) => p.label)
+  const few = shown.points.length <= 6 && original.points.length <= 6
+  return {
+    shown,
+    honest,
+    from,
+    top,
+    sharedTop,
+    picked: few ? sLabels.filter((l) => !hLabels.includes(l)) : [],
+    honestPicked: few ? hLabels.filter((l) => !sLabels.includes(l)) : [],
+  }
+}
+
+/**
+ * "Drop the axis to 0": the posted chart's floor tweens to 0 and its top to the honest chart's top,
+ * so once dropped both charts share one scale.
+ */
+function useAxisDrop(pair: ChartPair | null) {
+  const reduced = useReducedMotion()
+  const [playKey, setPlayKey] = useState(0)
+  const p = useTween(0, 1, playKey, 800, reduced)
+  const from = pair?.from ?? 0
+  const top = pair?.top ?? 1
+  const shared = pair?.sharedTop ?? top
+  return {
+    dropped: playKey > 0,
+    yMin: playKey ? from * (1 - p) : undefined,
+    yMax: playKey ? top + (shared - top) * p : undefined,
+    animating: playKey > 0 && p < 1 - 1e-6,
+    drop: () => setPlayKey((k) => k + 1),
+  }
+}
+
+function DropButton({ dropped, onClick, className = '' }: { dropped: boolean; onClick: () => void; className?: string }) {
+  return (
+    <button type="button" className={`self-start text-xs font-semibold text-con hover:underline ${className}`} onClick={onClick}>
+      {dropped ? '↺ Replay the axis drop' : '▶ Drop the axis to 0'}
+    </button>
+  )
+}
+
+function ShownCaption({ pair }: { pair: ChartPair }) {
+  const a = change(pair.shown)
+  return (
+    <p className="text-[13px] leading-snug text-muted">
+      {pair.from > 0 ? (
+        <>
+          Axis starts at <b className="num text-doctored">{withUnit(pair.from, pair.shown.unit)}</b>, not 0
+        </>
+      ) : (
+        <>Axis starts at 0</>
+      )}
+      {a && (
+        <>
+          {' '}
+          · shows <b className="num text-text">{a.text}</b> ({a.from} → {a.to})
+        </>
+      )}
+      {pair.picked.length > 0 && (
+        <span className="block">
+          Picked months: <b className="text-doctored">{pair.picked.join(' and ')}</b>
+        </span>
+      )}
+    </p>
+  )
+}
+
+function HonestCaption({ pair, onLight = false }: { pair: ChartPair; onLight?: boolean }) {
+  const b = change(pair.honest)
+  return (
+    <p className={`text-[13px] leading-snug ${onLight ? 'text-[#4A4A55]' : 'text-muted'}`}>
+      Axis from 0
+      {b && (
+        <>
+          {' '}
+          · {b.from} → {b.to}: <b className={`num ${onLight ? 'text-[#1B1B1F]' : 'text-text'}`}>{b.text}</b>
+        </>
+      )}
+    </p>
+  )
+}
+
+const dot = (color: string) => <span className="mr-1.5 inline-block h-2 w-2 rounded-full align-middle" style={{ background: color }} aria-hidden="true" />
 
 export function change(spec: ChartSpec): { text: string; from: string; to: string } | null {
   const pts = spec.points
@@ -111,47 +223,31 @@ function OriginalPanel({ children, note }: { children: ReactNode; note?: ReactNo
 }
 
 /**
- * "What you saw" next to "The original" (SPEC §3.7). For charts, the posted chart's axis
- * animates down to the honest floor (automatically once, then on click).
+ * "What you saw" next to "The honest view" (SPEC §3.7), side by side on desktop, stacked on mobile.
+ * For charts the posted chart keeps its trick, marked in red; "Drop the axis to 0" animates it honest.
  */
 export function DiffView({
   post,
   caseNumber,
   diff,
-  autoplay,
   shownLabel = 'What you saw',
   watermarkText,
 }: {
   post: Post
   caseNumber: number
   diff: Diff
-  autoplay: boolean
   shownLabel?: string
   watermarkText?: string
 }) {
-  const reduced = useReducedMotion()
-  const [playKey, setPlayKey] = useState(0)
-  const isChart = diff.type === 'chart'
-  const shownSpec = isChart ? diff.shown ?? post.chart ?? null : post.chart ?? null
-  const from = shownSpec?.y_min ?? 0
-  const to = isChart ? diff.original?.y_min ?? 0 : from
-  const yMin = useTween(from, to, playKey, 800, reduced)
-  const morphed = playKey > 0
-
-  useEffect(() => {
-    if (!autoplay || !isChart || from === to) return
-    const id = window.setTimeout(() => setPlayKey((k) => k || 1), 900)
-    return () => window.clearTimeout(id)
-  }, [autoplay, isChart, from, to])
-
-  const shownPost: Post = isChart && shownSpec ? { ...post, chart: shownSpec } : post
+  const pair = diff.type === 'chart' ? chartPair(diff, post) : null
+  const axis = useAxisDrop(pair)
+  const shownPost: Post = pair ? { ...post, chart: pair.shown } : post
 
   let right: ReactNode = null
-  if (diff.type === 'chart' && diff.original) {
-    const c = change(diff.original)
+  if (pair) {
     right = (
-      <OriginalPanel note={c && <>Change, {c.from} → {c.to}: <b className="font-mono">{c.text}</b></>}>
-        <PostChart spec={diff.original} height={200} />
+      <OriginalPanel note={<HonestCaption pair={pair} onLight />}>
+        <PostChart spec={pair.honest} height={200} marks={{ labels: pair.honestPicked, tone: 'honest' }} />
       </OriginalPanel>
     )
   } else if (diff.type === 'quote') {
@@ -184,46 +280,46 @@ export function DiffView({
     )
   }
 
-  const shownChange = isChart && shownSpec ? change(shownSpec) : null
-  const axisNow = morphed ? yMin : from
-  const axisLabel = Math.abs(axisNow - Math.round(axisNow)) < 0.05 ? formatNumber(Math.round(axisNow), 0) : formatNumber(axisNow, 1)
-
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="flex min-w-0 flex-col gap-2">
-        <SectionLabel>{shownLabel}</SectionLabel>
+        <SectionLabel>
+          {dot('var(--doctored)')}
+          {shownLabel}
+        </SectionLabel>
         <FeedCard
           post={shownPost}
           caseNumber={caseNumber}
           watermarkText={watermarkText}
           doctoredStamp
+          stampCorner={!!pair}
           renderChart={
-            isChart
+            pair
               ? (spec) => (
-                  <PostChart spec={spec} height={200} yMinOverride={morphed ? yMin : undefined} animating={morphed && Math.abs(yMin - to) > 1e-6} />
+                  <PostChart
+                    spec={spec}
+                    height={200}
+                    yMinOverride={axis.yMin}
+                    yMaxOverride={axis.yMax}
+                    animating={axis.animating}
+                    marks={{ floor: true, labels: pair.picked, tone: 'trick' }}
+                  />
                 )
               : undefined
           }
         />
-        {isChart && from !== to && (
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-            <span>
-              Axis starts at <b className="font-mono text-text">{axisLabel}</b>
-              {shownChange && (
-                <>
-                  {' '}
-                  · {shownChange.from} → {shownChange.to}: <b className="font-mono text-text">{shownChange.text}</b>
-                </>
-              )}
-            </span>
-            <Button size="sm" variant="con" className="ml-auto" onClick={() => setPlayKey((k) => k + 1)}>
-              {morphed ? '↺ Drop the axis again' : `↓ Drop the axis to ${formatNumber(to, Number.isInteger(to) ? 0 : 1)}`}
-            </Button>
+        {pair && (
+          <div className="flex flex-col gap-1">
+            <ShownCaption pair={pair} />
+            {pair.from > 0 && <DropButton dropped={axis.dropped} onClick={axis.drop} />}
           </div>
         )}
       </div>
       <div className="flex min-w-0 flex-col gap-2">
-        <SectionLabel>The original</SectionLabel>
+        <SectionLabel>
+          {dot('var(--real)')}
+          {pair ? 'The honest view' : 'The original'}
+        </SectionLabel>
         {right}
       </div>
     </div>
@@ -249,54 +345,48 @@ export function DetailChanges({ changed }: { changed: { from: string; to: string
  * to its honest start, cut words come back highlighted, a missing number reappears, a swapped detail is shown.
  */
 export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
-  const reduced = useReducedMotion()
-  const [playKey, setPlayKey] = useState(0)
-  const shownSpec = diff.type === 'chart' ? diff.shown ?? post?.chart ?? null : null
-  const from = shownSpec?.y_min ?? 0
-  const to = diff.type === 'chart' ? diff.original?.y_min ?? 0 : from
-  const yMin = useTween(from, to, playKey, 800, reduced)
+  const pair = diff.type === 'chart' ? chartPair(diff, post) : null
+  const axis = useAxisDrop(pair)
 
-  // No auto-play: the player first sees the chart exactly as posted (the trick visible),
-  // then chooses to drop the axis. The honest comparison is always shown underneath.
-  const box = 'rounded-xl bg-white p-3 text-[14px] leading-relaxed text-[#1B1B1F]'
+  // No auto-play: the player first sees the chart exactly as posted (the trick marked in red),
+  // then chooses to drop the axis. The honest view sits beside it (below it on a phone).
+  const box = 'rounded-xl bg-white p-2.5 text-[14px] leading-relaxed text-[#1B1B1F]'
   const label = 'text-[11px] font-bold tracking-[0.14em] text-muted uppercase'
 
-  if (diff.type === 'chart' && shownSpec) {
-    const a = change(shownSpec)
-    const b = diff.original ? change(diff.original) : null
-    const fmt = (v: number) => formatNumber(v, Number.isInteger(v) ? 0 : 2)
+  if (pair) {
     return (
-      <div className="flex flex-col gap-2">
-        <p className={label}>What you saw</p>
-        <div className={box}>
-          <PostChart spec={shownSpec} height={150} compact yMinOverride={playKey ? yMin : undefined} animating={!!playKey && Math.abs(yMin - to) > 1e-6} />
-        </div>
-        <p className="text-[13px] text-muted">
-          Axis starts at <b className="font-mono text-text">{fmt(from)}</b>, not 0
-          {a && (
-            <>
-              {' '}· shows <b className="font-mono text-text">{a.text}</b> ({a.from} → {a.to})
-            </>
-          )}
-        </p>
-        {from !== to && (
-          <button type="button" className="self-start text-xs font-semibold text-con hover:underline" onClick={() => setPlayKey((k) => k + 1)}>
-            {playKey ? '↺ Replay the axis drop' : '▶ Drop the axis to 0'}
-          </button>
-        )}
-        {diff.original && (
-          <>
-            <p className={`${label} mt-2`}>The honest view</p>
+      <div className="@container">
+        <div className="grid gap-3 @sm:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <p className={label}>
+              {dot('var(--doctored)')}
+              What you saw
+            </p>
             <div className={box}>
-              <PostChart spec={diff.original} height={150} compact />
+              <PostChart
+                spec={pair.shown}
+                height={150}
+                compact
+                yMinOverride={axis.yMin}
+                yMaxOverride={axis.yMax}
+                animating={axis.animating}
+                marks={{ floor: true, labels: pair.picked, tone: 'trick' }}
+              />
             </div>
-            {b && (
-              <p className="text-[13px] text-muted">
-                {b.from} → {b.to}: <b className="font-mono text-text">{b.text}</b>
-              </p>
-            )}
-          </>
-        )}
+            <ShownCaption pair={pair} />
+            {pair.from > 0 && <DropButton dropped={axis.dropped} onClick={axis.drop} />}
+          </div>
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <p className={label}>
+              {dot('var(--real)')}
+              The honest view
+            </p>
+            <div className={box}>
+              <PostChart spec={pair.honest} height={150} compact marks={{ labels: pair.honestPicked, tone: 'honest' }} />
+            </div>
+            <HonestCaption pair={pair} />
+          </div>
+        </div>
       </div>
     )
   }

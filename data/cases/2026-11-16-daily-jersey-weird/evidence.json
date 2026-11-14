@@ -20,20 +20,20 @@
   },
   "p2": {
     "source": {
-      "outlet": "New Jersey 101.5",
-      "date": "2026-11-12",
-      "url": "https://nj1015.com/ixp/942/p/tacony-palmyra-bridge-closed-ship-crash/",
+      "outlet": "WHYY",
+      "date": "2019-05-11",
+      "url": "https://whyy.org/articles/new-jersey-gets-official-state-microbe-streptomyces-griseus/",
       "before": "",
-      "highlight": "Cargo Ship Crashes Into Tacony-Palmyra Bridge Causing It to Be Stuck Open",
-      "after": "There are very early reports that a cargo ship has crashed into the Tacony-Palmyra Bridge this afternoon. As a result of the crash the bridge is unable to close, officials say. … The good news is that there were no reported injuries in the incident."
+      "highlight": "New Jersey gets official state microbe: Streptomyces griseus",
+      "after": "A microorganism that played a role in treating tuberculosis is now officially recognized as New Jersey's state microbe. Gov. Phil Murphy signed a bill Friday giving the distinction to Streptomyces griseus."
     },
     "account": {
-      "name": "New Jersey 101.5",
-      "handle": "@nj1015",
+      "name": "WHYY",
+      "handle": "@WHYY",
       "created": null,
       "followers": null,
       "verified": true,
-      "bio": "Radio news · nj1015.com",
+      "bio": "Public media · whyy.org",
       "recent_posts": []
     }
   },
@@ -62,17 +62,20 @@
       "date": "2026-11-13",
       "url": "https://nj1015.com/new-jersey-worst-drivers-2/",
       "before": "",
-      "highlight": "A new study from LendingTree ranks New Jersey number one for the worst drivers in the country. According to the study, New Jersey drivers recorded 56.9 driving incidents per 1,000 drivers through August 2026.",
-      "after": "That includes accidents, DUIs, speeding-related incidents and other traffic citations. … To be fair, LendingTree's study is based on insurance inquiry data from QuoteWizard, not some nationwide experiment in which researchers actually put drivers behind the wheel and watched them attempt to navigate the Flemington Circle."
+      "highlight": "A new study from LendingTree ranks New Jersey number one for the worst drivers in the country.",
+      "after": "According to the study, New Jersey drivers recorded 56.9 driving incidents per 1,000 drivers through August 2026. … To be fair, LendingTree's study is based on insurance inquiry data from QuoteWizard, not some nationwide experiment in which researchers actually put drivers behind the wheel and watched them attempt to navigate the Flemington Circle."
     },
     "account": {
-      "name": "New Jersey 101.5",
-      "handle": "@nj1015",
-      "created": null,
-      "followers": null,
-      "verified": true,
-      "bio": "Radio news · nj1015.com",
-      "recent_posts": []
+      "name": "Jughandle Jury",
+      "handle": "@jughandlejury",
+      "created": "September 2026",
+      "followers": 780,
+      "verified": false,
+      "bio": "Jersey roads, judged. 🚗",
+      "recent_posts": [
+        "Left turn from the right lane. Only in Jersey.",
+        "Rate your commute 1-10. Mine's a 2."
+      ]
     }
   },
   "p5": {

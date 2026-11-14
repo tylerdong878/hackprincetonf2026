@@ -13,6 +13,17 @@ CLEAN = "2026-11-14-power-bills-clean"
 SEED_CASES = (DEMO, CLEAN)
 
 
+# Server settings a developer's .env might set (main.py loads .env on import). Tests start from the defaults.
+SERVER_ENV = ("GOS_PUBLIC", "TEACHER_TOKEN", "DEMO_TOKEN", "CON_LIVE_DAILY_CAP", "CON_LIVE_PER_PLAYER",
+              "ANSWER_RATE_PER_MIN", "CROWD_MIN", "GOS_DATA_DIR")
+
+
+@pytest.fixture(autouse=True)
+def default_server_env(monkeypatch):
+    for name in SERVER_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture
 def data_dir(tmp_path):
     """A private copy of the two seed cases, so tests never touch the real data/."""

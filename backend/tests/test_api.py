@@ -2,6 +2,7 @@ import json
 
 from fastapi.testclient import TestClient
 
+from backend.app.con_lines import NO_RECEIPTS
 from backend.app.main import create_app
 
 from .conftest import CLEAN, DEMO, load, save, submit, verdicts
@@ -174,9 +175,10 @@ def test_perfect_demo_with_trick_bonus_and_clue_bonus(client, player, data_dir):
     assert res["p2"]["trick_named_correctly"] is True
     assert res["p2"]["trick"] == "misleading-chart"
     assert res["p2"]["tell"] == ak["posts"]["p2"]["tell"]
-    assert res["p2"]["con_line"] == ak["posts"]["p2"]["con_line_caught"]
+    # No evidence was opened, so no answer-key line that claims "you checked the data" (§8.4).
+    assert res["p2"]["con_line"] in NO_RECEIPTS and res["p2"]["con_line"] != ak["posts"]["p2"]["con_line_caught"]
     assert res["p2"]["diff"]["type"] == "chart"
-    assert res["p1"]["con_line"] is None and res["p1"]["points"] == 100
+    assert res["p1"]["con_line"] in NO_RECEIPTS and res["p1"]["points"] == 100
     assert res["p3"]["suspicious_real"] is True
     assert body["clue_bonus"] == 60
     assert body["score"] == 450 + 60
@@ -193,6 +195,10 @@ def test_clue_bonus_counts_unused_tokens(client, player):
     body = submit(client, player, DEMO, PERFECT_DEMO).json()
     assert body["clue_bonus"] == 40
     assert body["score"] == 490
+    res = {x["post_id"]: x for x in body["results"]}
+    ak = load(client.app.state.store.data_dir, DEMO, "answer_key.json")
+    assert res["p2"]["con_line"] == ak["posts"]["p2"]["con_line_caught"]  # checked the data: the real line
+    assert res["p1"]["con_line"] in NO_RECEIPTS                           # trusted without looking
     assert "craftier" in body["adaptation_message"]
     # The clue session resets after a verdict, so a replay starts with a full budget.
     assert submit(client, player, DEMO, PERFECT_DEMO).json()["clue_bonus"] == 60
@@ -210,7 +216,7 @@ def test_fooled_and_false_alarm(client, player, data_dir):
     assert res["p3"]["outcome"] == "false_alarm" and res["p3"]["points"] == -50
     assert res["p3"]["con_line"] == ak["posts"]["p3"]["con_line_false_alarm"]
     assert body["score"] == 100 + 0 - 50 + 100 + 60
-    assert body["share_grid"] == "🟩⬛🟥🟩"
+    assert body["share_grid"] == "🟩🟥🟨🟩"  # §8.2: fooled 🟥, false alarm 🟨
     # hit 0/1, false alarms 1/3 -> round(50 - 16.67) = 33
     assert body["rating"] == 33 and body["rank"] == "Rookie"
     msg = body["adaptation_message"]
@@ -230,7 +236,7 @@ def test_marking_everything_doctored_rates_about_50(client, player):
     assert [x["outcome"] for x in body["results"]] == ["false_alarm", "caught", "false_alarm", "false_alarm"]
     assert body["score"] == -150 + 150 + 60
     assert body["rating"] == 50 and body["rank"] == "Gumshoe"
-    assert body["share_grid"] == "🟥🧂🟥🟥"
+    assert body["share_grid"] == "🟨🧂🟨🟨"
 
 
 def test_clean_case(client, player, data_dir):
@@ -238,7 +244,7 @@ def test_clean_case(client, player, data_dir):
     body = submit(client, player, CLEAN, verdicts(real=["p1", "p2", "p3", "p4"])).json()
     assert body["clean_case"] is True
     assert body["con_line_clean"] == ak["con_line_clean"]
-    assert all(x["outcome"] == "trusted" and x["con_line"] is None for x in body["results"])
+    assert all(x["outcome"] == "trusted" and x["con_line"] in NO_RECEIPTS for x in body["results"])
     assert body["score"] == 400 + 60
     # A false alarm on the real-but-suspicious post gets its own line.
     body = submit(client, player, CLEAN, verdicts(real=["p1", "p3", "p4"], doctored={"p2": "misleading-chart"})).json()

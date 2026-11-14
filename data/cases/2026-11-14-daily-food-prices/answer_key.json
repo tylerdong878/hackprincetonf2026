@@ -4,10 +4,10 @@
     "p1": {
       "doctored": true,
       "trick": "misleading-chart",
-      "tell": "The axis starts at $2.10, so an 18-cent rise looks like a rocket. Last September a dozen cost $3.49; this September, $2.27. Eggs are down 35% on the year.",
-      "explanation": "Real BLS prices, framed to scare. June to October did rise 8%, but the cropped axis makes the October bar five times taller, and the four-month window hides the fall from the $6.23 record in March 2025.",
-      "con_line_fooled": "Real prices, my axis. I just started it where it hurts.",
-      "con_line_caught": "You checked the carton. Down 35% on the year. Fine.",
+      "tell": "Jun to Oct 2026 on an axis that starts at $2.10 makes an 18-cent rise look like a rocket. Same month a year apart, Sep 2025 vs. Sep 2026, a dozen fell from $3.49 to $2.27 (-35%).",
+      "explanation": "Real BLS prices, framed to scare. June to October 2026 did rise 8%, but the axis from $2.10 makes the October bar about five times taller, and the four-month window hides the fall from the $6.23 record in March 2025.",
+      "con_line_fooled": "Real prices, my axis. I started it at $2.10 and picked June to October. Two choices, one panic. I'm framing this.",
+      "con_line_caught": "An axis at $2.10 and a four-month window, and you didn't flinch. My egg rocket is grounded.",
       "diff": {
         "type": "chart",
         "shown": {
@@ -29,7 +29,7 @@
         },
         "original": {
           "type": "bar",
-          "title": "Same month, one year apart",
+          "title": "Same month a year apart, axis from $0",
           "unit": "$/dozen",
           "points": [
             {
@@ -50,15 +50,15 @@
       "doctored": false,
       "suspicious_real": true,
       "explanation": "Real and word for word from NPR, and BLS data backs it: butter fell from $4.787 to $3.959 a pound, September to September. Not everything goes up.",
-      "con_line_false_alarm": "Real. Prices can fall too. Doubting good news is still doubting the truth."
+      "con_line_false_alarm": "Real. Butter got cheaper. Doubting good news is still doubting the truth, and that's my job."
     },
     "p3": {
       "doctored": true,
       "trick": "cherry-picked-stat",
-      "tell": "The 18% is over two years. NPR's same sentence says candy rose 7.7% in one year.",
-      "explanation": "The number is real; its time window was dropped. 'Up more than 18%' reads like this year's damage, but it's two years of increases stacked together. Candy did rise faster than food overall, which is why the claim feels right.",
-      "con_line_fooled": "I didn't change the number. I just lost the 'in two years.'",
-      "con_line_caught": "You read the whole sentence. Most people stop at the scary number.",
+      "tell": "The 18% is over two years. NPR's same sentence says candy and gum rose 7.7% in one year.",
+      "explanation": "The number is real; its time window was dropped. 'Up more than 18%' reads like this year's damage, but it's two years of increases stacked together. Candy did rise faster than food overall, which is why the claim feels right, and the calm, helpful voice makes it feel safe.",
+      "con_line_fooled": "I didn't touch the 18%. I deleted 'in two years' and the 7.7% beside it. I'm framing this.",
+      "con_line_caught": "You noticed the 18% had lost its 'in two years.' The number was real; my timeline wasn't.",
       "diff": {
         "type": "stat",
         "shown": "Prices for candy, the most popular Halloween purchase, and gum are up more than 18%",
@@ -69,14 +69,14 @@
     "p4": {
       "doctored": false,
       "suspicious_real": true,
-      "explanation": "Real. Both numbers match BLS average prices exactly, the axis starts at zero, and the account cites its source. Per pound, coffee has out-priced ground beef every month since at least 2022.",
-      "con_line_false_alarm": "Real, and honestly charted. Absurd isn't the same as false."
+      "explanation": "Real. The account is loud, but the sentence is word for word from NPR, and BLS data backs it: $3.665 a pound in Sep 2016, $6.792 in Sep 2026, up 85%. The ten-year window is stated right in the sentence, so nothing is hidden.",
+      "con_line_false_alarm": "Real. 85% over a decade, and it says 'a decade' right there. Shouting isn't lying. Get your own tricks."
     },
     "p5": {
       "doctored": false,
       "suspicious_real": false,
       "explanation": "Word for word from NPR. Grocery prices are rising more slowly than in 2022, but on top of a much higher base.",
-      "con_line_false_alarm": "Real. Not every gloomy quote is a crop."
+      "con_line_false_alarm": "That one was real. Not every gloomy quote is a crop. Doubting the truth is my job."
     }
   },
   "con_line_clean": null

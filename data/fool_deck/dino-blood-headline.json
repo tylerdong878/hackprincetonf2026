@@ -1,0 +1,64 @@
+{
+  "id": "dino-blood-headline",
+  "kind": "quote",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#1D4ED8"
+    },
+    "posted_at": "2026-11-09T22:00:49Z",
+    "body": "",
+    "quote": {
+      "text": "Scientists think they've found ancient remnants of dinosaur blood",
+      "speaker": "NPR headline"
+    },
+    "chart": null,
+    "source_label": "NPR · Nov 9, 2026",
+    "card_style": "quote",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+      "before": "",
+      "highlight": "Scientists think they've found ancient remnants of dinosaur blood",
+      "after": "GRICE: So I'm quietly confident that these may be red blood cells. ROTT: Other scientists are not as sure."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": [
+      "Scientists",
+      "think",
+      "they've",
+      "found",
+      "ancient",
+      "remnants",
+      "of",
+      "dinosaur",
+      "blood"
+    ],
+    "chart_series": null,
+    "stat": null
+  },
+  "tools": [
+    "crop"
+  ]
+}

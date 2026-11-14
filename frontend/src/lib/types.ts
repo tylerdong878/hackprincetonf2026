@@ -52,6 +52,8 @@ export interface GameCase {
   clue_budget: number
   trick_options: TrickId[]
   posts: Post[]
+  /** One line shown muted under the feed, never inside a card (same text on every case). */
+  notice?: string | null
 }
 
 export interface CaseSummary {
@@ -147,6 +149,13 @@ export interface PostResult {
   con_line?: string | null
   diff?: Diff | null
   rarity?: Rarity | null
+  /** CONTRACT §8.7: a bonus for a correct call few players made ("Rare catch" +50, "One in a shaker" +100). */
+  rarity_bonus?: RarityBonus | null
+}
+
+export interface RarityBonus {
+  label: string
+  points: number
 }
 
 export interface Crowd {
@@ -203,15 +212,26 @@ export interface AnswerResponse {
   crowd: Crowd | null
   clues_left?: number
   rarity?: Rarity | null
+  rarity_bonus?: RarityBonus | null
 }
 
 // ---- Con the Con (CONTRACT §7.3) ----
 export type FoolTool = 'crop' | 'axis' | 'window' | 'drop'
 
+/** The Con's level (CONTRACT §8.1): 1 Rookie (no evidence), 2 Street (one check, fast model), 3 Master. */
+export type ConLevel = 1 | 2 | 3
+
+export interface LevelRecord {
+  fooled: number
+  played: number
+}
+
 export interface FoolDeckItem {
   id: string
   kind: 'quote' | 'chart' | 'stat' | (string & {})
   post: Post
+  /** The made-up account a changed post will show (CONTRACT §8.3): the same in the preview and the verdict. */
+  edited_author?: Author | null
   tools: FoolTool[]
   editable: {
     quote_words?: string[]
@@ -245,8 +265,10 @@ export interface FoolJudgeResponse {
   }
   outcome: FoolOutcome
   con_line?: string | null
-  /** The player's all-time Con the Con record, when the server keeps one. */
-  scoreboard?: { fooled: number; played: number } | null
+  /** The level that judged this round (CONTRACT §8.1). */
+  level?: ConLevel | null
+  /** The player's all-time Con the Con record, overall and per level. */
+  scoreboard?: { fooled?: number; played?: number; by_level?: Partial<Record<'1' | '2' | '3', LevelRecord>> } | null
 }
 
 // ---- Player ----

@@ -28,7 +28,7 @@ function RateBar({ label, rate, color }: { label: string; rate: number; color: s
       >
         <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${v}%`, background: color }} />
       </div>
-      <span className="w-10 shrink-0 text-right font-mono text-sm tabular-nums">{v}%</span>
+      <span className="num w-10 shrink-0 text-right text-sm">{v}%</span>
     </div>
   )
 }
@@ -65,7 +65,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
         <div className="paper-texture rounded-2xl p-6">
           <p className="text-xs font-semibold tracking-[0.18em] text-[#6B5E45] uppercase">Detective rating</p>
           <div className="mt-1 flex items-end gap-3">
-            <span className="font-mono text-6xl font-semibold tabular-nums">{rating}</span>
+            <span className="num text-6xl font-bold">{rating}</span>
             <span className="mb-2 font-display text-2xl font-semibold text-[#6D3FD8]">{profile.rank}</span>
           </div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#D9CCAE]" aria-hidden="true">
@@ -78,15 +78,15 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
           <dl className="mt-4 flex gap-8 text-sm">
             <div>
               <dt className="text-xs text-[#6B5E45]">Cases solved</dt>
-              <dd className="font-mono text-xl font-semibold">{history.length}</dd>
+              <dd className="num text-xl font-bold">{history.length}</dd>
             </div>
             <div>
               <dt className="text-xs text-[#6B5E45]">Posts judged</dt>
-              <dd className="font-mono text-xl font-semibold">{profile.recent?.length ?? 0}</dd>
+              <dd className="num text-xl font-bold">{profile.recent?.length ?? 0}</dd>
             </div>
             <div>
               <dt className="text-xs text-[#6B5E45]">Daily streak</dt>
-              <dd className="font-mono text-xl font-semibold">
+              <dd className="num text-xl font-bold">
                 <span className={extras.streak > 0 ? 'flame' : 'opacity-40 grayscale'} aria-hidden="true">
                   🔥
                 </span>{' '}

@@ -1,0 +1,153 @@
+{
+  "id": "2026-11-15-daily-hackprinceton",
+  "number": 5,
+  "title": "Mice, Magazines and Megawatts",
+  "topic": "Princeton science, odd news, prices and power bills",
+  "briefing": "HackPrinceton Special. Five posts, 0–3 doctored today. Princeton mice, a very overdue magazine, your groceries and your power bill. I never make up a number. I don't have to.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-09T21:39:35Z",
+      "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "quote": {
+        "text": "We set this up to look a little bit like a gladiator arena, so the mouse is kind of above the two mice fighting on a platform.",
+        "speaker": "Annegret Falkner, Princeton Neuroscience Institute"
+      },
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Jersey Bill Watch",
+        "handle": "@jerseybills",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#E3A42B"
+      },
+      "posted_at": "2026-11-14T15:20:00Z",
+      "body": "NJ power prices are up 27% in ONE YEAR. Share before your next bill hits.",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "NJ residential electricity price",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          }
+        ],
+        "y_min": 19,
+        "y_max": 26
+      },
+      "source_label": "Data: U.S. EIA",
+      "card_style": "chart",
+      "tools": [
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "Brew Ha-Ha",
+        "handle": "@brewhaha_daily",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#92400E"
+      },
+      "posted_at": "2026-11-14T16:05:00Z",
+      "body": "WAIT. A pound of ground coffee costs MORE than a pound of ground beef?! ☕🥩 BLS average prices, Oct 2026: $9.249 vs. $6.755.",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "Average price per pound, Oct 2026",
+        "unit": "$/lb",
+        "points": [
+          {
+            "label": "Coffee",
+            "value": 9.249
+          },
+          {
+            "label": "Ground beef",
+            "value": 6.755
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "source_label": "Data: BLS average prices (via FRED)",
+      "card_style": "chart",
+      "tools": [
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "Shelf Life",
+        "handle": "@shelflifereads",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-09-20T15:00:00Z",
+      "body": "Overdue library magazine returned after 32 years 📚 Imagine the late fees.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 18, 2026",
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "Checkout Lane",
+        "handle": "@checkoutlane",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#475569"
+      },
+      "posted_at": "2026-10-22T13:00:00Z",
+      "body": "Grocery check 🛒 \"A typical pound of ground beef last month cost $6.79, an 85% jump, according to the Bureau of Labor Statistics.\"",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 20, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "data",
+        "account"
+      ]
+    }
+  ]
+}

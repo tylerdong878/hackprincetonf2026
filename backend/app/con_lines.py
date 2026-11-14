@@ -4,7 +4,30 @@ Voice: smug, playful, theatrical. Never mean, never political.
 """
 from __future__ import annotations
 
+import hashlib
+
 from .scoring import FORMAT_TRICK
+
+# A correct call made WITHOUT opening any evidence for that post (CONTRACT §8.4): the answer key's lines may say
+# "you checked the data", so these generic ones are used instead. They never claim the player looked.
+NO_RECEIPTS = [
+    "Good eye. No receipts needed.",
+    "Gut call. Correct gut.",
+    "Didn't even check. Annoyingly right.",
+    "No evidence, right answer. Lucky, or good? I'm watching.",
+]
+
+
+def no_receipts_line(seed: str) -> str:
+    """One of NO_RECEIPTS, picked deterministically (the same card always gets the same line)."""
+    return NO_RECEIPTS[int(hashlib.sha1(seed.encode("utf-8")).hexdigest(), 16) % len(NO_RECEIPTS)]
+
+
+def honest_result(result: dict, looked: bool, seed: str) -> dict:
+    """A card's result with an honest con_line: caught/trusted without any evidence opened -> a generic line."""
+    if looked or result.get("outcome") not in ("caught", "trusted"):
+        return result
+    return {**result, "con_line": no_receipts_line(seed)}
 
 # What the player falls for, per trick (when fooled).
 TRUSTS = {

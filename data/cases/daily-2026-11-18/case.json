@@ -1,0 +1,119 @@
+{
+  "id": "daily-2026-11-18",
+  "number": 8,
+  "title": "Your Bills: Zoom Out",
+  "topic": "NJ electricity prices",
+  "briefing": "0–3 doctored today. Some numbers hit different when you zoom out.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Garden State Savings",
+        "handle": "@gs_savings_daily",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0891B2"
+      },
+      "posted_at": "2026-11-18T08:15:00Z",
+      "body": "The average Rockland customer using about 650 kilowatt-hours within a billing cycle can expect their bill to decrease by $67, board staff said, and ratepayers with Atlantic City Electric will pay 5 cents less each month.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Chart Crusader",
+        "handle": "@chartcrusader",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#059669"
+      },
+      "posted_at": "2026-11-18T09:02:00Z",
+      "body": "NJ residential electricity prices surged 24% in one year — from 19.9¢ to 24.65¢ per kWh.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "tools": [
+        "data",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "New Jersey Monitor",
+        "handle": "@NJMonitor",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#2F9E6A"
+      },
+      "posted_at": "2026-11-18T10:30:00Z",
+      "body": "I don't know if everyone in New Jersey understands, but it is the most expensive hours of the year that are driving the really unsustainable price hikes in the utility and electricity bills that we saw in the last few years",
+      "quote": {
+        "text": "I don’t know if everyone in New Jersey understands, but it is the most expensive hours of the year that are driving the really unsustainable price hikes in the utility and electricity bills that we saw in the last few years.",
+        "speaker": "Emma Rebhorn, Board of Public Utilities Commissioner"
+      },
+      "chart": null,
+      "source_label": "New Jersey Monitor · Nov 12, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "quote"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "Shore Commuter",
+        "handle": "@shore_commuter_",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#64748B"
+      },
+      "posted_at": "2026-11-18T11:00:00Z",
+      "body": "NJ utilities board votes to keep electricity rates level",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey Monitor · Sept 24, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NJ Board of Public Utilities",
+        "handle": "@NJBPU",
+        "kind": "official",
+        "verified": true,
+        "avatar_color": "#1F5FD1"
+      },
+      "posted_at": "2026-11-18T11:45:00Z",
+      "body": "…New Jersey electricity bills jumped roughly 20 percent last year, driven in large part by rising costs in PJM's capacity market.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NJBPU press release · Aug 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    }
+  ]
+}

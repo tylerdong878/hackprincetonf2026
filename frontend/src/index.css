@@ -21,6 +21,10 @@
   --focus: #7fb2ff;
   --on-accent: #ffffff;
   --lamp: rgba(239, 228, 204, 0.07);
+  /* "caught" is salt: a white stamp with dark ink (CONTRACT §8.2) */
+  --salt: #f4f1e8;
+  --salt-ink: #1b1b1f;
+  --salt-edge: #f4f1e8;
 }
 
 @media (prefers-color-scheme: light) {
@@ -42,6 +46,9 @@
     --focus: #1f5fd1;
     --on-accent: #ffffff;
     --lamp: rgba(255, 255, 255, 0.6);
+    --salt: #ffffff;
+    --salt-ink: #1b1b1f;
+    --salt-edge: #6b6457;
   }
 }
 
@@ -61,6 +68,9 @@
   --color-con: var(--con);
   --color-focus: var(--focus);
   --color-on-accent: var(--on-accent);
+  --color-salt: var(--salt);
+  --color-salt-ink: var(--salt-ink);
+  --color-salt-edge: var(--salt-edge);
 
   --font-display: "Fredoka", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif;
   --font-con: "Special Elite", "Courier New", ui-monospace, monospace;
@@ -120,7 +130,7 @@ button:disabled {
 @keyframes stamp-thunk {
   0% {
     opacity: 0;
-    transform: scale(1.3) rotate(var(--stamp-rot-from, -14deg));
+    transform: scale(1.22) rotate(var(--stamp-rot-from, -14deg));
   }
   100% {
     opacity: 1;
@@ -334,10 +344,10 @@ button:disabled {
   animation: card-in 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .flip-out {
-  animation: flip-out 160ms ease-in forwards;
+  animation: flip-out 140ms ease-in forwards;
 }
 .flip-in {
-  animation: flip-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
+  animation: flip-in 200ms cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
 }
 .burst-grain {
   animation: burst 760ms cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
@@ -360,7 +370,59 @@ button:disabled {
   animation: magnify 1.8s ease-in-out infinite;
 }
 
+/* ---- v2.1 juice: Wordle-style tiles, a card thud, a points count-up pop ---- */
+@keyframes tile-flip {
+  0% {
+    transform: perspective(400px) rotateX(-90deg);
+    opacity: 0;
+  }
+  55% {
+    transform: perspective(400px) rotateX(12deg);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(400px) rotateX(0deg);
+    opacity: 1;
+  }
+}
+@keyframes thud {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.985);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes ack-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tile-flip {
+  animation: tile-flip 420ms cubic-bezier(0.3, 0.7, 0.4, 1.2) both;
+  backface-visibility: hidden;
+}
+.thud {
+  animation: thud 220ms ease-out both;
+}
+.ack-in {
+  animation: ack-in 180ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .tile-flip,
+  .thud,
+  .ack-in {
+    animation: fade-in 200ms ease-out both !important;
+  }
   .stamp-thunk,
   .rise-in,
   .folder-open,
@@ -401,6 +463,13 @@ button:disabled {
 /* ------------------------------------------------------------------
    Shared pieces
    ------------------------------------------------------------------ */
+/* Stats, scores and percentages: Inter with tabular, non-slashed numerals (not the mono's slashed zero). */
+.num {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 0;
+}
+
 .stamp {
   font-family: var(--font-con);
   text-transform: uppercase;

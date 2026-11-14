@@ -105,7 +105,7 @@ function describe(ev: PipelineEvent): string {
     case 'solver_result':
       return `Blind solver: ${ev.pass ? 'pass' : 'fail'}${ev.difficulty ? ` (${ev.difficulty})` : ''}`
     case 'awaiting_approval':
-      return 'Paused for teacher approval'
+      return 'Paused for the puzzle editor’s approval'
     case 'case_status':
       return `Case status: ${ev.status}`
     default:

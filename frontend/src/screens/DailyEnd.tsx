@@ -1,44 +1,108 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { LeanMeter } from '../components/LeanMeter'
 import { LinkButton } from '../components/ui'
-import { computeLean, gridFor, hms, leanLabel, msUntilMidnightET, outcomeStyle, shortDate, trickLabel } from '../lib/format'
+import { computeLean, gridFor, GRID_LEGEND, hms, leanLabel, msUntilMidnightET, outcomeStyle, shortDate, trickLabel } from '../lib/format'
 import { copyText, useReducedMotion, useTween } from '../lib/hooks'
-import type { DailyResponse, VerdictResponse } from '../lib/types'
+import { play } from '../lib/sound'
+import type { DailyResponse, Post, PostResult, VerdictResponse } from '../lib/types'
 import { useNow } from './common'
 
 export function Countdown({ className = '' }: { className?: string }) {
   const now = useNow(1000)
   return (
     <p className={className}>
-      Next Grain in <span className="font-mono font-semibold tabular-nums">{hms(msUntilMidnightET(now))}</span>
+      Next Grain in <span className="num font-semibold">{hms(msUntilMidnightET(now))}</span>
       <span className="text-muted"> (midnight ET)</span>
     </p>
   )
 }
 
+const TILE_MS = 230
+
+/** Wordle-style: each card's tile flips in one by one, with a small tick per tile. */
+function Tiles({ outcomes, animate }: { outcomes: string[]; animate: boolean }) {
+  useEffect(() => {
+    if (!animate) return
+    const ids = outcomes.map((_, i) => window.setTimeout(() => play('tile'), i * TILE_MS + 220))
+    return () => ids.forEach((id) => window.clearTimeout(id))
+  }, [outcomes, animate])
+  return (
+    <div className="flex flex-nowrap justify-center gap-1.5" role="img" aria-label={outcomes.map((o) => outcomeStyle(o).word).join(', ')}>
+      {outcomes.map((o, i) => (
+        <span
+          key={i}
+          className={`${animate ? 'tile-flip' : ''} inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 bg-white/55 text-[26px] leading-none sm:h-12 sm:w-12 sm:text-[28px]`}
+          style={{ borderColor: 'rgba(42,36,24,0.18)', animationDelay: animate ? `${i * TILE_MS}ms` : undefined }}
+          aria-hidden="true"
+        >
+          {outcomeStyle(o).emoji}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+interface Rarest {
+  index: number
+  post: Post
+  r: PostResult
+  pct: number | null
+}
+
+/** The rarest correct call today: the biggest rarity bonus, else the lowest "% got it right". */
+function rarestCatch(ordered: { post: Post; r?: PostResult }[]): Rarest | null {
+  let best: Rarest | null = null
+  ordered.forEach(({ post, r }, index) => {
+    if (!r || (r.outcome !== 'caught' && r.outcome !== 'trusted')) return
+    const pct = r.rarity?.correct_pct ?? null
+    const bonus = r.rarity_bonus?.points ?? 0
+    if (!bonus && (pct == null || pct > 40)) return
+    const cand = { index, post, r, pct }
+    if (!best) best = cand
+    else {
+      const b: Rarest = best
+      const bb = b.r.rarity_bonus?.points ?? 0
+      if (bonus > bb || (bonus === bb && (pct ?? 101) < (b.pct ?? 101))) best = cand
+    }
+  })
+  return best
+}
+
 export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyResponse; result: VerdictResponse; alreadyPlayed: boolean }) {
   const reduced = useReducedMotion()
-  const score = Math.round(useTween(0, result.score ?? 0, 1, 1000, reduced))
-  const [copied, setCopied] = useState<'idle' | 'ok' | 'fail'>('idle')
-  const [showCards, setShowCards] = useState(false)
-
   const posts = daily.case.posts
   const byId = new Map(result.results.map((r) => [r.post_id, r]))
   const ordered = posts.map((p) => ({ post: p, r: byId.get(p.id) })).filter((x) => x.r)
   const outcomes = ordered.map((x) => x.r!.outcome)
-  const grid = result.share_grid || gridFor(outcomes)
+  const animate = !reduced && !alreadyPlayed
+  const tilesDone = outcomes.length * TILE_MS + 300
+  const [scoreGo, setScoreGo] = useState(animate ? 0 : 1)
+  useEffect(() => {
+    if (!animate) return
+    const id = window.setTimeout(() => setScoreGo(1), tilesDone)
+    return () => window.clearTimeout(id)
+  }, [animate, tilesDone])
+  const score = Math.round(useTween(0, result.score ?? 0, scoreGo, 900, reduced || !animate))
+  const [copied, setCopied] = useState<'idle' | 'ok' | 'fail'>('idle')
+  const [showCards, setShowCards] = useState(false)
+
+  // The grid always uses the v2.1 emoji (CONTRACT §8.2), whatever an older server sends.
+  const grid = gridFor(outcomes)
   const correct = outcomes.filter((o) => o === 'caught' || o === 'trusted').length
   const n = result.daily_number ?? daily.daily_number
   const streak = result.streak ?? 0
-  const lean =
-    result.lean ??
-    computeLean(ordered.map((x) => ({ doctored: x.r!.doctored, outcome: x.r!.outcome })))
+  const lean = result.lean ?? computeLean(ordered.map((x) => ({ doctored: x.r!.doctored, outcome: x.r!.outcome })))
   const label = result.lean_label ?? (lean == null ? null : leanLabel(lean))
-  const shareText =
-    result.share_text ||
-    `Grain of Salt #${n} 🧂 ${correct}/${outcomes.length}${streak ? ` 🔥${streak}` : ''}\n${grid}${label ? `\n${label} detective` : ''}`
+  const fallbackShare = `Grain of Salt #${n} 🧂 ${correct}/${outcomes.length}${streak ? ` 🔥${streak}` : ''}\n${grid}${label ? `\n${label} detective` : ''}`
+  const shareText = result.share_text
+    ? result.share_grid && result.share_grid !== grid
+      ? result.share_text.replace(result.share_grid, grid)
+      : result.share_text
+    : fallbackShare
+  const rare = rarestCatch(ordered)
+  const bonusTotal = ordered.reduce((s, x) => s + (x.r?.rarity_bonus?.points ?? 0), 0)
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-4 pt-5 pb-16">
@@ -48,54 +112,88 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
         </p>
       )}
 
-      <section className="paper-texture rise-in relative overflow-hidden rounded-2xl p-6 text-center" aria-labelledby="end-h">
+      {/* Lead with the grid and the lean meter. */}
+      <section className="paper-texture rise-in rounded-2xl px-5 pt-5 pb-5 text-center sm:px-6" aria-labelledby="end-h">
         <p className="font-mono text-xs font-semibold tracking-[0.18em] text-[#6B5E45] uppercase">
           {shortDate(`${daily.date}T12:00:00`)} {daily.theme ? `· ${daily.theme}` : ''}
         </p>
         <h1 id="end-h" className="mt-1 font-display text-3xl font-bold">
           Grain of Salt #{n}
         </h1>
-        <p className="mt-3 font-mono text-6xl font-semibold tabular-nums" aria-label={`Score ${result.score}`}>
-          {score}
-        </p>
-        <p className="text-sm text-[#4B4232]">
-          <b>{correct}/{outcomes.length}</b> right
-          {result.clue_bonus ? <> · +{result.clue_bonus} for unused checks</> : null}
-        </p>
-        <p className="pop mt-4 text-4xl tracking-[0.2em]" role="img" aria-label={outcomes.map((o) => outcomeStyle(o).word).join(', ')}>
-          {grid}
-        </p>
-        <p className="mt-1 text-[11px] text-[#6B5E45]">🟩 trusted · 🧂 caught · 🟥 false alarm · ⬛ fooled</p>
-        <span
-          className="stamp stamp-thunk absolute top-4 right-4 text-sm text-[#B8322A] opacity-80"
-          style={{ ['--stamp-rot' as string]: '12deg' }}
-          aria-hidden="true"
-        >
-          Closed
-        </span>
-      </section>
-
-      <section className="rounded-2xl border border-line bg-surface p-5">
-        <LeanMeter lean={lean} label={label} />
-      </section>
-
-      <section className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-line bg-surface p-4">
-          <p className="text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Detective rating</p>
-          <p className="mt-1 font-mono text-3xl font-semibold">{result.rating}</p>
-          <p className="font-display font-semibold text-con">{result.rank}</p>
+        <div className="mt-4">
+          <Tiles outcomes={outcomes} animate={animate} />
         </div>
-        <div className="rounded-2xl border border-line bg-surface p-4">
-          <p className="text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Streak</p>
-          <p className="mt-1 font-mono text-3xl font-semibold">
-            <span className={streak > 0 ? 'flame' : 'opacity-40 grayscale'} aria-hidden="true">
-              🔥
-            </span>{' '}
-            {streak}
+        <p className="mt-1.5 text-[11px] text-[#6B5E45]">{GRID_LEGEND}</p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          <p className="text-[15px] text-[#4B4232]" aria-label={`${correct} of ${outcomes.length} right, ${result.score} points`}>
+            <b className="num text-[#2A2418]">
+              {correct}/{outcomes.length}
+            </b>{' '}
+            right · <b className="num text-2xl text-[#2A2418]">{score}</b> pts
           </p>
-          <p className="text-sm text-muted">{streak === 1 ? 'day played' : 'days in a row'}</p>
+          <span
+            className={`stamp ${animate ? 'stamp-thunk' : ''} text-xs text-[#B8322A]`}
+            style={{ ['--stamp-rot' as string]: '-6deg', animationDelay: animate ? `${tilesDone}ms` : undefined }}
+            aria-hidden="true"
+          >
+            Closed
+          </span>
+        </div>
+        {(result.clue_bonus || bonusTotal > 0) && (
+          <p className="mt-0.5 text-xs text-[#6B5E45]">
+            {result.clue_bonus ? <>+{result.clue_bonus} unused checks</> : null}
+            {result.clue_bonus && bonusTotal ? ' · ' : null}
+            {bonusTotal ? <>+{bonusTotal} rarity bonus</> : null}
+          </p>
+        )}
+        <div className="mt-4 border-t border-dashed border-[#B9A985] pt-4 text-left text-[#2A2418]">
+          <LeanMeter lean={lean} label={label} onPaper />
         </div>
       </section>
+
+      {/* Small chips: streak, rating, the rarest catch. */}
+      <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 font-semibold">
+          <span className={streak > 0 ? 'flame' : 'opacity-40 grayscale'} aria-hidden="true">
+            🔥
+          </span>
+          <span>
+            <span className="num">{streak}</span>-day streak
+          </span>
+        </span>
+        <a
+          href="#/dossier"
+          className="inline-flex items-center gap-1.5 rounded-full border border-con/50 bg-con/10 px-3 py-1.5 font-semibold hover:bg-con/20"
+        >
+          <span aria-hidden="true">🕵️</span> {result.rank} <span className="num text-muted">{result.rating}</span>
+        </a>
+      </div>
+
+      {rare && (
+        <section className="pop flex items-center gap-3 rounded-2xl border-2 border-con/60 bg-con/10 px-4 py-3" aria-label="Your rarest catch today">
+          <span className="text-3xl" aria-hidden="true">
+            {rare.r.rarity_bonus && rare.r.rarity_bonus.points >= 100 ? '🧂' : '💎'}
+          </span>
+          <div className="min-w-0 flex-1 text-sm">
+            <p className="font-display text-base font-semibold">
+              Rarest catch: card {rare.index + 1}
+              {rare.r.rarity_bonus && (
+                <span className="ml-2 text-con">
+                  {rare.r.rarity_bonus.label} <span className="num">+{rare.r.rarity_bonus.points}</span>
+                </span>
+              )}
+            </p>
+            <p className="truncate text-muted">
+              {rare.pct != null && (
+                <>
+                  Only <b className="num text-text">{Math.round(rare.pct)}%</b> {rare.r.doctored ? 'caught' : 'trusted'} this ·{' '}
+                </>
+              )}
+              {rare.post.author.name}
+            </p>
+          </div>
+        </section>
+      )}
 
       {result.adaptation_message && (
         <div className="flex items-end gap-2.5">
@@ -116,9 +214,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
           {copied === 'ok' ? '✓ Copied!' : 'Share'} <span className="tracking-[0.1em]">{grid}</span>
         </button>
         <p className="text-center text-xs text-muted" role="status">
-          {copied === 'fail'
-            ? `Copy this instead: ${shareText.replace(/\n/g, ' · ')}`
-            : 'Shares the number, grid and lean. Never the doctored posts.'}
+          {copied === 'fail' ? `Copy this instead: ${shareText.replace(/\n/g, ' · ')}` : 'Shares the number, grid and lean. Never the doctored posts.'}
         </p>
         <Countdown className="text-center text-sm" />
       </section>
@@ -128,9 +224,9 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
         className="group flex w-full flex-col items-center rounded-2xl border-2 border-con bg-con/15 px-5 py-4 text-center transition hover:bg-con/25"
       >
         <span className="font-display text-xl font-semibold">
-          Now try to con the Con <span className="inline-block transition group-hover:translate-x-1">→</span>
+          Bonus round: con the Con <span className="inline-block transition group-hover:translate-x-1">→</span>
         </span>
-        <span className="text-sm text-muted">Doctor a real post. Our AI tries to catch you, live.</span>
+        <span className="text-sm text-muted">Doctor a real post. Our AI tries to bust you, live.</span>
       </a>
 
       <section className="rounded-2xl border border-line bg-surface">
@@ -167,7 +263,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
           Dossier
         </LinkButton>
         <LinkButton to="/casefiles" variant="ghost" size="sm">
-          Case Files
+          More cases
         </LinkButton>
         <LinkButton to="/" variant="ghost" size="sm">
           Home

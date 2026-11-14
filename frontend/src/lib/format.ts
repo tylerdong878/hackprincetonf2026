@@ -85,20 +85,61 @@ export const rankFor = (rating: number) => RANKS.find((r) => rating >= r.min)?.t
 export interface OutcomeStyle {
   word: string
   icon: string
-  color: string // CSS var
+  /** Accent for borders, rings and text on the page (CSS var). */
+  color: string
+  /** Stamp / tile fill and the ink on it (CONTRACT §8.2: green, salt/white, amber, red). */
+  fill: string
+  ink: string
   blurb: string
   emoji: string
 }
 
+/** One mapping for every stamp, tile and grid (CONTRACT §8.2). */
 export const OUTCOMES: Record<Outcome, OutcomeStyle> = {
-  caught: { word: 'Caught', icon: '✓', color: 'var(--real)', blurb: 'Doctored, and you caught it.', emoji: '🧂' },
-  trusted: { word: 'Trusted', icon: '✓', color: 'var(--real)', blurb: 'It was real, and you trusted it.', emoji: '🟩' },
-  fooled: { word: 'Fooled', icon: '✗', color: 'var(--doctored)', blurb: 'Doctored, and it got past you.', emoji: '⬛' },
-  false_alarm: { word: 'False alarm', icon: '⚠', color: 'var(--alarm)', blurb: 'It was real. Surprising, but true.', emoji: '🟥' },
+  trusted: {
+    word: 'Trusted',
+    icon: '✓',
+    color: 'var(--real)',
+    fill: 'var(--real)',
+    ink: '#FFFFFF',
+    blurb: 'It was real, and you trusted it.',
+    emoji: '🟩',
+  },
+  caught: {
+    word: 'Caught',
+    icon: '✓',
+    color: 'var(--salt-edge)',
+    fill: 'var(--salt)',
+    ink: 'var(--salt-ink)',
+    blurb: 'Doctored, and you caught it.',
+    emoji: '🧂',
+  },
+  false_alarm: {
+    word: 'False alarm',
+    icon: '⚠',
+    color: 'var(--alarm)',
+    fill: 'var(--alarm)',
+    ink: '#1B1B1F',
+    blurb: 'It was real. Surprising, but true.',
+    emoji: '🟨',
+  },
+  fooled: {
+    word: 'Fooled',
+    icon: '✗',
+    color: 'var(--doctored)',
+    fill: 'var(--doctored)',
+    ink: '#FFFFFF',
+    blurb: 'Doctored, and it got past you.',
+    emoji: '🟥',
+  },
 }
 
+export const GRID_LEGEND = '🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled'
+
 export function outcomeStyle(o: string): OutcomeStyle {
-  return OUTCOMES[o as Outcome] ?? { word: o, icon: '•', color: 'var(--muted)', blurb: '', emoji: '⬜' }
+  return (
+    OUTCOMES[o as Outcome] ?? { word: o, icon: '•', color: 'var(--muted)', fill: 'var(--surface-2)', ink: 'var(--text)', blurb: '', emoji: '⬜' }
+  )
 }
 
 export function pct(rate: number | undefined | null): number {
@@ -178,5 +219,21 @@ export function computeStreak(dates: string[] | undefined, today = etDate()): nu
   return n
 }
 
-/** The share grid in v2 emoji for a list of outcomes. */
+/** The share grid in v2.1 emoji (CONTRACT §8.2) for a list of outcomes. */
 export const gridFor = (outcomes: string[]) => outcomes.map((o) => outcomeStyle(o).emoji).join('')
+
+/** A value with its unit, for chart annotations: "$2.10", "19¢", "4.5%". */
+export function withUnit(v: number, unit: string | null | undefined): string {
+  const u = (unit ?? '').trim()
+  if (u.startsWith('$')) return `$${formatNumber(v, Number.isInteger(v) && Math.abs(v) >= 10 ? 0 : 2)}`
+  const d = Number.isInteger(v) ? 0 : Math.abs(v - Math.round(v * 10) / 10) < 1e-9 ? 1 : 2
+  if (u.startsWith('¢')) return `${formatNumber(v, d)}¢`
+  if (u.startsWith('%')) return `${formatNumber(v, d)}%`
+  return formatNumber(v, d)
+}
+
+/** Decimal places that keep ticks spaced `step` apart distinct (0.05 -> 2, 0.5 -> 1, 5 -> 0). */
+export function decimalsFor(step: number): number {
+  if (!(step > 0) || !Number.isFinite(step)) return 0
+  return Math.max(0, Math.min(4, Math.ceil(-Math.log10(step) - 1e-9)))
+}

@@ -1,55 +1,119 @@
-# hackprincetonf2026
+# Grain of Salt
 
-## Backend
+**Don't believe everything. Don't doubt everything.**
 
-FastAPI game server in `backend/app/` (API per CONTRACT.md §5, all under `/api`).
+A 2-minute daily game. An AI con artist called **the Con** doctors real news posts. You catch the fakes without doubting the true ones. Then you turn the tables and try to fool the Con.
 
+*Built at HackPrinceton Fall 2026 · Entertainment & Media*
+
+![Home screen](docs/img/home.png)
+
+## How to play
+
+**🧂 Daily Grain.** Five real news posts a day, the same five for everyone. The Con has secretly doctored some of them: a quote cropped mid-sentence, a chart axis that doesn't start at zero, a statistic missing its time frame. Some days nothing is fake.
+- Tap **Real** or **Doctored**, and name the trick for bonus points.
+- Every card flips over right away to show the original next to what you saw.
+- **Getting fooled costs you.** So does **crying wolf on a true post.**
+- Few people spotted it? You get a rarity bonus: *Rare catch* +50, *One in a shaker* +100.
+- Share your grid without spoilers: 🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled.
+
+| The reveal | The end card |
+|---|---|
+| ![Chart reveal](docs/img/daily-reveal.png) | ![End card](docs/img/end-card.png) |
+
+**🎭 Con the Con.** Now you're the con artist.
+- Take a real post and doctor it with one trick: crop the quote, move the axis, cherry-pick the months, drop the context. Or bluff and leave it untouched.
+- Then a live AI decides whether it's real. Pick your boss:
+  - **Rookie Con** judges on looks alone.
+  - **Street Con** gets one evidence check on a fast model.
+  - **Master Con** gets one check on the full models.
+
+![Con the Con](docs/img/con-the-con.png)
+
+*Screenshots are from a test run; the crowd numbers in them are test data.*
+
+## Why paranoia loses points
+
+Earlier fake-news games mostly trained suspicion. A [2023 reanalysis](https://pubmed.ncbi.nlm.nih.gov/36996156/) of *Bad News* and *Go Viral!* (Modirrousta-Galian & Higham, *Journal of Experimental Psychology: General*) found they made players more likely to call **everything** fake, true news included, without getting better at telling true from false. So Grain of Salt scores both mistakes, and your **Gullible ↔ Paranoid** meter shows which way you lean. A grain of salt, not the whole shaker. More in [docs/RESEARCH.md](docs/RESEARCH.md).
+
+## How the puzzles get made
+
+New puzzles are built ahead of time by a team of **LangChain Deep Agents** and approved by a human puzzle editor. The game never shows unreviewed AI output. (Launch week's dailies were curated by the team with a scripted builder that checks every excerpt against its source, under the same rules.)
+
+```mermaid
+flowchart LR
+    O[Orchestrator<br/>plans with todos] --> R[Researcher<br/>saves word-for-word<br/>sources with links]
+    O --> F[Forger<br/>loads one trick<br/>SKILL.md]
+    O --> S[Blind solver<br/>never sees the answer key;<br/>must crack it fairly]
+    S -- unfair: rebuild --> O
+    S -- fair --> E{{Editor's Desk<br/>human approves<br/>interrupt_on}}
+    E -- reject + feedback --> O
+    E -- approve --> B[(Case bank<br/>data/cases)]
+    B --> G[Daily Grain]
+    D[(Con the Con deck)] --> J[Live judge<br/>levels 1-3] --> C[Con the Con]
 ```
-uv run uvicorn backend.app.main:app --reload --port 8000   # dev server
-uv run pytest backend/tests -q                             # tests
+
+- **Researcher:** can only save text that appears word for word in a page it fetched during that run, with the URL.
+- **Forger:** doctors real material in code (crop, axis, window, drop, detail swap). It never writes quotes freehand.
+- **Blind solver:** gets the same evidence tools as the player and none of the answers. If it can't solve a puzzle, the puzzle is rejected as unfair and rebuilt.
+- **Editor's Desk:** a human-in-the-loop interrupt holds every puzzle until the editor approves it, rejects it with feedback (the agents revise), or holds it.
+- **Tracing:** every build and every live judgment is traced in LangSmith.
+
+## Ground rules
+
+- **Real posts are real.** Every real card is verbatim from a published source and links to it. Sources are listed in [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), and `--verify` re-checks every excerpt against the live page.
+- **Doctored posts only come from made-up accounts** with invented handles. We never invent quotes from real people, and only ever cut or reframe real material.
+- **Every doctored post is stamped at the reveal.** Share grids contain no post content.
+- **Off-limits topics:** tragedies, minors, private individuals, elections and active emergencies.
+- **Privacy:** no accounts and no personal data. A random player id lives in your browser. The server stores only the answers made under that id, plus anonymous crowd counts.
+
+## Run it
+
+You need Python 3.12 with [uv](https://docs.astral.sh/uv/) and Node 20.19+ or 22.12+.
+
+```bash
+uv sync
+cd frontend && npm install && npm run build && cd ..
+uv run uvicorn backend.app.main:app --port 8000
+# open http://localhost:8000
 ```
 
-- Reads cases from `data/cases/*/` on every request (the pipeline can add cases live). Players only see `meta.status == "approved"`; teacher routes see everything.
-- Player profiles go to `data/players/<id>/profile.json` (git-ignored). Set `GOS_DATA_DIR` to use another data folder.
-- If `frontend/dist/` exists, it is served at `/` with SPA fallback, so the demo can run from one server.
-- Clue budgets are kept in memory per (player, case) and reset on restart or after a verdict.
-- Mastery (0-3, per trick, all-time): 3 = caught >= 3 with miss and false-alarm rates <= 25%; 2 = caught >= 2 with miss rate <= 50%; 1 = caught at least once; 0 = never caught.
+The Daily Grain and Case Files play from the saved case bank and need no API keys. Con the Con's live judge and the puzzle pipeline need a free [OpenRouter](https://openrouter.ai/keys) key: copy `.env.example` to `.env` and fill it in. LangSmith tracing is optional.
 
-## Frontend
-
-Vite + React + TypeScript + Tailwind v4 + Recharts in `frontend/`. Dev server on port 5173 proxies `/api` to the backend on 8000.
-
-```
-cd frontend
-npm install
-npm run dev        # http://localhost:5173 (start the backend first)
-npm run build      # typecheck + production build to frontend/dist/ (the backend serves it at http://localhost:8000)
+```bash
+uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20 --hold-for-teacher   # build a puzzle
+uv run python -m pipeline.build_case --dry-run                                                 # no model calls
 ```
 
-- Modes: **The Daily Grain** (`#/daily`: five cards one at a time, 3 magnifiers, an instant flip reveal per card, then an end card with the Gullible-to-Paranoid meter, streak, share text and a countdown to midnight ET), **Con the Con** (`#/con`: doctor a real Fool Deck post with crop / axis / window / drop, or bluff, then watch the AI judge rule), and **Case Files** (`#/casefiles`: the v1 four-post feed for classrooms, with the Workshop replay).
-- Also: Dossier (lean meter, streak, per-trick rates), Casebook, Teacher queue and case review.
-- Keyboard: in the Daily, `R` Real, `D` Doctored then `1`-`4` for the trick, `C` Check, Enter for the next card. In Case Files, Tab moves between posts, `R` / `D`, `1`-`3`, `E` for evidence.
-- The player id lives in `localStorage` (`gos.player_id`). "Start as a new detective" on Home or the Dossier resets it, which is handy between demo players.
-- Theme follows `prefers-color-scheme` (dark is the default). The logo switches between its `-dark` and `-light` files to match.
+For a public deployment, set `GOS_PUBLIC=1`. That hides the API docs, puts a token on the Editor's Desk, rate-limits answers and caps live Con calls. Details are in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-## Pipeline
+## Tests
 
-Deep Agents case builder in `pipeline/` (offline; the game only plays saved cases). Needs `OPENROUTER_API_KEY` (or `GEMINI_API_KEY`) in `.env`.
-
-```
-uv run python -m pipeline.build_case --topic "NJ electricity prices"                 # interactive teacher review
-uv run python -m pipeline.build_case --topic "NJ electricity prices" --auto-approve
-uv run python -m pipeline.build_case --clean --hold-for-teacher   # approve later in the web teacher queue
-uv run python -m pipeline.build_case --trick misleading-chart     # or --player <id> to target a weak spot
-uv run python -m pipeline.build_case --dry-run                    # build the graph, no model calls
-uv run pytest pipeline/tests -q                                   # no network, no LLM
+```bash
+uv run pytest -q              # 299 tests: backend, pipeline, content builder; no network or model calls
+cd frontend && npm run build  # typecheck + production build
 ```
 
-- **Orchestrator** (`create_deep_agent`, `TodoListMiddleware` plan) delegates via `task` to **researcher** (feeds, pages, EIA; `save_source` rejects anything not verbatim in a document fetched this run), **forger** (loads `data/skills/<trick>/SKILL.md`; `crop_quote` / `make_chart` / `make_stat_claim` doctor real material in code; `write_case` validates CONTRACT §2, the blocklist and the made-up-author rule) and **blind-solver** (a compiled sub-agent with no file tools: only `open_evidence`, `view_chart`, `submit_verdict`; its input is rebuilt from `case.json`, and grading against the answer key happens in code).
-- Files: `CompositeBackend` routes `/cases/` and `/skills/` to `FilesystemBackend`s on `data/`; permissions deny reading `answer_key.json` and hand-writing case/skill files through the file tools.
-- Human-in-the-loop: `submit_for_review` is gated by `interrupt_on` + `MemorySaver`. Approve, reject with feedback (the agent revises), edit in the terminal, or hold (`meta.status` stays `awaiting_approval`).
-- Output per case: `sources.json`, the four CONTRACT files (`origin: "pipeline"`), `solver_log.md`, `rendered/*.png`, and `pipeline_log.jsonl` (CONTRACT §6 events, spoilers marked).
-- Free tier: every request is counted (including failures), throttled to `PIPELINE_RPM` (15/min) and capped at `PIPELINE_MAX_CALLS` (45/run); 429s are retried with backoff, a daily-cap 429 stops the run (or falls back to Gemini when both keys are set). A clean run is about 14 requests.
-- Deadlines: every model request has a wall-clock deadline (`PIPELINE_CALL_DEADLINE_S`, 120 s offline; `PIPELINE_JUDGE_DEADLINE_S`, 20 s for the live judge). ChatOpenRouter's `timeout` only bounds each network read, so a slow reply can hang without this. On a timeout the run switches to `PIPELINE_FALLBACK_MODEL` (default `nvidia/nemotron-3.5-lightning:free`). `max_retries=0` everywhere. `GEMINI_MODEL` picks the Gemini model (default `gemini-flash-latest`).
-- **v2 Daily:** `--mode daily --daily-date YYYY-MM-DD [--theme "..."] [--doctored 0-3]` builds a 5-post Daily Grain (0–3 doctored, planned from the weekday; briefing says "0–3 doctored today"; `meta.mode/daily_date/theme`, `card_style` per post; capped at 25 calls, 1 solver retry). New trick `edited-detail` (`edit_detail` tool + `data/skills/edited-detail/SKILL.md`).
-- **v2 Con the Con:** `pipeline/fool.py` has `apply_edit(deck_item, edit)` (deterministic §7.3 edits; a changed post moves to a made-up account) and `judge_post(edited_post, evidence)` (one evidence look, then a verdict; 2 calls, one fallback, raises `ConAsleep`). The judge sees every post from the same neutral reposter, so it can't tell edits apart by author.
+## Repo map
+
+| Path | What's there |
+|---|---|
+| `backend/app/` | FastAPI game server: scoring, crowd stats, Con the Con, public-mode limits |
+| `frontend/` | React 19 + TypeScript + Tailwind game |
+| `pipeline/` | Deep Agents puzzle builder, trick tools, live judge |
+| `data/skills/` | One `SKILL.md` per trick |
+| `data/cases/`, `data/fool_deck/` | The puzzle bank and the Con the Con deck |
+| `scripts/` | Hand-built content builder with source verification |
+| `docs/` | [Spec](docs/SPEC.md), [API contract](docs/CONTRACT.md), [research](docs/RESEARCH.md), [sources](docs/CONTENT_SOURCES.md), [development notes](docs/DEVELOPMENT.md), [pitch kit](docs/PITCH.md) |
+
+## Built with
+
+Python, FastAPI, LangChain [Deep Agents](https://github.com/langchain-ai/deepagents), LangGraph, LangSmith, OpenRouter, NVIDIA Nemotron (free models), React, TypeScript, Vite, Tailwind CSS and Recharts. Data comes from the U.S. EIA and from BLS average prices via FRED.
+
+**AI tools used:**
+- **In the product:** NVIDIA Nemotron models on OpenRouter's free tier build puzzles and judge Con the Con. Gemini is the backup.
+- **For building it:** the team used Claude Code as a coding assistant.
+
+## License
+
+Code: [MIT](LICENSE). Quoted news excerpts belong to their publishers and appear as short excerpts with links; see [NOTICE](NOTICE).
