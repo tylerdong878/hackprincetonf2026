@@ -1,0 +1,110 @@
+{
+  "id": "2026-11-14-power-bills-clean",
+  "number": 2,
+  "title": "Who's driving your bill?",
+  "topic": "NJ electricity prices",
+  "briefing": "More about your power bill. Four posts. Some of them are mine. Maybe.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "NJ Board of Public Utilities",
+        "handle": "@NJBPU",
+        "kind": "official",
+        "verified": true,
+        "avatar_color": "#1F5FD1"
+      },
+      "posted_at": "2026-08-13T16:05:00Z",
+      "body": "While capacity charges currently account for approximately 15 to 20 percent of a typical customer's electric bill, they represent the single largest cost component that state utility commissions like the NJBPU cannot directly set, regulate, or change.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NJBPU press release · Aug 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Priya (watt nerd)",
+        "handle": "@wattnerd",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-13T02:10:00Z",
+      "body": "July vs July: NJ home electricity prices barely moved, 25.11¢ → 25.19¢ per kWh (EIA). The big jump was summer 2025.",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "July vs. July",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Jul 2025",
+            "value": 25.11
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "source_label": null,
+      "tools": [
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NJ Board of Public Utilities",
+        "handle": "@NJBPU",
+        "kind": "official",
+        "verified": true,
+        "avatar_color": "#1F5FD1"
+      },
+      "posted_at": "2026-08-13T16:10:00Z",
+      "body": "",
+      "quote": {
+        "text": "The fastest way to lower bills is getting new power generation built.",
+        "speaker": "Ben Hertz-Shargel, NJBPU President"
+      },
+      "chart": null,
+      "source_label": "NJBPU press release · Aug 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "New Jersey Monitor",
+        "handle": "@NJMonitor",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#2F9E6A"
+      },
+      "posted_at": "2026-09-24T20:00:00Z",
+      "body": "Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally. But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before.",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey Monitor · Sept 24, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}
