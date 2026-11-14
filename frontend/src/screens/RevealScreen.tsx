@@ -58,7 +58,7 @@ function PostReveal({
           )}
         </span>
         <span
-          className="ml-auto font-mono text-lg font-semibold tabular-nums"
+          className="num ml-auto text-lg font-bold"
           style={{ color: pts > 0 ? 'var(--real)' : pts < 0 ? 'var(--doctored)' : 'var(--muted)' }}
         >
           {pts > 0 ? `+${pts}` : pts < 0 ? `−${Math.abs(pts)}` : '0'}
@@ -71,7 +71,7 @@ function PostReveal({
 
       {result.doctored && result.diff ? (
         <div className="mt-4">
-          <DiffView post={post} caseNumber={caseNumber} diff={result.diff} autoplay />
+          <DiffView post={post} caseNumber={caseNumber} diff={result.diff} />
         </div>
       ) : (
         <div className={`mt-4 ${result.doctored ? '' : 'grid gap-4 md:grid-cols-2'}`}>
@@ -122,7 +122,7 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
     return () => window.clearTimeout(id)
   }, [shown, total])
 
-  const grid = result.share_grid || ordered.map((p) => outcomeStyle(byId.get(p.id)!.outcome).emoji).join('')
+  const grid = ordered.map((p) => outcomeStyle(byId.get(p.id)!.outcome).emoji).join('')
   const shareText = `Grain of Salt · Case ${caseNo(game.number)}\n${grid}\nDetective rating ${result.rating} (${result.rank})`
   const learnTrick =
     result.results.find((r) => r.doctored && r.outcome === 'fooled')?.trick ?? result.results.find((r) => r.doctored)?.trick ?? null
@@ -139,17 +139,17 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
           <dl className="flex flex-1 flex-wrap items-end gap-x-8 gap-y-3">
             <div>
               <dt className="text-xs font-semibold tracking-wide text-[#6B5E45] uppercase">Score</dt>
-              <dd className="font-mono text-3xl font-semibold tabular-nums">{score}</dd>
+              <dd className="num text-3xl font-bold">{score}</dd>
             </div>
             {result.clue_bonus != null && (
               <div>
                 <dt className="text-xs font-semibold tracking-wide text-[#6B5E45] uppercase">Clue bonus</dt>
-                <dd className="font-mono text-xl font-semibold">+{result.clue_bonus}</dd>
+                <dd className="num text-xl font-bold">+{result.clue_bonus}</dd>
               </div>
             )}
             <div>
               <dt className="text-xs font-semibold tracking-wide text-[#6B5E45] uppercase">Detective rating</dt>
-              <dd className="font-mono text-3xl font-semibold">
+              <dd className="num text-3xl font-bold">
                 {result.rating}{' '}
                 <span className="font-display text-lg font-semibold text-[#6D3FD8]">{result.rank}</span>
               </dd>

@@ -209,6 +209,7 @@ export function Investigation({
               <ErrorState error={submitError} onRetry={onSubmit} title="Couldn’t submit your verdicts." />
             </div>
           )}
+          {game.notice && <p className="mx-auto mt-6 max-w-[620px] text-center text-xs text-muted">{game.notice}</p>}
         </section>
 
         {!isMobile && (

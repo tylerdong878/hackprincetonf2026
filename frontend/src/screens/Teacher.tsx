@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { FeedCard } from '../components/PostCard'
 import { DiffView } from '../components/Reveal'
 import { SiteHeader } from '../components/Header'
 import { Workshop } from '../components/Workshop'
 import { Button, Chip, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
-import { api, ApiError } from '../lib/api'
+import { api, ApiError, getTeacherToken, setTeacherToken } from '../lib/api'
 import { caseNo, shortDate, trickLabel } from '../lib/format'
 import { useAsync } from '../lib/hooks'
 import { href } from '../lib/router'
@@ -33,20 +33,74 @@ function normalizeQueue(res: QueueItem[] | { cases: QueueItem[] }): QueueItem[] 
   })
 }
 
+/**
+ * Public mode (CONTRACT §8.6): the desk's routes answer 401 without X-Teacher-Token. Ask once, keep it in
+ * sessionStorage, and retry. A 404 from the queue in public mode means the desk is switched off.
+ */
+function DeskGate({ error, onToken, children }: { error: unknown; onToken: () => void; children: ReactNode }) {
+  const [token, setToken] = useState('')
+  const status = error instanceof ApiError ? error.status : 0
+  if (status !== 401) return <>{children}</>
+  const hadToken = !!getTeacherToken()
+  return (
+    <form
+      className="mx-auto mt-4 flex w-full max-w-md flex-col gap-3 rounded-2xl border border-line bg-surface p-6"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!token.trim()) return
+        setTeacherToken(token.trim())
+        onToken()
+      }}
+    >
+      <h2 className="font-display text-xl font-semibold">🔐 Editor’s Desk is locked</h2>
+      <p className="text-sm text-muted">Puzzle editors only. Enter the desk token once; it’s kept for this browser tab.</p>
+      <label htmlFor="desk-token" className="text-sm font-semibold">
+        Desk token
+      </label>
+      <input
+        id="desk-token"
+        type="password"
+        autoComplete="off"
+        autoFocus
+        value={token}
+        onChange={(e) => setToken(e.target.value)}
+        className="rounded-xl border border-line bg-bg px-3 py-2 text-sm text-text"
+      />
+      {hadToken && (
+        <p role="alert" className="text-sm text-doctored">
+          That token didn’t work. Try again.
+        </p>
+      )}
+      <Button type="submit" variant="primary" disabled={!token.trim()}>
+        Unlock
+      </Button>
+    </form>
+  )
+}
+
+function deskTitle(e: unknown, fallback: string) {
+  if (e instanceof ApiError && e.status === 404) return 'The Editor’s Desk is switched off on this server.'
+  return fallback
+}
+
 export function TeacherQueue() {
   const q = useAsync(() => api.teacherQueue().then(normalizeQueue), [])
   return (
     <>
       <SiteHeader active="teacher" />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <h1 className="font-display text-3xl font-bold">Teacher mode</h1>
+        <h1 className="font-display text-3xl font-bold">Editor’s Desk</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
-          Every case is reviewed by a teacher before students see it. Open a case to preview it as a student, check the answer key,
-          the diffs and the blind-solver log, then approve or reject it.
+          A human puzzle editor approves every puzzle before it goes live. Open one to play-test it, check the answer key, the diffs
+          and the blind-solver log, then approve or reject it.
         </p>
         <div className="mt-6">
-          {q.status === 'loading' && <Loading label="Loading the case queue…" />}
-          {q.status === 'error' && <ErrorState error={q.error} onRetry={q.reload} title="Couldn’t load the case queue." />}
+          {q.status === 'loading' && <Loading label="Loading the puzzle queue…" />}
+          {q.status === 'error' && (
+            <DeskGate error={q.error} onToken={q.reload}>
+              <ErrorState error={q.error} onRetry={q.reload} title={deskTitle(q.error, 'Couldn’t load the puzzle queue.')} />
+            </DeskGate>
+          )}
           {q.status === 'ok' &&
             (q.data.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-muted">No cases on file yet.</p>
@@ -241,7 +295,7 @@ function CaseReview({ data, onMeta }: { data: TeacherCase; onMeta: (m: CaseMeta)
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="preview-h" className="min-w-0">
           <SectionLabel className="mb-3">
-            <span id="preview-h">Student preview</span>
+            <span id="preview-h">Player preview</span>
           </SectionLabel>
           <div className="mb-4 rounded-2xl border border-line bg-surface p-4 text-sm">
             <p className="font-con text-base">{game.briefing}</p>
@@ -291,7 +345,7 @@ function CaseReview({ data, onMeta }: { data: TeacherCase; onMeta: (m: CaseMeta)
                   {k.explanation && <p className="mt-1.5 text-sm text-muted">{k.explanation}</p>}
                   {k.doctored && k.diff && (
                     <div className="mt-3">
-                      <DiffView post={p} caseNumber={game.number} diff={k.diff} autoplay={false} />
+                      <DiffView post={p} caseNumber={game.number} diff={k.diff} />
                     </div>
                   )}
                   <ul className="mt-3 flex flex-col gap-1 text-xs text-muted">
@@ -375,15 +429,17 @@ export function TeacherCaseScreen({ caseId }: { caseId: string }) {
       <SiteHeader active="teacher" />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
         <LinkButton to="/teacher" size="sm" variant="ghost" className="mb-4 -ml-2">
-          ← Case queue
+          ← Puzzle queue
         </LinkButton>
-        {d.status === 'loading' && <Loading label="Opening the case for review…" />}
+        {d.status === 'loading' && <Loading label="Opening the puzzle for review…" />}
         {d.status === 'error' && (
-          <ErrorState
-            error={d.error}
-            onRetry={d.reload}
-            title={d.error instanceof ApiError && d.error.status === 404 ? 'No such case.' : 'Couldn’t open the case.'}
-          />
+          <DeskGate error={d.error} onToken={d.reload}>
+            <ErrorState
+              error={d.error}
+              onRetry={d.reload}
+              title={d.error instanceof ApiError && d.error.status === 404 ? 'No such puzzle (or the desk is switched off).' : 'Couldn’t open the puzzle.'}
+            />
+          </DeskGate>
         )}
         {d.status === 'ok' && <CaseReview data={{ ...d.data, meta: meta ?? d.data.meta }} onMeta={setMeta} />}
       </main>

@@ -1,6 +1,7 @@
 import type {
   AnswerResponse,
   CaseMeta,
+  ConLevel,
   DailyArchiveItem,
   DailyResponse,
   FoolDeckItem,
@@ -110,8 +111,79 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) })
+const json = (body: unknown, headers?: Record<string, string>): RequestInit => ({ method: 'POST', body: JSON.stringify(body), headers })
 const enc = encodeURIComponent
+
+// ---- Tokens (CONTRACT §8.5, §8.6) ------------------------------------------------------------
+const DEMO_KEY = 'gos.demo_token'
+const TEACHER_KEY = 'gos.teacher_token'
+let memDemo: string | null = null
+let memTeacher: string | null = null
+
+/** Reads `?demo=TOKEN` (before or inside the hash) once, stores it, and strips it from the address bar. */
+export function captureDemoToken() {
+  try {
+    const search = new URLSearchParams(window.location.search)
+    const hash = window.location.hash
+    const qi = hash.indexOf('?')
+    const hashParams = qi >= 0 ? new URLSearchParams(hash.slice(qi + 1)) : null
+    const token = search.get('demo') ?? hashParams?.get('demo') ?? null
+    if (!token) return
+    memDemo = token
+    try {
+      window.localStorage.setItem(DEMO_KEY, token)
+    } catch {
+      /* memory only */
+    }
+    search.delete('demo')
+    hashParams?.delete('demo')
+    const rest = hashParams?.toString()
+    const newHash = qi >= 0 ? hash.slice(0, qi) + (rest ? `?${rest}` : '') : hash
+    const qs = search.toString()
+    window.history.replaceState(null, '', `${window.location.pathname}${qs ? `?${qs}` : ''}${newHash}`)
+  } catch {
+    /* no URL API: nothing to capture */
+  }
+}
+
+export function getDemoToken(): string | null {
+  if (memDemo) return memDemo
+  try {
+    memDemo = window.localStorage.getItem(DEMO_KEY)
+  } catch {
+    /* ignore */
+  }
+  return memDemo
+}
+
+export function getTeacherToken(): string | null {
+  if (memTeacher) return memTeacher
+  try {
+    memTeacher = window.sessionStorage.getItem(TEACHER_KEY)
+  } catch {
+    /* ignore */
+  }
+  return memTeacher
+}
+
+export function setTeacherToken(token: string | null) {
+  memTeacher = token
+  try {
+    if (token) window.sessionStorage.setItem(TEACHER_KEY, token)
+    else window.sessionStorage.removeItem(TEACHER_KEY)
+  } catch {
+    /* memory only */
+  }
+}
+
+const demoHeaders = (): Record<string, string> => {
+  const t = getDemoToken()
+  return t ? { 'X-Demo-Token': t } : {}
+}
+const teacherHeaders = (): Record<string, string> => {
+  const t = getTeacherToken()
+  return t ? { 'X-Teacher-Token': t } : {}
+}
 
 export const api = {
   health: () => request<{ ok: boolean }>('/health'),
@@ -141,15 +213,17 @@ export const api = {
 
   // ---- v2: Con the Con (CONTRACT §7.3)
   foolDeck: () => request<FoolDeckItem[] | { items: FoolDeckItem[] }>('/fool/deck'),
-  foolJudge: (playerId: string, deckId: string, edit: FoolEdit) =>
-    request<FoolJudgeResponse>('/fool/judge', json({ player_id: playerId, deck_id: deckId, edit })),
+  /** `level` is the Con's level (CONTRACT §8.1). Sends the demo token, if any, to skip the live caps (§8.5). */
+  foolJudge: (playerId: string, deckId: string, edit: FoolEdit, level: ConLevel) =>
+    request<FoolJudgeResponse>('/fool/judge', json({ player_id: playerId, deck_id: deckId, edit, level }, demoHeaders())),
 
   pipelineLog: (caseId: string) => request<PipelineEvent[] | { events: PipelineEvent[] }>(`/cases/${enc(caseId)}/pipeline-log`),
 
-  teacherQueue: () => request<QueueItem[] | { cases: QueueItem[] }>('/teacher/queue'),
-  teacherCase: (id: string) => request<TeacherCase>(`/teacher/cases/${enc(id)}`),
-  approve: (id: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/approve`, json({})),
-  reject: (id: string, reason: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/reject`, json({ reason })),
+  // Teacher routes send X-Teacher-Token when one is stored (public mode, CONTRACT §8.6).
+  teacherQueue: () => request<QueueItem[] | { cases: QueueItem[] }>('/teacher/queue', { headers: teacherHeaders() }),
+  teacherCase: (id: string) => request<TeacherCase>(`/teacher/cases/${enc(id)}`, { headers: teacherHeaders() }),
+  approve: (id: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/approve`, json({}, teacherHeaders())),
+  reject: (id: string, reason: string) => request<CaseMeta>(`/teacher/cases/${enc(id)}/reject`, json({ reason }, teacherHeaders())),
 }
 
 /** Case objects fetched once are kept so navigation doesn't refetch them. */

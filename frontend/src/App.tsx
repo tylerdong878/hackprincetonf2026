@@ -33,7 +33,7 @@ const TITLES: Record<string, string> = {
   casefiles: 'Case Files',
   case: 'Case',
   dossier: 'Dossier',
-  teacher: 'Teacher mode',
+  teacher: 'Editor’s Desk',
   casebook: 'Casebook',
 }
 

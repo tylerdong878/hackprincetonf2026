@@ -48,10 +48,13 @@ export function FeedCard({
   compact = false,
   size = 'feed',
   watermarkText,
+  stampCorner = false,
 }: {
   post: Post
   caseNumber: number
   doctoredStamp?: boolean
+  /** Put the DOCTORED stamp in the top corner (so it doesn't cover a marked-up chart). */
+  stampCorner?: boolean
   renderChart?: (spec: ChartSpec) => ReactNode
   compact?: boolean
   /** 'daily' = one big card at a time: larger type for headlines and stats. */
@@ -118,15 +121,55 @@ export function FeedCard({
         {watermarkText ?? watermark(caseNumber)}
       </div>
 
-      {doctoredStamp && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      {doctoredStamp &&
+        (stampCorner ? (
           <span
-            className="stamp stamp-thunk text-[min(3rem,11cqw)] mix-blend-multiply"
-            style={{ color: CARD_DOCTORED, borderWidth: 5, opacity: 0.88, ['--stamp-rot' as string]: '-14deg', ['--stamp-rot-from' as string]: '-24deg' }}
+            className="stamp stamp-thunk pointer-events-none absolute top-3 right-3 bg-white text-[15px] shadow-sm"
+            style={{ color: CARD_DOCTORED, borderWidth: 3, ['--stamp-rot' as string]: '6deg', ['--stamp-rot-from' as string]: '16deg' }}
+            aria-hidden="true"
           >
             Doctored
           </span>
-        </div>
+        ) : (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+            <span
+              className="stamp stamp-thunk text-[min(3rem,11cqw)] mix-blend-multiply"
+              style={{ color: CARD_DOCTORED, borderWidth: 5, opacity: 0.88, ['--stamp-rot' as string]: '-14deg', ['--stamp-rot-from' as string]: '-24deg' }}
+            >
+              Doctored
+            </span>
+          </div>
+        ))}
+    </div>
+  )
+}
+
+/** A small thumbnail of a post, kept on the card's back after it flips (so you remember what you judged). */
+export function PostThumb({ post, className = '' }: { post: Post; className?: string }) {
+  const a = post.author
+  const excerpt = post.quote?.text ? `“${post.quote.text}”` : post.body || post.chart?.title || ''
+  return (
+    <div
+      className={`feed-font flex min-w-0 items-center gap-2.5 rounded-lg bg-feed-card px-2.5 py-2 text-[#0F1419] shadow-[0_1px_2px_rgba(0,0,0,0.25)] ${className}`}
+    >
+      <div
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
+        style={{ background: a.avatar_color || '#6B7280' }}
+        aria-hidden="true"
+      >
+        {initials(a.name)}
+      </div>
+      <div className="min-w-0 flex-1 leading-tight">
+        <p className="flex items-center gap-1 truncate text-[12px] font-bold">
+          {a.name}
+          {a.verified && <VerifiedBadge />}
+        </p>
+        <p className="truncate text-[12px] text-[#536471]">{excerpt}</p>
+      </div>
+      {post.chart && (
+        <span className="shrink-0 text-base" aria-hidden="true">
+          📊
+        </span>
       )}
     </div>
   )

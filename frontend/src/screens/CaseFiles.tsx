@@ -7,7 +7,7 @@ import { useAsync } from '../lib/hooks'
 import { href, navigate } from '../lib/router'
 import { NextCaseError, useNextCase } from './common'
 
-/** Case Files: the v1 four-post feed, positioned for classrooms (PLAN_V2 §1C). */
+/** Case Files: the v1 four-post feed, now an archive of extra cases (CONTRACT §8.7). */
 export function CaseFiles() {
   const featured = useAsync(() => api.todayCase(), [])
   const list = useAsync(() => api.listCases(), [])
@@ -21,11 +21,11 @@ export function CaseFiles() {
     <>
       <SiteHeader active="casefiles" />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
-        <p className="text-xs font-bold tracking-[0.18em] text-muted uppercase">For classrooms</p>
+        <p className="text-xs font-bold tracking-[0.18em] text-muted uppercase">Extra cases</p>
         <h1 className="mt-1 font-display text-3xl font-bold sm:text-4xl">Case Files 🗂️</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          A full four-post feed to investigate together: spend clue tokens on real evidence, mark every post, then walk through the
-          side-by-side reveal. Teachers approve each case before students see it, and can replay how the AI built it in the Workshop.
+          Done with today’s Grain? Crack a whole feed: four posts, a few clue tokens, one verdict. Then watch how the AI forged the
+          case in the Workshop replay.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">
@@ -37,7 +37,7 @@ export function CaseFiles() {
           >
             {featured.status === 'ok' ? (
               <>
-                Open the featured case <span className="font-mono text-sm opacity-80">{caseNo(featured.data.number)}</span>
+                Open the featured case <span className="num text-sm opacity-80">{caseNo(featured.data.number)}</span>
               </>
             ) : (
               'Loading the featured case…'
@@ -47,7 +47,7 @@ export function CaseFiles() {
             {next.loading ? 'Finding…' : 'A case picked for me'}
           </Button>
           <LinkButton to="/teacher" size="lg" variant="ghost">
-            Teacher mode →
+            Editor’s Desk →
           </LinkButton>
         </div>
         {featured.status === 'error' && <ErrorState error={featured.error} onRetry={featured.reload} className="mt-6" />}

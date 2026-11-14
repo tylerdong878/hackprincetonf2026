@@ -2,16 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { AccountView, DataView, normalizeEvidence, SourceView, TOOLS } from '../components/EvidenceKit'
-import { Brand } from '../components/Header'
-import { FeedCard } from '../components/PostCard'
+import { Brand, SoundToggle } from '../components/Header'
+import { FeedCard, PostThumb } from '../components/PostCard'
 import { MiniDiff, OutcomeBadge } from '../components/Reveal'
 import { Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, BACKEND_START_CMD } from '../lib/api'
 import { CON_QUIPS, pick } from '../lib/content'
 import { outcomeStyle, shortDate, trickLabel } from '../lib/format'
-import { useAsync, useReducedMotion } from '../lib/hooks'
+import { useAsync, useElementHeight, useReducedMotion, useTween } from '../lib/hooks'
 import { withPlayer } from '../lib/player'
 import { navigate } from '../lib/router'
+import { play } from '../lib/sound'
 import type {
   AccountEvidence,
   AnswerResponse,
@@ -19,6 +20,7 @@ import type {
   DailyResponse,
   DataEvidence,
   Post,
+  RarityBonus,
   SourceEvidence,
   ToolId,
   VerdictResponse,
@@ -95,7 +97,7 @@ export function ProgressDots({ posts, cards, current }: { posts: Post[]; cards: 
               <span className="pop flex h-8 w-8 items-center justify-center text-xl leading-none">{outcomeStyle(outcome).emoji}</span>
             ) : (
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 font-mono text-xs font-semibold ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 num text-xs font-semibold ${
                   i === current ? 'border-con bg-con/15 text-text' : 'border-line text-muted'
                 }`}
               >
@@ -121,9 +123,35 @@ function Magnifiers({ left, total }: { left: number; total: number }) {
   )
 }
 
+/** CONTRACT §8.7 rarity bonus: "One in a shaker" (+100) or "Rare catch" (+50). */
+export function rarityBonusOf(reveal: AnswerResponse | null | undefined): RarityBonus | null {
+  const b = reveal?.result.rarity_bonus ?? reveal?.rarity_bonus ?? null
+  return b && typeof b.points === 'number' && b.points > 0 ? b : null
+}
+
+export function RarityBadge({ bonus, className = '' }: { bonus: RarityBonus; className?: string }) {
+  const shaker = /shaker/i.test(bonus.label) || bonus.points >= 100
+  return (
+    <span
+      className={`pop inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 font-display text-sm font-bold whitespace-nowrap shadow-[0_6px_18px_-8px_var(--con)] ${className}`}
+      style={{
+        borderColor: shaker ? 'var(--alarm)' : 'var(--con)',
+        background: shaker
+          ? 'linear-gradient(135deg, color-mix(in srgb, var(--alarm) 30%, var(--surface)), color-mix(in srgb, var(--con) 22%, var(--surface)))'
+          : 'color-mix(in srgb, var(--con) 18%, var(--surface))',
+      }}
+    >
+      <span aria-hidden="true">{shaker ? '🧂' : '💎'}</span>
+      {bonus.label}
+      {/[!.]$/.test(bonus.label) ? '' : shaker ? '!' : ''} <span className="num">+{bonus.points}</span>
+    </span>
+  )
+}
+
 function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
   const crowd = reveal.crowd
   const rarity = reveal.rarity ?? reveal.result.rarity ?? null
+  const bonus = rarityBonusOf(reveal)
   if (!crowd) {
     return (
       <p className="rounded-xl border border-dashed border-line px-3 py-2 text-sm text-muted">
@@ -134,6 +162,7 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
   const doctoredPct = Math.round(crowd.said_doctored_pct)
   const realPct = 100 - doctoredPct
   const correct = Math.round(rarity?.correct_pct ?? crowd.correct_pct)
+  const verb = reveal.result.doctored ? 'caught this' : 'trusted this'
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex h-3 overflow-hidden rounded-full bg-surface-2" aria-hidden="true">
@@ -141,13 +170,47 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
         <span className="h-full bg-doctored" style={{ width: `${doctoredPct}%` }} />
       </div>
       <p className="text-sm">
-        <b className="font-mono">{realPct}%</b> said Real · <b className="font-mono">{doctoredPct}%</b> said Doctored
-        <span className="text-muted"> · {crowd.n} detectives</span>
+        <b className="num">{realPct}%</b> said Real · <b className="num">{doctoredPct}%</b> said Doctored
+        <span className="text-muted">
+          {' '}
+          · <span className="num">{crowd.n}</span> detectives
+        </span>
       </p>
-      <p className="text-sm font-semibold" style={{ color: correct < 50 ? 'var(--con)' : 'var(--muted)' }}>
-        {correct < 50 ? `Only ${correct}% got this right.` : `${correct}% got this right.`}
-      </p>
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-sm font-semibold" style={{ color: correct < 50 ? 'var(--con)' : 'var(--muted)' }}>
+          {correct < 50 ? (
+            <>
+              Only <span className="num">{correct}%</span> {verb}.
+            </>
+          ) : (
+            <>
+              <span className="num">{correct}%</span> {verb}.
+            </>
+          )}
+        </p>
+        {bonus && <RarityBadge bonus={bonus} />}
+      </div>
     </div>
+  )
+}
+
+function Points({ value, delay = 120 }: { value: number; delay?: number }) {
+  const reduced = useReducedMotion()
+  const [go, setGo] = useState(reduced ? 1 : 0)
+  useEffect(() => {
+    if (reduced) return
+    const id = window.setTimeout(() => setGo(1), delay)
+    return () => window.clearTimeout(id)
+  }, [reduced, delay])
+  const v = Math.round(useTween(0, value, go, 520, reduced))
+  return (
+    <span
+      className="pop num ml-auto text-2xl font-bold"
+      style={{ color: value > 0 ? 'var(--real)' : value < 0 ? 'var(--doctored)' : 'var(--muted)' }}
+      aria-label={`${value} points`}
+    >
+      {v > 0 ? `+${v}` : v < 0 ? `−${Math.abs(v)}` : '0'}
+    </span>
   )
 }
 
@@ -177,21 +240,16 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border-2 bg-surface p-4 sm:p-5 ${!win ? 'shake' : ''}`}
+      className={`relative overflow-hidden rounded-2xl border-2 bg-surface p-4 sm:p-5 ${win ? 'thud' : 'shake'}`}
       style={{ borderColor: s.color }}
       aria-live="polite"
     >
       {win && <SaltBurst />}
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-xl sm:text-2xl">
-          <OutcomeBadge outcome={r.outcome} />
-        </span>
-        <span
-          className="pop ml-auto font-mono text-2xl font-semibold tabular-nums"
-          style={{ color: pts > 0 ? 'var(--real)' : pts < 0 ? 'var(--doctored)' : 'var(--muted)' }}
-        >
-          {pts > 0 ? `+${pts}` : pts < 0 ? `−${Math.abs(pts)}` : '0'}
-        </span>
+      {/* the post you just judged, shrunk to a thumbnail */}
+      <PostThumb post={post} className="mb-3 opacity-95" />
+      <div className="flex items-center gap-3 px-1 py-1">
+        <OutcomeBadge outcome={r.outcome} size="lg" />
+        <Points value={pts} />
       </div>
       <p className="mt-2 font-display text-lg font-semibold">
         {r.doctored ? <>Doctored · {trickLabel(r.trick)}</> : r.suspicious_real ? <>Real · sounds fake, isn’t</> : <>Real</>}
@@ -264,7 +322,7 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
         <p className="mt-3 text-[15px] text-[#4B4232]">{c.title}</p>
         <ul className="mt-5 grid grid-cols-3 gap-2 border-y border-dashed border-[#B9A985] py-4 text-center">
           <li>
-            <span className="block font-mono text-2xl font-semibold">{c.posts.length}</span>
+            <span className="num block text-2xl font-bold">{c.posts.length}</span>
             <span className="text-xs text-[#6B5E45]">cards</span>
           </li>
           <li>
@@ -274,13 +332,13 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
             <span className="text-xs text-[#6B5E45]">{c.clue_budget} checks</span>
           </li>
           <li>
-            <span className="block font-mono text-2xl font-semibold">0–3</span>
+            <span className="num block text-2xl font-bold">0–3</span>
             <span className="text-xs text-[#6B5E45]">doctored</span>
           </li>
         </ul>
         <p className="mt-4 rounded-xl border-2 border-[#2A2418] px-4 py-2.5 text-center font-con text-lg">{DAILY_RANGE}. Maybe none.</p>
         <p className="mt-3 text-center text-[13px] text-[#4B4232]">
-          +100 per right call · −50 for accusing the truth · +20 per unused check
+          +100 per right call · −50 for accusing the truth · bonus for rare catches
         </p>
         <button
           ref={startRef}
@@ -334,6 +392,8 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   const [finishing, setFinishing] = useState(false)
   const [finishErr, setFinishErr] = useState<unknown>(null)
   const nextBtn = useRef<HTMLButtonElement>(null)
+  // The sticky action bar changes height (Next / Real+Doctored / trick picker): pad the page by exactly that much.
+  const [barRef, barH] = useElementHeight<HTMLDivElement>()
 
   useEffect(() => saveJSON(storeKey, prog), [storeKey, prog])
 
@@ -362,23 +422,28 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
       setPicker(false)
       try {
         const res = await withPlayer((pid) => api.answer(game.id, pid, post.id, doctored, trick))
+        const won = res.result.outcome === 'caught' || res.result.outcome === 'trusted'
         try {
-          if (!reduced) navigator.vibrate?.(res.result.outcome === 'caught' || res.result.outcome === 'trusted' ? 12 : [20, 40, 20])
+          if (!reduced) navigator.vibrate?.(won ? 12 : [20, 40, 20])
         } catch {
           /* no vibration API */
         }
+        // ~300ms flip: out 140ms, swap to the back, in 180ms. Sounds: paper flip, stamp thunk, then ding / bwomp.
+        play('flip')
         if (!reduced) {
           setFlip('out')
-          await new Promise((r) => window.setTimeout(r, 160))
+          await new Promise((r) => window.setTimeout(r, 140))
         }
         setProg((p) => ({
           ...p,
           cards: { ...p.cards, [post.id]: { doctored, trick, reveal: res } },
           cluesLeft: typeof res.clues_left === 'number' ? res.clues_left : p.cluesLeft,
         }))
+        play('thunk')
+        window.setTimeout(() => play(won ? 'ding' : 'bwomp'), 140)
         if (!reduced) {
           setFlip('in')
-          window.setTimeout(() => setFlip(null), 300)
+          window.setTimeout(() => setFlip(null), 200)
         }
       } catch (e) {
         setFlip(null)
@@ -467,7 +532,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   const flipClass = flip === 'out' ? 'flip-out' : flip === 'in' ? 'flip-in' : ''
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3 pb-40">
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3" style={{ paddingBottom: Math.max(barH, 96) + 20 }}>
       <ProgressDots posts={posts} cards={prog.cards} current={idx} />
       <p className="mt-1 text-center text-xs text-muted">
         Card {idx + 1} of {posts.length} · {DAILY_RANGE}
@@ -491,7 +556,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                     checkOpen ? 'border-focus bg-focus/10' : 'border-line bg-surface hover:border-muted'
                   }`}
                 >
-                  🔍 Check <span className="font-mono text-xs text-muted">{prog.cluesLeft} left</span>
+                  🔍 Check <span className="num text-xs text-muted">{prog.cluesLeft} left</span>
                 </button>
                 <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
               </div>
@@ -531,9 +596,13 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
           )}
         </div>
       </div>
+      {game.notice && <p className="mt-5 text-center text-xs text-muted">{game.notice}</p>}
 
       {/* Sticky action bar */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-bg/95 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur">
+      <div
+        ref={barRef}
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-bg/95 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur"
+      >
         <div className="mx-auto max-w-lg">
           {answered ? (
             <>
@@ -624,6 +693,7 @@ function DailyTopBar({ daily }: { daily: DailyResponse | null }) {
         <a href="#/" className="rounded-lg px-2 py-1 text-sm font-semibold text-muted hover:text-text">
           Home
         </a>
+        <SoundToggle className="-mr-1.5" />
       </div>
     </header>
   )
