@@ -1,0 +1,49 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real. Arsenal sent dozens of used match socks to a horse and donkey sanctuary in England, where they protect the animals' legs from biting flies.",
+      "con_line_false_alarm": "Real. Donkeys in Arsenal socks. I have limits. Reality doesn't."
+    },
+    "p2": {
+      "doctored": true,
+      "trick": "edited-detail",
+      "tell": "NPR's headline says 132 years. The magazine was published in 1894.",
+      "explanation": "This fake made the story less weird. The real magazine, from 1894, came back about 132 years overdue after a New Hampshire library announced a fine freeze. A believable number is still a wrong number.",
+      "con_line_fooled": "I knocked a century off and you relaxed. Plausible is my favorite disguise.",
+      "con_line_caught": "132 years. You checked. The truth was weirder than my lie.",
+      "diff": {
+        "type": "detail",
+        "shown": "Overdue library magazine returned after 32 years",
+        "original": "Overdue library magazine returned after 132 years",
+        "changed": [
+          {
+            "from": "132",
+            "to": "32"
+          }
+        ]
+      }
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real. In the 1950s a Nevada newspaper editor wrote a joke story about a camel race. A few years later the race really happened, and it still runs every year: fake news that came true.",
+      "con_line_false_alarm": "Real, and it's my origin story: a fake headline so good it came true."
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Word for word from NPR's New York City Marathon story: just over 2,000 runners in 1976, about 60,000 this year.",
+      "con_line_false_alarm": "Real. 88 women in 1976, nearly half of 60,000 now. Some numbers just grow."
+    },
+    "p5": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real and word for word from NPR. Read all of it: she isn't saying watching makes you a pro, just that watching beats never watching.",
+      "con_line_false_alarm": "Real. Watching sports counts as practice now. You're welcome, couch."
+    }
+  },
+  "con_line_clean": null
+}

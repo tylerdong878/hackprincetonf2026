@@ -1,0 +1,601 @@
+{
+  "id": "eggs-dozen",
+  "kind": "chart",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "Chart Desk",
+      "handle": "@chartdesk",
+      "kind": "person",
+      "verified": false,
+      "avatar_color": "#64748B"
+    },
+    "posted_at": "2026-11-14T08:00:00Z",
+    "body": "U.S. average price of a dozen grade A large eggs, Jan 2024 to Oct 2026.",
+    "quote": null,
+    "chart": {
+      "type": "line",
+      "title": "Eggs, average price per dozen",
+      "unit": "$/dozen",
+      "points": [
+        {
+          "label": "Jan 2024",
+          "value": 2.522
+        },
+        {
+          "label": "Feb 2024",
+          "value": 2.996
+        },
+        {
+          "label": "Mar 2024",
+          "value": 2.992
+        },
+        {
+          "label": "Apr 2024",
+          "value": 2.864
+        },
+        {
+          "label": "May 2024",
+          "value": 2.699
+        },
+        {
+          "label": "Jun 2024",
+          "value": 2.715
+        },
+        {
+          "label": "Jul 2024",
+          "value": 3.08
+        },
+        {
+          "label": "Aug 2024",
+          "value": 3.204
+        },
+        {
+          "label": "Sep 2024",
+          "value": 3.821
+        },
+        {
+          "label": "Oct 2024",
+          "value": 3.37
+        },
+        {
+          "label": "Nov 2024",
+          "value": 3.649
+        },
+        {
+          "label": "Dec 2024",
+          "value": 4.146
+        },
+        {
+          "label": "Jan 2025",
+          "value": 4.953
+        },
+        {
+          "label": "Feb 2025",
+          "value": 5.897
+        },
+        {
+          "label": "Mar 2025",
+          "value": 6.227
+        },
+        {
+          "label": "Apr 2025",
+          "value": 5.122
+        },
+        {
+          "label": "May 2025",
+          "value": 4.548
+        },
+        {
+          "label": "Jun 2025",
+          "value": 3.775
+        },
+        {
+          "label": "Jul 2025",
+          "value": 3.599
+        },
+        {
+          "label": "Aug 2025",
+          "value": 3.587
+        },
+        {
+          "label": "Sep 2025",
+          "value": 3.488
+        },
+        {
+          "label": "Nov 2025",
+          "value": 2.86
+        },
+        {
+          "label": "Dec 2025",
+          "value": 2.712
+        },
+        {
+          "label": "Jan 2026",
+          "value": 2.577
+        },
+        {
+          "label": "Feb 2026",
+          "value": 2.5
+        },
+        {
+          "label": "Mar 2026",
+          "value": 2.348
+        },
+        {
+          "label": "Apr 2026",
+          "value": 2.25
+        },
+        {
+          "label": "May 2026",
+          "value": 2.191
+        },
+        {
+          "label": "Jun 2026",
+          "value": 2.141
+        },
+        {
+          "label": "Jul 2026",
+          "value": 2.189
+        },
+        {
+          "label": "Aug 2026",
+          "value": 2.272
+        },
+        {
+          "label": "Sep 2026",
+          "value": 2.272
+        },
+        {
+          "label": "Oct 2026",
+          "value": 2.32
+        }
+      ],
+      "y_min": 0,
+      "y_max": null
+    },
+    "source_label": "Data: BLS average price data · FRED (U.S. Bureau of Labor Statistics)",
+    "card_style": "chart",
+    "tools": [
+      "data",
+      "account"
+    ]
+  },
+  "evidence": {
+    "data": {
+      "title": "Average price: eggs, grade A, large, per dozen, U.S. city average (BLS, via FRED)",
+      "unit": "$/dozen",
+      "url": "https://fred.stlouisfed.org/series/APU0000708111",
+      "table": [
+        {
+          "label": "2024-01",
+          "value": 2.522
+        },
+        {
+          "label": "2024-02",
+          "value": 2.996
+        },
+        {
+          "label": "2024-03",
+          "value": 2.992
+        },
+        {
+          "label": "2024-04",
+          "value": 2.864
+        },
+        {
+          "label": "2024-05",
+          "value": 2.699
+        },
+        {
+          "label": "2024-06",
+          "value": 2.715
+        },
+        {
+          "label": "2024-07",
+          "value": 3.08
+        },
+        {
+          "label": "2024-08",
+          "value": 3.204
+        },
+        {
+          "label": "2024-09",
+          "value": 3.821
+        },
+        {
+          "label": "2024-10",
+          "value": 3.37
+        },
+        {
+          "label": "2024-11",
+          "value": 3.649
+        },
+        {
+          "label": "2024-12",
+          "value": 4.146
+        },
+        {
+          "label": "2025-01",
+          "value": 4.953
+        },
+        {
+          "label": "2025-02",
+          "value": 5.897
+        },
+        {
+          "label": "2025-03",
+          "value": 6.227
+        },
+        {
+          "label": "2025-04",
+          "value": 5.122
+        },
+        {
+          "label": "2025-05",
+          "value": 4.548
+        },
+        {
+          "label": "2025-06",
+          "value": 3.775
+        },
+        {
+          "label": "2025-07",
+          "value": 3.599
+        },
+        {
+          "label": "2025-08",
+          "value": 3.587
+        },
+        {
+          "label": "2025-09",
+          "value": 3.488
+        },
+        {
+          "label": "2025-11",
+          "value": 2.86
+        },
+        {
+          "label": "2025-12",
+          "value": 2.712
+        },
+        {
+          "label": "2026-01",
+          "value": 2.577
+        },
+        {
+          "label": "2026-02",
+          "value": 2.5
+        },
+        {
+          "label": "2026-03",
+          "value": 2.348
+        },
+        {
+          "label": "2026-04",
+          "value": 2.25
+        },
+        {
+          "label": "2026-05",
+          "value": 2.191
+        },
+        {
+          "label": "2026-06",
+          "value": 2.141
+        },
+        {
+          "label": "2026-07",
+          "value": 2.189
+        },
+        {
+          "label": "2026-08",
+          "value": 2.272
+        },
+        {
+          "label": "2026-09",
+          "value": 2.272
+        },
+        {
+          "label": "2026-10",
+          "value": 2.32
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "Eggs, average price per dozen",
+        "unit": "$/dozen",
+        "points": [
+          {
+            "label": "Jan 2024",
+            "value": 2.522
+          },
+          {
+            "label": "Feb 2024",
+            "value": 2.996
+          },
+          {
+            "label": "Mar 2024",
+            "value": 2.992
+          },
+          {
+            "label": "Apr 2024",
+            "value": 2.864
+          },
+          {
+            "label": "May 2024",
+            "value": 2.699
+          },
+          {
+            "label": "Jun 2024",
+            "value": 2.715
+          },
+          {
+            "label": "Jul 2024",
+            "value": 3.08
+          },
+          {
+            "label": "Aug 2024",
+            "value": 3.204
+          },
+          {
+            "label": "Sep 2024",
+            "value": 3.821
+          },
+          {
+            "label": "Oct 2024",
+            "value": 3.37
+          },
+          {
+            "label": "Nov 2024",
+            "value": 3.649
+          },
+          {
+            "label": "Dec 2024",
+            "value": 4.146
+          },
+          {
+            "label": "Jan 2025",
+            "value": 4.953
+          },
+          {
+            "label": "Feb 2025",
+            "value": 5.897
+          },
+          {
+            "label": "Mar 2025",
+            "value": 6.227
+          },
+          {
+            "label": "Apr 2025",
+            "value": 5.122
+          },
+          {
+            "label": "May 2025",
+            "value": 4.548
+          },
+          {
+            "label": "Jun 2025",
+            "value": 3.775
+          },
+          {
+            "label": "Jul 2025",
+            "value": 3.599
+          },
+          {
+            "label": "Aug 2025",
+            "value": 3.587
+          },
+          {
+            "label": "Sep 2025",
+            "value": 3.488
+          },
+          {
+            "label": "Nov 2025",
+            "value": 2.86
+          },
+          {
+            "label": "Dec 2025",
+            "value": 2.712
+          },
+          {
+            "label": "Jan 2026",
+            "value": 2.577
+          },
+          {
+            "label": "Feb 2026",
+            "value": 2.5
+          },
+          {
+            "label": "Mar 2026",
+            "value": 2.348
+          },
+          {
+            "label": "Apr 2026",
+            "value": 2.25
+          },
+          {
+            "label": "May 2026",
+            "value": 2.191
+          },
+          {
+            "label": "Jun 2026",
+            "value": 2.141
+          },
+          {
+            "label": "Jul 2026",
+            "value": 2.189
+          },
+          {
+            "label": "Aug 2026",
+            "value": 2.272
+          },
+          {
+            "label": "Sep 2026",
+            "value": 2.272
+          },
+          {
+            "label": "Oct 2026",
+            "value": 2.32
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Record $6.227 in Mar 2025; $2.32 in Oct 2026. No Oct 2025 value was published."
+    },
+    "account": {
+      "name": "Chart Desk",
+      "handle": "@chartdesk",
+      "created": "June 2021",
+      "followers": 4200,
+      "verified": false,
+      "bio": "Charts from public data. The source is in every post.",
+      "recent_posts": [
+        "New federal price data is out. Chart below.",
+        "Axis from zero, always."
+      ]
+    }
+  },
+  "editable": {
+    "quote_words": null,
+    "chart_series": [
+      {
+        "label": "2024-01",
+        "value": 2.522
+      },
+      {
+        "label": "2024-02",
+        "value": 2.996
+      },
+      {
+        "label": "2024-03",
+        "value": 2.992
+      },
+      {
+        "label": "2024-04",
+        "value": 2.864
+      },
+      {
+        "label": "2024-05",
+        "value": 2.699
+      },
+      {
+        "label": "2024-06",
+        "value": 2.715
+      },
+      {
+        "label": "2024-07",
+        "value": 3.08
+      },
+      {
+        "label": "2024-08",
+        "value": 3.204
+      },
+      {
+        "label": "2024-09",
+        "value": 3.821
+      },
+      {
+        "label": "2024-10",
+        "value": 3.37
+      },
+      {
+        "label": "2024-11",
+        "value": 3.649
+      },
+      {
+        "label": "2024-12",
+        "value": 4.146
+      },
+      {
+        "label": "2025-01",
+        "value": 4.953
+      },
+      {
+        "label": "2025-02",
+        "value": 5.897
+      },
+      {
+        "label": "2025-03",
+        "value": 6.227
+      },
+      {
+        "label": "2025-04",
+        "value": 5.122
+      },
+      {
+        "label": "2025-05",
+        "value": 4.548
+      },
+      {
+        "label": "2025-06",
+        "value": 3.775
+      },
+      {
+        "label": "2025-07",
+        "value": 3.599
+      },
+      {
+        "label": "2025-08",
+        "value": 3.587
+      },
+      {
+        "label": "2025-09",
+        "value": 3.488
+      },
+      {
+        "label": "2025-11",
+        "value": 2.86
+      },
+      {
+        "label": "2025-12",
+        "value": 2.712
+      },
+      {
+        "label": "2026-01",
+        "value": 2.577
+      },
+      {
+        "label": "2026-02",
+        "value": 2.5
+      },
+      {
+        "label": "2026-03",
+        "value": 2.348
+      },
+      {
+        "label": "2026-04",
+        "value": 2.25
+      },
+      {
+        "label": "2026-05",
+        "value": 2.191
+      },
+      {
+        "label": "2026-06",
+        "value": 2.141
+      },
+      {
+        "label": "2026-07",
+        "value": 2.189
+      },
+      {
+        "label": "2026-08",
+        "value": 2.272
+      },
+      {
+        "label": "2026-09",
+        "value": 2.272
+      },
+      {
+        "label": "2026-10",
+        "value": 2.32
+      }
+    ],
+    "stat": null
+  },
+  "tools": [
+    "axis",
+    "window"
+  ]
+}

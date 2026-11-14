@@ -1,0 +1,84 @@
+{
+  "id": "hs-net-increase",
+  "kind": "quote",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#2F9E6A"
+    },
+    "posted_at": "2026-09-24T19:48:02Z",
+    "body": "The Board of Public Utilities on Thursday pledged no net increase in electricity rates for New Jersey's four regulated utilities.",
+    "quote": {
+      "text": "Taken together with the items on the agenda earlier this month, these actions will result in no net increase in electricity rates and a slight decrease in gas rates.",
+      "speaker": "Ben Hertz-Shargel, NJBPU President"
+    },
+    "chart": null,
+    "source_label": "New Jersey Monitor · Sept 24, 2026",
+    "card_style": "quote",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-09-24",
+      "url": "https://newjerseymonitor.com/2026/09/24/utilities-board-votes-electric-rates/",
+      "before": "Sherrill signed the order during her inauguration as governor in January.",
+      "highlight": "“Taken together with the items on the agenda earlier this month, these actions will result in no net increase in electricity rates and a slight decrease in gas rates,” said Ben Hertz-Shargel, the board's president.",
+      "after": "… Some customers will see individual components of their bills increase, but those will be offset by drops to other components. Atlantic City Electric's average monthly bills, for example, will rise by $4.09 because of changes to its Regional Greenhouse Gas Initiative charges, certain infrastructure investments, and shifts in transmission charges set federally. But those same bills will fall by $4.14 due to changes to some Societal Benefits Charge components and lost sales related to energy efficiency and conservation programs, leaving the average monthly bill 5 cents cheaper than before."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": [
+      "Taken",
+      "together",
+      "with",
+      "the",
+      "items",
+      "on",
+      "the",
+      "agenda",
+      "earlier",
+      "this",
+      "month,",
+      "these",
+      "actions",
+      "will",
+      "result",
+      "in",
+      "no",
+      "net",
+      "increase",
+      "in",
+      "electricity",
+      "rates",
+      "and",
+      "a",
+      "slight",
+      "decrease",
+      "in",
+      "gas",
+      "rates."
+    ],
+    "chart_series": null,
+    "stat": null
+  },
+  "tools": [
+    "crop"
+  ]
+}

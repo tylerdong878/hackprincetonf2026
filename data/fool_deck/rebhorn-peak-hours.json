@@ -1,0 +1,96 @@
+{
+  "id": "rebhorn-peak-hours",
+  "kind": "quote",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "kind": "outlet",
+      "verified": true,
+      "avatar_color": "#2F9E6A"
+    },
+    "posted_at": "2026-11-12T20:18:21Z",
+    "body": "",
+    "quote": {
+      "text": "I don't know if everyone in New Jersey understands, but it is the most expensive hours of the year that are driving the really unsustainable price hikes in the utility and electricity bills that we saw in the last few years.",
+      "speaker": "Emma Rebhorn, BPU Commissioner"
+    },
+    "chart": null,
+    "source_label": "New Jersey Monitor · Nov 12, 2026",
+    "card_style": "quote",
+    "tools": [
+      "source",
+      "account"
+    ]
+  },
+  "evidence": {
+    "source": {
+      "outlet": "New Jersey Monitor",
+      "date": "2026-11-12",
+      "url": "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
+      "before": "The state is seeking an overall reduction of 547.1 megawatts across the four electric distribution companies.",
+      "highlight": "“I don't know if everyone in New Jersey understands, but it is the most expensive hours of the year that are driving the really unsustainable price hikes in the utility and electricity bills that we saw in the last few years,” Board of Public Utilities Commissioner Emma Rebhorn said Thursday.",
+      "after": "The order approved by the BPU Thursday requires the state's four regulated utilities to stand up their interim virtual power plant programs by Oct. 1, 2027."
+    },
+    "account": {
+      "name": "New Jersey Monitor",
+      "handle": "@NJMonitor",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · newjerseymonitor.com",
+      "recent_posts": []
+    }
+  },
+  "editable": {
+    "quote_words": [
+      "I",
+      "don't",
+      "know",
+      "if",
+      "everyone",
+      "in",
+      "New",
+      "Jersey",
+      "understands,",
+      "but",
+      "it",
+      "is",
+      "the",
+      "most",
+      "expensive",
+      "hours",
+      "of",
+      "the",
+      "year",
+      "that",
+      "are",
+      "driving",
+      "the",
+      "really",
+      "unsustainable",
+      "price",
+      "hikes",
+      "in",
+      "the",
+      "utility",
+      "and",
+      "electricity",
+      "bills",
+      "that",
+      "we",
+      "saw",
+      "in",
+      "the",
+      "last",
+      "few",
+      "years."
+    ],
+    "chart_series": null,
+    "stat": null
+  },
+  "tools": [
+    "crop"
+  ]
+}

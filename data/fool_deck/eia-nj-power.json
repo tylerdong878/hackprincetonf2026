@@ -1,0 +1,393 @@
+{
+  "id": "eia-nj-power",
+  "kind": "chart",
+  "post": {
+    "id": "p1",
+    "author": {
+      "name": "Chart Desk",
+      "handle": "@chartdesk",
+      "kind": "person",
+      "verified": false,
+      "avatar_color": "#64748B"
+    },
+    "posted_at": "2026-11-14T08:00:00Z",
+    "body": "New Jersey residential electricity price by month, Jan 2025 to Aug 2026.",
+    "quote": null,
+    "chart": {
+      "type": "line",
+      "title": "NJ residential electricity price, monthly",
+      "unit": "¢/kWh",
+      "points": [
+        {
+          "label": "Jan 2025",
+          "value": 19.7
+        },
+        {
+          "label": "Feb 2025",
+          "value": 19.7
+        },
+        {
+          "label": "Mar 2025",
+          "value": 19.65
+        },
+        {
+          "label": "Apr 2025",
+          "value": 19.91
+        },
+        {
+          "label": "May 2025",
+          "value": 20.24
+        },
+        {
+          "label": "Jun 2025",
+          "value": 24.65
+        },
+        {
+          "label": "Jul 2025",
+          "value": 25.11
+        },
+        {
+          "label": "Aug 2025",
+          "value": 24.7
+        },
+        {
+          "label": "Sep 2025",
+          "value": 23.32
+        },
+        {
+          "label": "Oct 2025",
+          "value": 22.49
+        },
+        {
+          "label": "Nov 2025",
+          "value": 22.68
+        },
+        {
+          "label": "Dec 2025",
+          "value": 22.92
+        },
+        {
+          "label": "Jan 2026",
+          "value": 23.13
+        },
+        {
+          "label": "Feb 2026",
+          "value": 23.12
+        },
+        {
+          "label": "Mar 2026",
+          "value": 23.48
+        },
+        {
+          "label": "Apr 2026",
+          "value": 23.53
+        },
+        {
+          "label": "May 2026",
+          "value": 23.27
+        },
+        {
+          "label": "Jun 2026",
+          "value": 24.95
+        },
+        {
+          "label": "Jul 2026",
+          "value": 25.19
+        },
+        {
+          "label": "Aug 2026",
+          "value": 24.61
+        }
+      ],
+      "y_min": 0,
+      "y_max": null
+    },
+    "source_label": "Data: EIA electricity data browser (U.S. Energy Information Administration)",
+    "card_style": "chart",
+    "tools": [
+      "data",
+      "account"
+    ]
+  },
+  "evidence": {
+    "data": {
+      "title": "NJ residential average electricity price (EIA)",
+      "unit": "¢/kWh",
+      "url": "https://www.eia.gov/electricity/data/browser/",
+      "table": [
+        {
+          "label": "2025-01",
+          "value": 19.7
+        },
+        {
+          "label": "2025-02",
+          "value": 19.7
+        },
+        {
+          "label": "2025-03",
+          "value": 19.65
+        },
+        {
+          "label": "2025-04",
+          "value": 19.91
+        },
+        {
+          "label": "2025-05",
+          "value": 20.24
+        },
+        {
+          "label": "2025-06",
+          "value": 24.65
+        },
+        {
+          "label": "2025-07",
+          "value": 25.11
+        },
+        {
+          "label": "2025-08",
+          "value": 24.7
+        },
+        {
+          "label": "2025-09",
+          "value": 23.32
+        },
+        {
+          "label": "2025-10",
+          "value": 22.49
+        },
+        {
+          "label": "2025-11",
+          "value": 22.68
+        },
+        {
+          "label": "2025-12",
+          "value": 22.92
+        },
+        {
+          "label": "2026-01",
+          "value": 23.13
+        },
+        {
+          "label": "2026-02",
+          "value": 23.12
+        },
+        {
+          "label": "2026-03",
+          "value": 23.48
+        },
+        {
+          "label": "2026-04",
+          "value": 23.53
+        },
+        {
+          "label": "2026-05",
+          "value": 23.27
+        },
+        {
+          "label": "2026-06",
+          "value": 24.95
+        },
+        {
+          "label": "2026-07",
+          "value": 25.19
+        },
+        {
+          "label": "2026-08",
+          "value": 24.61
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "NJ residential electricity price, monthly",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Jan 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Feb 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Mar 2025",
+            "value": 19.65
+          },
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "May 2025",
+            "value": 20.24
+          },
+          {
+            "label": "Jun 2025",
+            "value": 24.65
+          },
+          {
+            "label": "Jul 2025",
+            "value": 25.11
+          },
+          {
+            "label": "Aug 2025",
+            "value": 24.7
+          },
+          {
+            "label": "Sep 2025",
+            "value": 23.32
+          },
+          {
+            "label": "Oct 2025",
+            "value": 22.49
+          },
+          {
+            "label": "Nov 2025",
+            "value": 22.68
+          },
+          {
+            "label": "Dec 2025",
+            "value": 22.92
+          },
+          {
+            "label": "Jan 2026",
+            "value": 23.13
+          },
+          {
+            "label": "Feb 2026",
+            "value": 23.12
+          },
+          {
+            "label": "Mar 2026",
+            "value": 23.48
+          },
+          {
+            "label": "Apr 2026",
+            "value": 23.53
+          },
+          {
+            "label": "May 2026",
+            "value": 23.27
+          },
+          {
+            "label": "Jun 2026",
+            "value": 24.95
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          },
+          {
+            "label": "Aug 2026",
+            "value": 24.61
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Summer 2025 spiked. July to July: 25.11 to 25.19¢ (+0.3%)."
+    },
+    "account": {
+      "name": "Chart Desk",
+      "handle": "@chartdesk",
+      "created": "June 2021",
+      "followers": 4200,
+      "verified": false,
+      "bio": "Charts from public data. The source is in every post.",
+      "recent_posts": [
+        "New federal price data is out. Chart below.",
+        "Axis from zero, always."
+      ]
+    }
+  },
+  "editable": {
+    "quote_words": null,
+    "chart_series": [
+      {
+        "label": "2025-01",
+        "value": 19.7
+      },
+      {
+        "label": "2025-02",
+        "value": 19.7
+      },
+      {
+        "label": "2025-03",
+        "value": 19.65
+      },
+      {
+        "label": "2025-04",
+        "value": 19.91
+      },
+      {
+        "label": "2025-05",
+        "value": 20.24
+      },
+      {
+        "label": "2025-06",
+        "value": 24.65
+      },
+      {
+        "label": "2025-07",
+        "value": 25.11
+      },
+      {
+        "label": "2025-08",
+        "value": 24.7
+      },
+      {
+        "label": "2025-09",
+        "value": 23.32
+      },
+      {
+        "label": "2025-10",
+        "value": 22.49
+      },
+      {
+        "label": "2025-11",
+        "value": 22.68
+      },
+      {
+        "label": "2025-12",
+        "value": 22.92
+      },
+      {
+        "label": "2026-01",
+        "value": 23.13
+      },
+      {
+        "label": "2026-02",
+        "value": 23.12
+      },
+      {
+        "label": "2026-03",
+        "value": 23.48
+      },
+      {
+        "label": "2026-04",
+        "value": 23.53
+      },
+      {
+        "label": "2026-05",
+        "value": 23.27
+      },
+      {
+        "label": "2026-06",
+        "value": 24.95
+      },
+      {
+        "label": "2026-07",
+        "value": 25.19
+      },
+      {
+        "label": "2026-08",
+        "value": 24.61
+      }
+    ],
+    "stat": null
+  },
+  "tools": [
+    "axis",
+    "window"
+  ]
+}

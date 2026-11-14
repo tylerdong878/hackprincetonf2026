@@ -1,0 +1,122 @@
+{
+  "id": "2026-11-16-daily-jersey-weird",
+  "number": 6,
+  "title": "Only in Jersey",
+  "topic": "New Jersey oddities",
+  "briefing": "Jersey weirdness. Five posts, 0–3 doctored today. Some of this can't possibly be true. Can it?",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-13T21:08:49Z",
+      "body": "Bruce Springsteen has a bone to pick with the movie 'Jaws'",
+      "quote": {
+        "text": "In June of 1975 I went to a small theater directly across from the Atlantic Ocean and I saw 'Jaws.' I was 25 years old and one of the great pleasures on the Jersey shore in 1975 was night swimming.",
+        "speaker": "Bruce Springsteen, at the 2026 MoMA film benefit"
+      },
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 13, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-12T20:49:22Z",
+      "body": "Cargo Ship Crashes Into Tacony-Palmyra Bridge Causing It to Be Stuck Open",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 12, 2026",
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "WHYY",
+        "handle": "@WHYY",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#7C3AED"
+      },
+      "posted_at": "2026-11-02T10:00:04Z",
+      "body": "The music recording industry was born in Camden. This Berlin museum traces RCA-Victor's rise and fall",
+      "quote": null,
+      "chart": null,
+      "source_label": "WHYY · Nov 2, 2026",
+      "card_style": "headline",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-14T00:43:04Z",
+      "body": "A new study from LendingTree ranks New Jersey number one for the worst drivers in the country. According to the study, New Jersey drivers recorded 56.9 driving incidents per 1,000 drivers through August 2026.",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 13, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-12T14:56:26Z",
+      "body": "Jon Stewart Heralds the Return of the Sandy Hook Seals",
+      "quote": {
+        "text": "New pal alert!! Jersey Shore Novembers!!!",
+        "speaker": "Jon Stewart, on Instagram"
+      },
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 12, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}
