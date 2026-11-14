@@ -7,6 +7,9 @@ Env (.env is loaded):
   GOS_API_URL                         the game server (default http://127.0.0.1:8000)
   GOS_NUDGE_HOUR                      ET hour for the daily reminder (default 9; -1 turns reminders off)
   GOS_POLL_SECONDS                    how often to check for new texts (default 2)
+  OPENROUTER_API_KEY / GEMINI_API_KEY the detective partner's model (no key -> commands only)
+  GOS_PARTNER_MODEL                   OpenRouter model (default nvidia/nemotron-3.5-lightning:free)
+  GOS_PARTNER_DAILY                   partner replies per player per day (default 40)
 """
 from __future__ import annotations
 
@@ -25,7 +28,10 @@ load_dotenv(REPO / ".env", override=False)
 
 from backend.app.daily import today_et  # noqa: E402
 
+from backend.app.store import Store  # noqa: E402
+
 from .engine import Engine, GameAPI, Sessions  # noqa: E402
+from .partner import Partner, default_chat  # noqa: E402
 from .photon_io import PhotonIO, nudge_key  # noqa: E402
 from .render import Out  # noqa: E402
 
@@ -59,7 +65,15 @@ def main() -> int:
         print(f"Game server not reachable at {api_url}. Start it first:\n"
               "  uv run uvicorn backend.app.main:app --port 8000", file=sys.stderr)
         return 1
-    engine = Engine(GameAPI(http), Sessions(state_dir / "sessions.json"))
+    store = Store(state_dir.parent)
+
+    def answer_key(case_id: str) -> dict:
+        rec = store.get_case(case_id)
+        return (rec.answer_key() or {}).get("posts", {}) if rec else {}
+
+    partner = Partner(default_chat())
+    log.info("partner: %s", "on" if partner.available() else "off (no OPENROUTER_API_KEY / GEMINI_API_KEY)")
+    engine = Engine(GameAPI(http), Sessions(state_dir / "sessions.json"), partner, answer_key)
     io = PhotonIO(os.environ["PHOTON_API_KEY"], os.environ["PHOTON_PROJECT_ID"],
                   os.environ.get("PHOTON_AGENT_HANDLE") or None, state_dir / "cursor.json")
     log.info("🧂 Grain of Salt is listening on every line in the project (yours: %s). Text it!",

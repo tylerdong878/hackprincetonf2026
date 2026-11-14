@@ -20,7 +20,8 @@ STATS = {"stats", "me", "score", "dossier", "streak", "profile", "rank"}
 HELP = {"help", "?", "how", "rules", "commands", "menu", "h"}
 MUTE = {"stop", "mute", "quiet", "unsubscribe", "pause"}
 RESET = {"reset", "restart", "newgame", "new"}
-UNMUTE = {"unmute", "remind", "reminders", "nudge", "subscribe"}
+UNMUTE = {"unmute", "remind", "reminders", "subscribe"}
+HINT = {"hint", "hints", "stuck", "nudge", "help me"}
 NOT_SURE = {"0", "unsure", "idk", "dunno", "skip", "notsure", "?"}
 TOOLS = {"source": ("source", "article", "original", "📄"), "data": ("data", "table", "numbers", "📊"),
          "account": ("account", "author", "who", "profile", "poster", "👤")}
@@ -28,7 +29,7 @@ TOOLS = {"source": ("source", "article", "original", "📄"), "data": ("data", "
 
 @dataclass(frozen=True)
 class Intent:
-    kind: str  # real | fake | trick | check | play | stats | help | mute | unmute | reset | unknown
+    kind: str  # real | fake | trick | check | hint | play | stats | help | mute | unmute | reset | unknown
     trick: str | None = None  # a trick id, for fake/trick
     choice: int | None = None  # a bare number 0-9, for picking from a list
     tool: str | None = None  # for check
@@ -69,14 +70,18 @@ def parse(text: str, trick_options: list[str] | None = None) -> Intent:
     joined = " ".join(tokens)
     if joined in ("not sure", "no idea", "dont know", "don't know", "i don't know", "idk"):
         return Intent("trick", not_sure=True)
-    if head in REAL:
+    # REAL/FAKE only count as answers in short texts: "real quick question, ..." is a chat, not a verdict.
+    if head in REAL and len(tokens) <= 3:
         return Intent("real")
     if head in FAKE or joined.startswith(("it's fake", "its fake", "thats fake", "that's fake")):
         trick, choice, not_sure = trick_from(rest, options)
-        return Intent("fake", trick=trick, choice=choice, not_sure=not_sure)
+        if len(tokens) <= 3 or trick or choice is not None or not_sure:
+            return Intent("fake", trick=trick, choice=choice, not_sure=not_sure)
     if head in CHECK:
         tool = next((t for t, keys in TOOLS.items() for w in rest if w in keys), None)
         return Intent("check", tool=tool)
+    if head in HINT or joined in ("help me", "give me a hint", "any hints", "im stuck", "i'm stuck"):
+        return Intent("hint")
     if head in RESET:
         return Intent("reset")
     if head in MUTE:
@@ -91,6 +96,6 @@ def parse(text: str, trick_options: list[str] | None = None) -> Intent:
         return Intent("play")
     # A bare trick answer ("2", "chart", "not sure") to "which trick?".
     trick, choice, not_sure = trick_from(tokens, options)
-    if trick or choice is not None or not_sure:
+    if len(tokens) <= 3 and (trick or choice is not None or not_sure):
         return Intent("trick", trick=trick, choice=choice, not_sure=not_sure)
     return Intent("unknown")

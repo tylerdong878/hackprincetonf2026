@@ -25,7 +25,8 @@ PHONE = "+15555550100"
     ("3", "trick", "cherry-picked-stat"), ("edited", "trick", "edited-detail"),
     ("check", "check", None), ("🔍", "check", None), ("play", "play", None), ("help", "help", None),
     ("?", "help", None), ("stats", "stats", None), ("STOP", "mute", None), ("remind", "unmute", None),
-    ("what is this", "unknown", None),
+    ("what is this", "unknown", None), ("real quick question about the chart", "unknown", None),
+    ("fake news is everywhere lol", "unknown", None), ("fake, not sure which", "fake", None),
 ])
 def test_parse(text, kind, trick):
     i = parse(text, OPTS)
@@ -133,3 +134,83 @@ def test_reset_starts_a_fresh_daily(engine):
     out = texts(engine.handle(PHONE, "reset"))
     assert "New detective" in out and "Post 1/5" in out
     assert engine.sessions.get(PHONE).player_id != old
+
+
+# ---- the detective partner (fake model: no network) ---------------------------------
+
+class FakeChat:
+    def __init__(self, reply="Hm. Look at where that axis starts."):
+        self.reply, self.calls = reply, []
+
+    def __call__(self, system, turns):
+        self.calls.append((system, turns))
+        if isinstance(self.reply, Exception):
+            raise self.reply
+        return self.reply
+
+
+def partner_engine(engine, chat, cap=40):
+    from backend.imessage.partner import Partner
+    keys = key()
+    return Engine(engine.api, engine.sessions, Partner(chat, daily_cap=cap), lambda case_id: keys)
+
+
+def test_partner_answers_free_text_with_case_notes(engine):
+    chat = FakeChat()
+    e = partner_engine(engine, chat)
+    e.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    out = texts(e.handle(PHONE, "who even posts this stuff"))
+    assert out == "Hm. Look at where that axis starts."
+    system, turns = chat.calls[-1]
+    assert "CURRENT POST (post 1 of 5" in system and "Egg prices" in system
+    assert "SECRET, for aiming hints only" in system  # the key aims hints ...
+    assert turns[-1] == ("user", "who even posts this stuff")
+    assert len(chat.calls) == 1  # ... and commands never reach the model
+    e.handle(PHONE, "check")
+    assert len(chat.calls) == 1
+
+
+def test_partner_hint_and_history(engine):
+    chat = FakeChat("Dates. Check the dates.")
+    e = partner_engine(engine, chat)
+    e.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    assert texts(e.handle(PHONE, "hint")) == "Dates. Check the dates."
+    e.handle(PHONE, "still lost")
+    _, turns = chat.calls[-1]
+    assert ("assistant", "Dates. Check the dates.") in turns
+
+
+@pytest.mark.parametrize("leaky", ["It's fake, obviously.", "That one's real.", "Classic misleading chart.",
+                                   "The answer is doctored.", "I'd go with real on this one."])
+def test_partner_never_gives_the_answer_before_you_answer(engine, leaky):
+    from backend.imessage.partner import SAFE_HINT
+    e = partner_engine(engine, FakeChat(leaky))
+    e.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    assert texts(e.handle(PHONE, "just tell me")) == SAFE_HINT
+
+
+def test_partner_explains_freely_after_the_reveal(engine):
+    chat = FakeChat("It was a misleading chart: the axis starts at $2.10.")
+    e = partner_engine(engine, chat)
+    e.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    for pid in ["p1", "p2", "p3", "p4", "p5"]:
+        e.handle(PHONE, "fake 0" if key()[pid]["doctored"] else "real")
+    out = texts(e.handle(PHONE, "wait why was the egg one fake"))
+    assert "misleading chart" in out  # no post pending -> no leak guard
+    assert "LAST REVEALED POST" in chat.calls[-1][0]
+
+
+def test_partner_failure_and_cap_fall_back(engine):
+    e = partner_engine(engine, FakeChat(RuntimeError("down")))
+    e.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    assert "Didn't catch that" in texts(e.handle(PHONE, "hmm"))
+    e2 = partner_engine(engine, FakeChat("ok"), cap=1)
+    assert texts(e2.handle(PHONE, "hmm")) == "ok"
+    assert "out of words" in texts(e2.handle(PHONE, "hmm again"))
+
+
+def test_parse_hint():
+    assert parse("hint", OPTS).kind == "hint"
+    assert parse("I'm stuck", OPTS).kind == "hint"
+    assert parse("help me", OPTS).kind == "hint"
+    assert parse("help", OPTS).kind == "help"

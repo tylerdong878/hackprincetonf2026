@@ -176,6 +176,7 @@ def stats(player: dict) -> Out:
 COMMANDS = ("Commands:\n"
             "• REAL or FAKE (add the trick number: FAKE 2)\n"
             "• CHECK to spend a 🔍 on evidence (CHECK SOURCE / DATA / ACCOUNT)\n"
+            "• HINT if you're stuck (or just text me like a person)\n"
             "• PLAY to start or resume today's Daily\n"
             "• STATS for your streak and weak spots\n"
             "• STOP / REMIND to pause or resume the daily reminder\n"

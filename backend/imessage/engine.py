@@ -11,10 +11,11 @@ import threading
 from dataclasses import asdict, dataclass, field
 from datetime import date
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 
 from . import render
 from .parse import parse
+from .partner import Partner
 from .render import Out
 
 TOOL_ORDER = ("data", "source", "account")  # what CHECK opens when no tool is named
@@ -77,6 +78,10 @@ class Session:
     last_nudge: str | None = None  # ISO date
     space_id: str | None = None  # Photon conversation, for nudges
     agent_id: str | None = None
+    history: list[list[str]] = field(default_factory=list)  # partner chat: [role, text], last few turns
+    last_reveal: dict | None = None  # the post just revealed, so the partner can discuss it
+    partner_day: str | None = None
+    partner_count: int = 0  # partner replies today (capped: the free model tier is small)
 
 
 class Sessions:
@@ -106,8 +111,12 @@ class Sessions:
 
 
 class Engine:
-    def __init__(self, api: GameAPI, sessions: Sessions):
+    def __init__(self, api: GameAPI, sessions: Sessions, partner: Partner | None = None,
+                 answer_key: Callable[[str], dict] | None = None):
+        """partner: free-form replies (None -> commands only). answer_key(case_id) -> {post_id: key}, read
+        locally so the partner's hints point the right way; it is never shown to the player."""
         self.api, self.sessions = api, sessions
+        self.partner, self.answer_key = partner, answer_key
 
     # ---- entry point ---------------------------------------------------------------
 
@@ -145,9 +154,13 @@ class Engine:
             return self.play(s, daily)
         if intent.kind == "reset":  # a fresh detective (handy between demo players)
             s.player_id, s.case_id, s.opened, s.awaiting_trick = self.api.new_player(), None, {}, None
+            s.history, s.last_reveal = [], None
             return [Out.t("New detective, clean record.\n\n" + render.WELCOME)] + self.play(s)
         post, index = self.current(s, daily)
-        if post is None:  # nothing in progress: any other text means "play"
+        if post is None:
+            # Done for today: chat about it. Not started yet: any other text means "play".
+            if daily.get("already_played") and intent.kind in ("unknown", "hint"):
+                return self.chat(s, daily, text, None, None) or self.play(s, daily)
             return self.play(s, daily)
         if intent.kind == "real":
             return self.answer(s, daily, post, False, None)
@@ -162,9 +175,45 @@ class Engine:
             return [Out.t("Pick a number from the list, or 0 if you're not sure.")]
         if intent.kind == "check":
             return self.check(s, daily, post, intent.tool)
+        if intent.kind == "hint":
+            return self.chat(s, daily, text, post, index, ask_hint=True) or \
+                [Out.t("My hint: spend a 🔍. Text CHECK.")]
         if s.awaiting_trick == post["id"]:
-            return [render.trick_question(daily["case"].get("trick_options") or [])]
-        return [Out.t("Didn't catch that. " + render.COMMANDS)]
+            said = self.chat(s, daily, text, post, index) or []
+            return said + [render.trick_question(daily["case"].get("trick_options") or [])]
+        return self.chat(s, daily, text, post, index) or [Out.t("Didn't catch that. " + render.COMMANDS)]
+
+    def chat(self, s: Session, daily: dict, text: str, post: dict | None, index: int | None,
+             ask_hint: bool = False) -> list[Out] | None:
+        """A partner reply, or None when there is no partner, it failed, or today's cap is used up."""
+        if self.partner is None or not self.partner.available():
+            return None
+        today = daily.get("date") or ""
+        if s.partner_day != today:
+            s.partner_day, s.partner_count = today, 0
+        if s.partner_count >= self.partner.daily_cap:
+            return [Out.t("I'm out of words for today. 🧂 Commands still work: " + render.COMMANDS)]
+        case = daily["case"]
+        key, opened = None, {}
+        if post is not None:
+            if self.answer_key:
+                try:
+                    key = (self.answer_key(case["id"]) or {}).get(post["id"])
+                except Exception:
+                    key = None
+            for tool in s.opened.get(post["id"], []):  # re-opening is free
+                try:
+                    opened[tool] = self.api.evidence(case["id"], s.player_id, post["id"], tool)["evidence"]
+                except ApiError:
+                    pass
+        reply = self.partner.reply(text=text, history=[(r, t) for r, t in s.history], post=post, index=index,
+                                   key=key, opened=opened, last_reveal=s.last_reveal,
+                                   options=case.get("trick_options") or [], ask_hint=ask_hint)
+        if not reply:
+            return None
+        s.partner_count += 1
+        s.history = (s.history + [["user", text], ["assistant", reply]])[-12:]
+        return [Out.t(reply)]
 
     # ---- steps ---------------------------------------------------------------------
 
@@ -207,6 +256,9 @@ class Engine:
         try:
             res = self.api.answer(case["id"], s.player_id, post["id"], doctored, trick)
             out = render.reveal(res["result"], trick)
+            r = res["result"]
+            s.last_reveal = {"body": post.get("body"), "outcome": r.get("outcome"), "doctored": r.get("doctored"),
+                             "trick": r.get("trick"), "tell": r.get("tell"), "explanation": r.get("explanation")}
         except ApiError as e:
             if e.status != 409:  # 409: answered already (e.g. from another device); just move on
                 raise
