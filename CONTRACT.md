@@ -42,6 +42,7 @@ data/
   "title": "Is your power bill really frozen?",
   "topic": "NJ electricity prices",
   "briefing": "Power bills in New Jersey. Four posts. I may have touched a few. Or none.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",  // optional; same text on every case, shown in a small footer
   "clue_budget": 3,
   "trick_options": ["out-of-context-quote", "misleading-chart", "cherry-picked-stat"],
   "posts": [
@@ -353,3 +354,83 @@ Everything in §1–6 stays valid. The v1 feed lives on as "Case Files". These a
   - Returns the `con` object above, minus `cached`.
   - Raises `ConAsleep` when there's no key or the model fails.
   - Callers cache via `data/fool_cache/`. Budget: 2 model calls (choose the tool, then the verdict).
+
+## 8. v2.1 additions (polish round, Sat Nov 14)
+
+### 8.1 Con levels (so the Con can be beaten)
+`POST /fool/judge` takes an optional `"level": 1 | 2 | 3` (default 3). `judge_post(..., level=)` behaves as follows:
+
+| Level | Name | What the Con gets | Model calls |
+|---|---|---|---|
+| 1 | Rookie Con | **No evidence.** It judges the post as shown. | 1 (verdict only) |
+| 2 | Street Con | **One evidence check**, using the fast fallback model (`nemotron-3.5-lightning:free`) | 2 |
+| 3 | Master Con | **One evidence check** with the full models (today's behavior) | 2 |
+
+- The cache key includes the level.
+- The response adds `"level"`, plus `"scoreboard": { "by_level": { "1": {"fooled": n, "played": n}, … } }`.
+- The `con` object's `checked` is `[]` at level 1.
+
+### 8.2 Grid emoji (replaces §7.2's mapping)
+
+| Emoji | Meaning |
+|---|---|
+| 🟩 | trusted |
+| 🧂 | caught |
+| 🟨 | false_alarm |
+| 🟥 | fooled |
+
+Stamp colors in the UI match: green, salt/white, amber, red.
+
+**Con the Con outcome words in the UI:**
+
+| Outcome | Wording |
+|---|---|
+| `caught` | **BUSTED** (the Con caught you) |
+| `fooled_the_con` | **FOOLED THE CON** |
+| `con_false_alarm` | **FALSE ALARM** |
+| `con_trusted` | **TRUSTED** |
+
+### 8.3 One made-up account per deck item
+- `GET /fool/deck` items add `"edited_author"`: the made-up account a changed post will show.
+- `apply_edit` must use **exactly** that author. It's deterministic per deck item, from a fixed persona list, using invented handles, never realistic personal names.
+- The editor's preview shows it, so the account never changes between preview and verdict.
+
+### 8.4 Honest Con lines
+- **Daily answers:** if the player marked a post correctly **without opening any evidence for it**, the backend returns a generic line ("Good eye. No receipts needed."), not an answer-key line that claims they checked.
+- **Con the Con:** `con_line` must refer only to what actually happened (the edit type, the level, and what the Con checked).
+
+### 8.5 Limits for live AI (env-configurable; cached verdicts are always free and always allowed)
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `CON_LIVE_DAILY_CAP` | 30 | Live (uncached) judge calls per server day, across everyone |
+| `CON_LIVE_PER_PLAYER` | 3 | Live judge rounds per player per day |
+| `DEMO_TOKEN` | unset | If the request has the header `X-Demo-Token` equal to it, both caps are skipped (for our demo laptop) |
+
+- **Over a cap:** return `429 {"error":"con_resting","message":"The Con is resting. Try a saved round, or come back tomorrow."}`.
+- **The frontend** stores a `?demo=<token>` URL parameter in localStorage and sends it as `X-Demo-Token`.
+
+### 8.6 Public mode (`GOS_PUBLIC=1`)
+- **Hide the docs pages:** `/docs`, `/redoc` and `/openapi.json` return 404.
+- **Lock the teacher routes:** **all** `/teacher/*` routes require the header `X-Teacher-Token == TEACHER_TOKEN`, otherwise 401. If `GOS_PUBLIC=1` and no `TEACHER_TOKEN` is set, the teacher routes are disabled (404).
+- **The frontend Teacher screen** asks for the token once and keeps it in sessionStorage.
+- **Rate limit:** `/cases/*/answer` is limited per client IP (loose, about 60 a minute).
+- **Without `GOS_PUBLIC`** (local dev and the demo laptop), everything works as it does today.
+
+### 8.7 Entertainment framing and rarity (Krillion-style)
+**Rarity bonus.** When a post's crowd stats are shown (`n` ≥ `CROWD_MIN`), a correct answer (trusted or caught) earns a bonus based on how few players got it right:
+
+| `correct_pct` | Label | Bonus |
+|---|---|---|
+| ≤ 25 | "Rare catch" | +50 |
+| ≤ 10 | "One in a shaker" | +100 |
+
+- **Where it appears:** the `answer` result and the verdict `results[]` gain `"rarity_bonus": { "label": "...", "points": n } | null`.
+- **Scoring:** the bonus counts toward `score`, using the crowd stats from *before* this answer is counted.
+- **Never fake numbers:** below `CROWD_MIN` the bonus is null.
+
+**UI wording:**
+- "Teacher" becomes **"Editor's Desk"** ("a human puzzle editor approves every puzzle before it goes live").
+- "Case Files (for classrooms)" becomes **"Case Files"** (an archive of extra cases).
+- Lead every screen with the game. Media literacy is the payoff, not the pitch.
+- Routes and API paths stay the same (`/teacher/*`). Only the labels change.
