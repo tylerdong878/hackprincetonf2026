@@ -27,3 +27,6 @@ data/fool_cache/
 Thumbs.db
 .vscode/
 .idea/
+
+# iMessage bot state (per-phone sessions, poll cursor)
+data/imessage/
