@@ -1,0 +1,19 @@
+{
+  "status": "rejected",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T07:04:31Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/14/nx-s1-6038952/saturday-sports-nfl-regular-season-action-college-football-playoff-format-expansion",
+    "https://www.npr.org/2026/11/14/nx-s1-6041115/faa-ground-stop-college-football-delays",
+    "https://www.npr.org/2026/11/07/nx-s1-6029737/saturday-sports-liv-golf-shuts-down-russian-hockey-teams-banned-from-world-juniors"
+  ],
+  "rejection_reason": "Too weak to play: the doctored posts are just trimmed headline fragments (like 'College football playoff format expansion.') with nothing a player could catch.",
+  "mode": "daily",
+  "daily_date": "2026-11-17",
+  "theme": "Game Day"
+}
