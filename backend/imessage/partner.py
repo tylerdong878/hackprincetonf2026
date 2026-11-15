@@ -18,6 +18,7 @@ log = logging.getLogger("gos.imessage")
 ChatFn = Callable[[str, list[tuple[str, str]]], str]  # (system prompt, [(role, text), ...]) -> reply
 
 MAX_REPLY = 480
+PARTNER_GEMINI_MODEL = "gemini-flash-lite-latest"  # ~1s replies; GOS_PARTNER_GEMINI_MODEL to change
 SAFE_HINT = "Not saying. 🧂 But I'd spend a 🔍 before trusting it. Text CHECK."
 
 SYSTEM = """You are the player's detective partner in Grain of Salt, a daily iMessage game about spotting \
@@ -44,7 +45,7 @@ def default_chat() -> ChatFn | None:
     try:
         from pipeline.config import load_env
         load_env()
-        from pipeline.models import DEFAULT_FALLBACK_MODEL, DEFAULT_GEMINI_MODEL, make_gemini, make_openrouter
+        from pipeline.models import DEFAULT_FALLBACK_MODEL, make_gemini, make_openrouter
     except Exception:
         log.exception("partner: model setup unavailable")
         return None
@@ -55,7 +56,7 @@ def default_chat() -> ChatFn | None:
             os.environ.get("GOS_PARTNER_MODEL", DEFAULT_FALLBACK_MODEL), timeout_ms=int(timeout * 1000))
     if (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip():
         available["gemini"] = lambda: make_gemini(
-            os.environ.get("GOS_PARTNER_GEMINI_MODEL") or os.environ.get("GEMINI_MODEL", DEFAULT_GEMINI_MODEL),
+            os.environ.get("GOS_PARTNER_GEMINI_MODEL", PARTNER_GEMINI_MODEL),
             timeout_s=timeout)
     # GOS_PARTNER_ORDER: which model to try first (default Gemini: faster replies feel like texting a person).
     order = [n.strip() for n in os.environ.get("GOS_PARTNER_ORDER", "gemini,openrouter").split(",")]
