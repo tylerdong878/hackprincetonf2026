@@ -117,7 +117,43 @@ def test_nudges_once_and_respect_mute(engine):
     due = engine.due_nudges(DAY)
     assert [s.handle for s, _ in due] == [PHONE]
     assert "Text PLAY" in due[0][1][0].text
+    assert [s.handle for s, _ in engine.due_nudges(DAY)] == [PHONE]  # asking doesn't mark anyone
+    sent = []
+    assert engine.send_reminders(DAY, lambda s, outs: sent.append(s.handle)) == 1
+    assert sent == [PHONE]
     assert engine.due_nudges(DAY) == []  # once a day
+    assert Sessions(engine.sessions.path).get(PHONE).last_nudge == DAY.isoformat()  # saved to disk
+
+
+def test_failed_reminder_is_retried_not_lost(engine):
+    other = "+15555550102"
+    engine.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+    engine.handle(other, "hi", space_id="sp2", agent_id="ag1")
+    sent = []
+
+    def flaky(s, outs):
+        if s.handle == PHONE:
+            raise ConnectionError("network blip")
+        sent.append(s.handle)
+
+    assert engine.send_reminders(DAY, flaky) == 1
+    assert sent == [other]  # one failed send doesn't stop the rest
+    assert engine.sessions.get(PHONE).last_nudge is None  # and the failed one isn't marked as reminded
+    assert engine.send_reminders(DAY, lambda s, outs: sent.append(s.handle)) == 1
+    assert sent == [other, PHONE]  # retried at the next check; `other` isn't texted twice
+
+
+def test_reminder_gives_up_for_the_day_after_a_few_tries(engine):
+    from backend.imessage.engine import MAX_NUDGE_TRIES
+    engine.handle(PHONE, "hi", space_id="sp1", agent_id="ag1")
+
+    def down(s, outs):
+        raise ConnectionError("chat is gone")
+
+    for _ in range(MAX_NUDGE_TRIES):
+        assert engine.send_reminders(DAY, down) == 0
+    assert engine.due_nudges(DAY) == []  # a dead chat isn't retried every minute all day
+    assert engine.sessions.get(PHONE).last_nudge is None  # never marked: it was never sent
 
 
 def test_merge_texts_keeps_images_in_place():

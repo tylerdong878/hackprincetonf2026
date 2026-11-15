@@ -93,9 +93,8 @@ def main() -> int:
                 if nudge_hour >= 0 and time.monotonic() >= next_nudge_check and et_hour() >= nudge_hour:
                     next_nudge_check = time.monotonic() + 60
                     today = today_et()
-                    for s, outs in engine.due_nudges(today):
-                        io.send(s.space_id, s.agent_id, outs, nudge_key(s.handle, today.isoformat()))
-                        log.info("-> %s: daily reminder", s.handle[-4:])
+                    engine.send_reminders(today, lambda s, outs: io.send(
+                        s.space_id, s.agent_id, outs, nudge_key(s.handle, today.isoformat())))
             except KeyboardInterrupt:
                 raise
             except Exception:  # one bad poll (network, API hiccup) must not kill the bot
