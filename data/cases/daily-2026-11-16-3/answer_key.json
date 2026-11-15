@@ -1,0 +1,56 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real. A random account shared it, but the words are exactly NPR's (Nov 6, 2026), as the source label says.",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p2": {
+      "doctored": true,
+      "trick": "made-up-story",
+      "tell": "No lab or study named, and 'exactly 7 seconds' is suspiciously precise for a soft robot.",
+      "explanation": "The Con made this up. The real NPR story (s1) says researchers are studying octopuses to inspire search-and-rescue robots that can wriggle through cracks — not that a working robot octopus already slips through keyholes on command. Look for who reported it and watch for round numbers.",
+      "con_line_fooled": "Sounded just like the next robotics press release, didn't it?",
+      "con_line_caught": "Too tidy? Fine. Real engineering is messier.",
+      "diff": {
+        "type": "made_up",
+        "shown": "A university lab says its robot octopus slips through a keyhole-sized hole in exactly 7 seconds.",
+        "real": "Robots used during search and rescue operations need to be able to wriggle through narrow cracks and crevices. Researchers have turned to a natural contortionist for inspiration — the octopus.",
+        "outlet": "NPR",
+        "date": "2026-11-06",
+        "url": "https://www.npr.org/2026/11/06/nx-s1-6027897/how-octopuses-squeeze-through-teeny-tiny-holes"
+      }
+    },
+    "p3": {
+      "doctored": true,
+      "trick": "made-up-story",
+      "tell": "No garden named, and a 22-foot tree floating three feet off the ground is physically implausible.",
+      "explanation": "The Con made this up. The real NJ 101.5 story (s4) describes a 22-foot rotating tree at Longwood Gardens with a night-sky theme inside the conservatory — it rotates, but it's firmly planted. The floating detail is the tell. Check the outlet before you share.",
+      "con_line_fooled": "Holiday magic made it plausible, right?",
+      "con_line_caught": "Real wonder doesn't need levitation.",
+      "diff": {
+        "type": "made_up",
+        "shown": "A botanical garden now has a 22-foot tree that floats three feet off the ground and spins on its own.",
+        "real": "Ever seen a 22-foot rotating tree? Longwood's new theme has the night sky inside the conservatory this year.",
+        "outlet": "New Jersey 101.5",
+        "date": "2026-11-14",
+        "url": "https://nj1015.com/longwood-gardens-cosmic-christmas-2026/"
+      }
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey 101.5 (Nov 14, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p5": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey 101.5 (Nov 13, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    }
+  },
+  "con_line_clean": null
+}

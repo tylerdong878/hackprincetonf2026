@@ -16,12 +16,18 @@ researcher saved, but the claim itself is false, and no outlet ever ran it.
   That story becomes the "closest real story" a player sees when they check.
 - Vary the difficulty across a day: an easier one (two clear tells) and a harder one (one subtle tell, close to a
   real weird story). Never make one that's impossible to tell from real news without opening the source.
+- Best days pair a made-up story with a startling-but-true real post on a similar subject (a real odd animal
+  study next to an invented one), so the player has to judge which is too neat and which is just weird.
 
 ## Forging recipe
 Call `make_tall_tale(source_id, claim)` once per made-up post.
 1. `source_id` = the real story it borrows from. Read it first: your claim must say something DIFFERENT, not copy
    or tweak it (the tool refuses near-copies).
 2. `claim` = 8-45 words, false, plausible at first glance, with at least one tell from the list below built in.
+   Write it like a real person's viral post: a full, natural sentence ("A boardwalk bakery in Wildwood is giving
+   away a 15-foot cinnamon roll..."), never headline shorthand with the little words dropped.
+   It must share the SUBJECT of its source story (the same animal, food, place or kind of discovery), so the
+   closest real story a player opens is a fair comparison, not an unrelated article.
 3. In `write_case`, the doctored post gets the `forgery_id` and a made-up persona (or leave `author_name` empty).
    The claim is the post body; add no extra words. Don't also use the same source as a real post.
 4. Real posts stay word for word. Include at least one startling-but-true real post (`real_suspicious`), so
@@ -36,6 +42,10 @@ It must be FAIR: a careful reader can catch it from the card, without opening ev
   40-foot pancake every day).
 - **Nothing behind it:** no study, place or outlet a person could look up, just "experts say".
 - **Emotional bait:** "you won't believe", "share before it's deleted".
+- **Sloppy writing:** a typo or "!!!" (not ALL CAPS: the tool reads capitals as names). Use it at most once a
+  day, and balance it: give one REAL
+  repost by a made-up account a casual reaction too (a short `body` like "wait, this is real??"), so sloppy
+  writing is a reason to check, never proof.
 In write_case, the `tell` (one sentence) names the clue a player could see ON THE CARD, e.g. "No study or outlet
 named, and '9 seconds' is suspiciously exact for an octopus." The `explanation` (2-3 sentences) says plainly that
 the Con made it up, what the closest real story actually says (outlet and gist), and the habit that would have
