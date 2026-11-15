@@ -54,21 +54,24 @@ npm run build      # typecheck + production build to frontend/dist/ (served by t
 - **Daily Grain** (`#/daily`): five cards one at a time, three magnifiers and an instant reveal per card. The end card has the Gullible ↔ Paranoid meter, a streak, the share grid and a countdown to midnight ET.
 - **Con the Con** (`#/con`): doctor a real deck post with crop, axis, window or drop, or bluff and leave it real. Then pick a boss: Rookie, Street or Master Con.
 - **Case Files** (`#/casefiles`): the longer four-post cases, with the Workshop replay of how the AI built each one.
-- **Also:** Stats (`#/dossier`: rating, lean meter, streak, per-trick rates), Tricks (`#/casebook`: a page per trick), and the Editor's Desk (`#/editor`: the approval queue and case review).
+- **Also:** Dossier (`#/dossier`: rating, lean meter, streak, per-trick rates), Casebook (`#/casebook`: a page per trick), and the Editor's Desk (`#/editor`: the approval queue and case review; not in the top menu, linked from Case Files).
 
 **Keyboard:**
-- **Daily:** `R` Real, `D` Doctored then `1`–`4` for the trick, `C` Check, Enter for the next card.
-- **Case Files:** Tab moves between posts, `R` / `D`, `1`–`4` for the trick, `E` for evidence.
+- **Daily:** `R` Real, `D` Doctored then `1`–`5` for the trick (made-up days add "Made up"), `C` Check, Enter for the next card.
+- **Case Files:** Tab moves between posts, `R` / `D`, a number for the trick, `E` for evidence.
 
 **Design system** (from the designer's Figma file; tokens in `src/index.css`):
-- One light newsprint theme: ink `#141414`, newsprint `#F2E8D5`, paper `#FBF7EE`, manila `#E6D3A8`, press red `#C8231B`, ochre `#B9822A`; focus blue `#1F5FD1` only for focus rings and the selected post.
+- A torn black-and-white newspaper front page: every screen opens on a black torn-paper hero (`.torn-hero`) over a newspaper collage, with the blackletter logo as an image. Palette: ink `#141414`, newsprint `#F2E8D5`, paper `#FBF7EE`, manila `#E6D3A8`, press red `#C8231B`, ochre `#B9822A`; focus blue `#1F5FD1` only for focus rings and the selected post.
+- Content tucked under a hero's torn edge uses negative top margins; `.torn-hero` lets clicks through its empty padding so nothing under it is covered.
 - One hard shadow (4px down-right, solid ink) and 2px ink rules.
-- Type: Gloock (the logotype), Bodoni Moda (titles), Oswald (caps headlines, buttons, stamps), Old Standard TT (copy; the Con speaks in its italic). Inter appears only inside post cards, so posts still look like a social app.
+- Type: Iosevka Charon throughout (headings, buttons, copy; the Con speaks in its italic). Inter appears only inside post cards, so posts still look like a social app.
+- On laptops (1024px and up) the Daily follows the Figma's desktop frames: card tabs, inline Real/Doctored with the trick grid, the Evidence Kit in its own column, and the Con on an ink bar.
 - Line icons (`src/components/Icon.tsx`, the designer's SVGs plus `lucide-react`) replace emoji in the UI; the share text keeps emoji.
 - The noir Con silhouette and halftone frame are in `src/assets/figma/`.
 
 **Other:**
-- The player id lives in `localStorage` (`gos.player_id`). "Start as a new detective" on Home or Stats resets it, which is handy between demo players.
+- The player id lives in `localStorage` (`gos.player_id`). "New detective" on the Dossier page resets it, which is handy between demo players.
+- The server sends `Cache-Control: no-cache` with `index.html`, so a new deploy shows up on the next page load.
 - Sound effects have a mute toggle in the header.
 - Shared links show a preview card (`public/og.png` and the `og:` tags in `index.html`).
 
@@ -88,7 +91,8 @@ uv run python -m pytest pipeline/tests -q                                   # no
 
 **Agents:** the **orchestrator** (`create_deep_agent`, planning with todos) delegates through `task` to three sub-agents:
 - **Researcher:** reads feeds, pages and EIA data. `save_source` rejects anything that isn't word for word in a document fetched during this run.
-- **Forger:** loads `data/skills/<trick>/SKILL.md`. `crop_quote`, `make_chart`, `make_stat_claim` and `edit_detail` doctor real material in code. `write_case` checks CONTRACT §2, the topic blocklist and the made-up-author rule.
+- **Forger:** loads `data/skills/<trick>/SKILL.md`. `make_tall_tale` writes a made-up story (it refuses names of people, bands or brands, quote marks, real-outlet credit, health claims and near-copies of real stories); `crop_quote`, `make_chart`, `make_stat_claim` and `edit_detail` doctor real material in code. `write_case` checks CONTRACT §2, the topic blocklist, the made-up-author rule and the case's random fake positions.
+- **Styles:** `--style made-up` (the nightly default) makes every fake a made-up story; `--style twist` uses the four edits of real material. The researcher never sees stories another approved or pending puzzle uses.
 - **Blind solver:** a compiled sub-agent with no file tools, only `open_evidence`, `view_chart` and `submit_verdict`. Its input is rebuilt from `case.json`, and it's graded against the answer key in code.
 
 **Files and approval:**

@@ -410,6 +410,11 @@ def test_static_frontend_with_spa_fallback(data_dir, tmp_path):
     assert "grain of salt" in c.get("/").text
     assert "grain of salt" in c.get("/dossier/abc").text
     assert c.get("/assets/app.js").text == "console.log(1)"
+    # the page always revalidates, so a deploy shows up on the next load; hashed assets cache normally
+    assert c.get("/").headers["cache-control"] == "no-cache"
+    assert c.get("/dossier/abc").headers["cache-control"] == "no-cache"
+    assert c.get("/index.html").headers["cache-control"] == "no-cache"
+    assert "cache-control" not in c.get("/assets/app.js").headers
     assert "TOP SECRET" not in c.get("/..%2Fsecret.txt").text
     assert c.get("/api/nope").status_code == 404
     assert c.get("/api/health").json() == {"ok": True}

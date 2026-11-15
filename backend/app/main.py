@@ -483,6 +483,11 @@ def reject_case(case_id: CaseId, store: StoreDep, body: RejectRequest | None = N
 
 # ---- app ---------------------------------------------------------------------
 
+# The page itself always revalidates (a cheap 304 via its ETag), so a new deploy shows up on the next load instead
+# of a browser reusing an old index.html that points at an old bundle. Hashed assets cache as usual.
+INDEX_HEADERS = {"Cache-Control": "no-cache"}
+
+
 def spa(full_path: str, request: Request):
     """Serve frontend/dist (if built) with SPA fallback to index.html."""
     if full_path == "api" or full_path.startswith("api/"):
@@ -496,8 +501,8 @@ def spa(full_path: str, request: Request):
     if full_path:
         target = (dist / full_path).resolve()
         if target.is_file() and target.is_relative_to(dist):
-            return FileResponse(target)
-    return FileResponse(index)
+            return FileResponse(target, headers=INDEX_HEADERS if target == index.resolve() else None)
+    return FileResponse(index, headers=INDEX_HEADERS)
 
 
 def env_flag(name: str) -> bool:
