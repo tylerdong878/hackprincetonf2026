@@ -116,9 +116,18 @@ class RunContext:
     feeds: list[str] | None = None
     articles: list[str] | None = None
     has_data: bool | None = None
+    used_urls: frozenset[str] | None = None  # stories other approved/pending puzzles use (loaded on first check)
     _counters: dict[str, int] = field(default_factory=dict)
     # Parallel tool calls in one model turn run in threads: guard ids, lists and file writes.
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
+
+    def already_used(self, url: str) -> bool:
+        """True when another approved or pending puzzle already uses this story (enforced here, not just in the prompt)."""
+        if self.used_urls is None:
+            from pipeline.topics import used_story_urls
+
+            self.used_urls = frozenset(used_story_urls(self.cases_dir, limit=None, exclude=self.case_id))
+        return url in self.used_urls
 
     def __post_init__(self) -> None:
         from pipeline.topics import hints_for, story_urls

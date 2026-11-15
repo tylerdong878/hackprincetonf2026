@@ -351,6 +351,9 @@ def save_source_impl(ctx: RunContext, url: str, text: str, speaker: str | None =
                 "Fetch it first with fetch_rss or fetch_article and copy text from the result.")
     if doc.via == "data":
         return "Rejected: EIA numbers are used directly by the forging tools; save_source is for news/official text."
+    if ctx.already_used(doc.url):
+        return ("Rejected: another puzzle already uses this story. Pick a DIFFERENT story from the feeds "
+                "(the hints list the URLs already used).")
     words = word_count(text)
     if words < MIN_PASSAGE_WORDS:
         return f"Rejected: passage too short ({words} words). Save a full sentence or quote."
