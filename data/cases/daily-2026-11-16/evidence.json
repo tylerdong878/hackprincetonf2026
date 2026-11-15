@@ -1,0 +1,106 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-14",
+      "url": "https://nj1015.com/ixp/564/p/larry-kane-retires-philadelphia-tv/",
+      "before": "",
+      "highlight": "Larry Kane, a familiar face and voice to generations of Philadelphia and South Jersey audiences, is retiring after 69 years in radio and television.",
+      "after": "Continue reading…"
+    },
+    "account": {
+      "name": "Jersey Bill Watch",
+      "handle": "@jerseybills",
+      "created": "October 2026",
+      "followers": 1840,
+      "verified": false,
+      "bio": "Exposing what they don't want you to know about your bills.",
+      "recent_posts": [
+        "Your utility bill is a SCAM. Thread 🧵",
+        "Share before they delete this!"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-14",
+      "url": "https://nj1015.com/favorite-thanksgiving-desserts-ranked/",
+      "before": "",
+      "highlight": "The most popular dessert in New Jersey on Thanksgiving",
+      "after": "There's one dessert New Jersey craves most after the turkey, and it's probably not on your table either. Continue reading…"
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-12",
+      "url": "https://nj1015.com/new-monmouth-diner-new-jersey/",
+      "before": "",
+      "highlight": "This beloved Diner in Middletown, NJ is stuck in the 1950's",
+      "after": "A New Jersey diner that's more than just food, it's a throwback to simpler times. Continue reading…"
+    },
+    "account": {
+      "name": "New Jersey 101.5",
+      "handle": "@nj1015",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Radio news · nj1015.com",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-13",
+      "url": "https://nj1015.com/ixp/564/p/wildwood-police-stop-phone-scam/",
+      "before": "",
+      "highlight": "Wildwood Police Officer Steps In Just In Time to Stop Scam",
+      "after": "A quick-thinking Wildwood police officer spotted the scam mid-stride at a bank, and the cash never left the building. Continue reading…"
+    },
+    "account": {
+      "name": "New Jersey 101.5",
+      "handle": "@nj1015",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Radio news · nj1015.com",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-14",
+      "url": "https://nj1015.com/ixp/394/p/jersey-birds-photographs/",
+      "before": "",
+      "highlight": "My Fav Birds Here In The Garden State I Photographed",
+      "after": "One Jersey photographer shares his backyard and shoreline finds, from bald eagles to a summer goldfinch. Continue reading…"
+    },
+    "account": {
+      "name": "Scroll Patrol",
+      "handle": "@scrollpatrol",
+      "created": "June 2019",
+      "followers": 22400,
+      "verified": false,
+      "bio": "I read the whole feed so you don't have to. 📱",
+      "recent_posts": [
+        "Today's feed, ranked.",
+        "Not a bot. Probably."
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 """Grain of Salt game server (CONTRACT §5, §7 and §8).
 
-Run:  uv run uvicorn backend.app.main:app --reload --port 8000
+Run:  uv run python -m uvicorn backend.app.main:app --reload --port 8000
 Data: data/ by default; override with the GOS_DATA_DIR env var (or create_app(data_dir=...)).
 
 Env (all optional):
@@ -37,8 +37,8 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from . import con_the_con as ctc
 from .con_lines import adaptation_message, honest_result
-from .daily import (crowd_view, current_daily, daily_number, dailies, is_daily, rarity_bonus, released, streak,
-                    today_et)
+from .daily import (crowd_view, current_daily, daily_number, dailies, is_daily, launch_date, next_open_day,
+                    rarity_bonus, released, streak, today_et)
 from .limits import CON_RESTING, LiveUsage, RateLimiter, client_ip, token_matches
 from .models import (AnswerRequest, EvidenceRequest, FoolJudgeRequest, PostVerdict, RejectRequest,
                      VerdictRequest)
@@ -435,9 +435,11 @@ editor = APIRouter(dependencies=[Depends(editor_guard)])
 
 @editor.get("/queue")
 def editor_queue(store: StoreDep):
+    official = dailies(store.approved_cases())
     return [
         {"id": r.id, "number": r.case.get("number"), "title": r.case.get("title"),
          "topic": r.case.get("topic"), "meta": r.meta,
+         "daily_number": daily_number(r, official) if is_daily(r) and r.meta.get("status") == "approved" else None,
          "has_pipeline_log": (r.dir / "pipeline_log.jsonl").is_file(),
          "has_solver_log": (r.dir / "solver_log.md").is_file()}
         for r in store.all_cases()
@@ -452,9 +454,19 @@ def editor_case(case_id: CaseId, store: StoreDep):
 
 
 @editor.post("/cases/{case_id}/approve")
-def approve_case(case_id: CaseId, store: StoreDep):
+def approve_case(case_id: CaseId, store: StoreDep, today: TodayDep):
     with store.lock:
         rec = any_case(store, case_id)
+        if is_daily(rec) and rec.meta.get("status") != "approved":
+            # Schedule it: an approved daily takes the next open day (from today or launch, whichever is later),
+            # so the official list runs day after day with no gaps and its numbers count up 1, 2, 3...
+            official = dailies(store.approved_cases())
+            taken = {d for d, r in official if r.id != rec.id}
+            start = max(today, launch_date(official) or today)
+            day = next_open_day(taken, start).isoformat()
+            if rec.meta.get("daily_date") != day:
+                rec.meta.setdefault("planned_date", rec.meta.get("daily_date"))
+                rec.meta["daily_date"] = day
         rec.meta.update(status="approved", rejection_reason=None)
         store.save_meta(rec)
     return rec.meta

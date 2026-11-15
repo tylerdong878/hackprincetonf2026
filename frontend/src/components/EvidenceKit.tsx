@@ -75,7 +75,9 @@ export function ToolRow({
           <span className="caps text-[12px] font-semibold tracking-[0.08em] text-press-soft">Open</span>
         ) : state === 'ready' ? (
           <>
-            <span className="num text-[15px] font-semibold">−1</span>
+            <span className="text-[13px] font-semibold" title="Uses one of today's clues. It never costs points; an unused clue is worth +20 at the end.">
+              Use 1
+            </span>
             <ClueToken size={22} />
           </>
         ) : (

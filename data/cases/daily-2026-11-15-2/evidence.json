@@ -1,0 +1,103 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+      "before": "",
+      "highlight": "Scientists think they've found ancient remnants of dinosaur blood",
+      "after": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood."
+    },
+    "account": {
+      "name": "Lab Notes Lite",
+      "handle": "@labnoteslite",
+      "created": "May 2020",
+      "followers": 18700,
+      "verified": false,
+      "bio": "Science news for people who skipped chem. 🔬",
+      "recent_posts": [
+        "Science thread incoming 🧵",
+        "Space is weird, part 12."
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+      "before": "",
+      "highlight": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "after": "Brain scientists set up \"gladiator style\" cage matches for mice — and found that simply observing fighting matches can rewire a mouse's brain to resemble those who actually fought."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-13",
+      "url": "https://nj1015.com/new-jersey-worst-drivers-2/",
+      "before": "",
+      "highlight": "Do you think NJ has the worst drivers in the U.S.? Study says yes",
+      "after": "LendingTree says New Jersey drivers are the worst in America. Come on."
+    },
+    "account": {
+      "name": "New Jersey 101.5",
+      "handle": "@nj1015",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Radio news · nj1015.com",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-12",
+      "url": "https://nj1015.com/new-monmouth-diner-new-jersey/",
+      "before": "",
+      "highlight": "This beloved Diner in Middletown, NJ is stuck in the 1950's",
+      "after": "A New Jersey diner that's more than just food, it's a throwback to simpler times. Continue reading…"
+    },
+    "account": {
+      "name": "New Jersey 101.5",
+      "handle": "@nj1015",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Radio news · nj1015.com",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-24",
+      "url": "https://www.npr.org/2026/09/24/nx-s1-5977047/south-africa-braai-bbq",
+      "before": "",
+      "highlight": "Thousands of people gather for a South African barbecue, aiming to set a world record",
+      "after": "South Africa is aiming to smash a savory world record — the world's largest BBQ — and more boerewors sausage than you can shake a stick at. (Image credit: Kate Bartlett)"
+    },
+    "account": {
+      "name": "Boardwalk Buzz",
+      "handle": "@boardwalkbuzz",
+      "created": "June 2018",
+      "followers": 26100,
+      "verified": false,
+      "bio": "Shore news, all year round. 🌊",
+      "recent_posts": [
+        "Boardwalk fries ranking, round 3 🍟",
+        "Beach badge thread 🧵"
+      ]
+    }
+  }
+}

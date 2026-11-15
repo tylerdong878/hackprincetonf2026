@@ -1020,7 +1020,7 @@ export function ConTheCon() {
         <div className="mb-8 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:items-start">
           <div className="min-w-0">
             <p className="caps inline-block bg-press px-2.5 py-1 text-[12px] font-semibold tracking-[0.1em] text-white">Bonus round · challenge mode</p>
-            <h1 className="caps mt-4 text-[52px] leading-[0.95] font-bold tracking-[0.01em] sm:text-[76px]">Con the Con</h1>
+            <h1 className="caps mt-4 text-[52px] leading-[0.95] font-bold tracking-[0.01em] normal-case sm:text-[76px]">Con the Con</h1>
             <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
             <p className="mt-3 max-w-2xl text-[17px] leading-relaxed text-ink italic">
               Your turn to be the con artist. Doctor a real post with one trick, then send it to a boss. Each boss is our blind-solver AI

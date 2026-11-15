@@ -88,6 +88,21 @@ function derive(events: PipelineEvent[]) {
         break
     }
   }
+  // The orchestrator often hands off to the editor without one last todo update, so the logged plan can lag
+  // behind what actually happened. Bring it up to date from the real events: a passing blind-solver result
+  // finishes the solve step, and reaching the editor finishes the hand-off step.
+  if (plan) {
+    const solved = solver.some((s) => s.pass === true)
+    const handedOff = status === 'awaiting_approval' || status === 'approved' || status === 'rejected'
+    plan = {
+      ...plan,
+      todos: plan.todos.map((todo) => {
+        const c = String(todo.content ?? '').toLowerCase()
+        const done = (solved && c.includes('solve')) || (handedOff && /editor|approv|review/.test(c))
+        return done && todo.status !== 'completed' ? { ...todo, status: 'completed' } : todo
+      }),
+    }
+  }
   return { plan, lanes: [...lanes.values()], files: [...files.values()], solver, status }
 }
 
@@ -356,9 +371,21 @@ export function Workshop({
                 <span className="num ml-auto text-[15px] font-semibold text-ink tabular-nums" aria-live="off">
                   {mmss(clock)} / {mmss(end)}
                 </span>
-                <div className="mt-2 h-1 w-full overflow-hidden bg-[#DDD3BF]" aria-hidden="true">
-                  <div className="h-full bg-press" style={{ width: `${end ? (clock / end) * 100 : 100}%` }} />
-                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={end || 0}
+                  step={0.1}
+                  value={Math.min(clock, end || 0)}
+                  onChange={(e) => {
+                    setPlaying(false) // dragging pauses; Play resumes from here
+                    setClock(Number(e.target.value))
+                  }}
+                  aria-label="Scrub through the agent run"
+                  aria-valuetext={`${mmss(clock)} of ${mmss(end)}`}
+                  className="mt-2 h-2 w-full cursor-pointer"
+                  style={{ accentColor: '#C8231B' }}
+                />
               </div>
 
               <section>

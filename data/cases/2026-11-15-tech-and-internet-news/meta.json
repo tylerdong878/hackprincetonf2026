@@ -1,0 +1,17 @@
+{
+  "status": "awaiting_approval",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T05:47:46Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/14/nx-s1-6040188/asia-societys-lizzi-c-lee-on-big-tech-restrictions-after-nvidia-espionage-claims",
+    "https://www.npr.org/2026/11/13/nx-s1-6040004/microsoft-outage-disrupts-work-and-gives-some-a-chance-to-unplug",
+    "https://www.npr.org/2026/11/14/nx-s1-6037416/hello-james-gleicks-new-book-compares-the-history-of-the-telephone-to-the-modern-era",
+    "https://www.npr.org/2026/11/13/nx-s1-6039350/microsoft-investigating-widespread-outage-that-took-email-and-other-apps-offline"
+  ],
+  "rejection_reason": null
+}

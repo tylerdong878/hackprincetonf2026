@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -180,7 +181,7 @@ def test_write_case_blocks_blocklisted_text(researched):
 
 @pytest.mark.parametrize("case_id", ["2026-11-14-power-bills", "2026-11-14-power-bills-clean"])
 def test_seed_cases_validate_against_contract_models(case_id):
-    folder = CASES_DIR / case_id
+    folder = Path(__file__).resolve().parents[2] / "backend" / "tests" / "fixtures" / "cases" / case_id
     load = lambda n: json.loads((folder / n).read_text(encoding="utf-8"))  # noqa: E731
     validate_bundle(load("case.json"), load("evidence.json"), load("answer_key.json"), load("meta.json"))
 

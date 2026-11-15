@@ -1,0 +1,116 @@
+{
+  "id": "daily-2026-11-15-2",
+  "number": 17,
+  "title": "Dinosaur Blood, Mouse Gladiators & BBQ Records",
+  "topic": "Odd science, food and Jersey news",
+  "briefing": "0–3 doctored today. Dinosaurs, gladiator mice, Jersey drivers and a record-setting barbecue. Trust your gut, or check the receipts.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Lab Notes Lite",
+        "handle": "@labnoteslite",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0E7490"
+      },
+      "posted_at": "2026-11-15T08:15:00Z",
+      "body": "Scientists found ancient remnants of dinosaur blood. Textbook rewrite time.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-15T09:30:00Z",
+      "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-15T10:45:00Z",
+      "body": "Do you think NJ has the worst drivers in the U.S.? Study says yes",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-15T12:00:00Z",
+      "body": "This beloved Diner in Middletown, NJ is stuck in the 1950's",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 12, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "Boardwalk Buzz",
+        "handle": "@boardwalkbuzz",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0369A1"
+      },
+      "posted_at": "2026-11-15T14:20:00Z",
+      "body": "Boerewors for days. 🇿🇦🔥 “Thousands of people gather for a South African barbecue, aiming to set a world record”",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 24, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    }
+  ]
+}

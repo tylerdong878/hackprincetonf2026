@@ -1,0 +1,640 @@
+{
+  "p1": {
+    "data": {
+      "title": "NJ residential average electricity price (EIA)",
+      "unit": "¢/kWh",
+      "url": "https://www.eia.gov/electricity/data/browser/",
+      "table": [
+        {
+          "label": "2024-12",
+          "value": 19.41
+        },
+        {
+          "label": "2025-01",
+          "value": 19.7
+        },
+        {
+          "label": "2025-02",
+          "value": 19.7
+        },
+        {
+          "label": "2025-03",
+          "value": 19.65
+        },
+        {
+          "label": "2025-04",
+          "value": 19.91
+        },
+        {
+          "label": "2025-05",
+          "value": 20.24
+        },
+        {
+          "label": "2025-06",
+          "value": 24.65
+        },
+        {
+          "label": "2025-07",
+          "value": 25.11
+        },
+        {
+          "label": "2025-08",
+          "value": 24.7
+        },
+        {
+          "label": "2025-09",
+          "value": 23.32
+        },
+        {
+          "label": "2025-10",
+          "value": 22.49
+        },
+        {
+          "label": "2025-11",
+          "value": 22.68
+        },
+        {
+          "label": "2025-12",
+          "value": 22.92
+        },
+        {
+          "label": "2026-01",
+          "value": 23.13
+        },
+        {
+          "label": "2026-02",
+          "value": 23.12
+        },
+        {
+          "label": "2026-03",
+          "value": 23.48
+        },
+        {
+          "label": "2026-04",
+          "value": 23.53
+        },
+        {
+          "label": "2026-05",
+          "value": 23.27
+        },
+        {
+          "label": "2026-06",
+          "value": 24.95
+        },
+        {
+          "label": "2026-07",
+          "value": 25.19
+        },
+        {
+          "label": "2026-08",
+          "value": 24.61
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "NJ residential electricity price, monthly (EIA)",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Jan 2023",
+            "value": 16.89
+          },
+          {
+            "label": "Feb 2023",
+            "value": 16.97
+          },
+          {
+            "label": "Mar 2023",
+            "value": 17.12
+          },
+          {
+            "label": "Apr 2023",
+            "value": 17.37
+          },
+          {
+            "label": "May 2023",
+            "value": 17.13
+          },
+          {
+            "label": "Jun 2023",
+            "value": 18.19
+          },
+          {
+            "label": "Jul 2023",
+            "value": 18.42
+          },
+          {
+            "label": "Aug 2023",
+            "value": 18.51
+          },
+          {
+            "label": "Sep 2023",
+            "value": 17.97
+          },
+          {
+            "label": "Oct 2023",
+            "value": 17.46
+          },
+          {
+            "label": "Nov 2023",
+            "value": 17.47
+          },
+          {
+            "label": "Dec 2023",
+            "value": 17.56
+          },
+          {
+            "label": "Jan 2024",
+            "value": 17.82
+          },
+          {
+            "label": "Feb 2024",
+            "value": 17.65
+          },
+          {
+            "label": "Mar 2024",
+            "value": 18.01
+          },
+          {
+            "label": "Apr 2024",
+            "value": 18.46
+          },
+          {
+            "label": "May 2024",
+            "value": 18.57
+          },
+          {
+            "label": "Jun 2024",
+            "value": 19.9
+          },
+          {
+            "label": "Jul 2024",
+            "value": 20.7
+          },
+          {
+            "label": "Aug 2024",
+            "value": 20.63
+          },
+          {
+            "label": "Sep 2024",
+            "value": 19.32
+          },
+          {
+            "label": "Oct 2024",
+            "value": 19.56
+          },
+          {
+            "label": "Nov 2024",
+            "value": 19.58
+          },
+          {
+            "label": "Dec 2024",
+            "value": 19.41
+          },
+          {
+            "label": "Jan 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Feb 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Mar 2025",
+            "value": 19.65
+          },
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "May 2025",
+            "value": 20.24
+          },
+          {
+            "label": "Jun 2025",
+            "value": 24.65
+          },
+          {
+            "label": "Jul 2025",
+            "value": 25.11
+          },
+          {
+            "label": "Aug 2025",
+            "value": 24.7
+          },
+          {
+            "label": "Sep 2025",
+            "value": 23.32
+          },
+          {
+            "label": "Oct 2025",
+            "value": 22.49
+          },
+          {
+            "label": "Nov 2025",
+            "value": 22.68
+          },
+          {
+            "label": "Dec 2025",
+            "value": 22.92
+          },
+          {
+            "label": "Jan 2026",
+            "value": 23.13
+          },
+          {
+            "label": "Feb 2026",
+            "value": 23.12
+          },
+          {
+            "label": "Mar 2026",
+            "value": 23.48
+          },
+          {
+            "label": "Apr 2026",
+            "value": 23.53
+          },
+          {
+            "label": "May 2026",
+            "value": 23.27
+          },
+          {
+            "label": "Jun 2026",
+            "value": 24.95
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          },
+          {
+            "label": "Aug 2026",
+            "value": 24.61
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Same month a year apart: Aug 2025 24.7 → Aug 2026 24.61 (-0.4%) ¢/kWh."
+    },
+    "account": {
+      "name": "Jersey Bill Watch",
+      "handle": "@jerseybills",
+      "created": "October 2026",
+      "followers": 1840,
+      "verified": false,
+      "bio": "Exposing what they don't want you to know about your bills.",
+      "recent_posts": [
+        "Your utility bill is a SCAM. Thread 🧵",
+        "Share before they delete this!"
+      ]
+    }
+  },
+  "p2": {
+    "data": {
+      "title": "NJ residential average electricity price (EIA)",
+      "unit": "¢/kWh",
+      "url": "https://www.eia.gov/electricity/data/browser/",
+      "table": [
+        {
+          "label": "2025-01",
+          "value": 19.7
+        },
+        {
+          "label": "2025-02",
+          "value": 19.7
+        },
+        {
+          "label": "2025-03",
+          "value": 19.65
+        },
+        {
+          "label": "2025-04",
+          "value": 19.91
+        },
+        {
+          "label": "2025-05",
+          "value": 20.24
+        },
+        {
+          "label": "2025-06",
+          "value": 24.65
+        },
+        {
+          "label": "2025-07",
+          "value": 25.11
+        },
+        {
+          "label": "2025-08",
+          "value": 24.7
+        },
+        {
+          "label": "2025-09",
+          "value": 23.32
+        },
+        {
+          "label": "2025-10",
+          "value": 22.49
+        },
+        {
+          "label": "2025-11",
+          "value": 22.68
+        },
+        {
+          "label": "2025-12",
+          "value": 22.92
+        },
+        {
+          "label": "2026-01",
+          "value": 23.13
+        },
+        {
+          "label": "2026-02",
+          "value": 23.12
+        },
+        {
+          "label": "2026-03",
+          "value": 23.48
+        },
+        {
+          "label": "2026-04",
+          "value": 23.53
+        },
+        {
+          "label": "2026-05",
+          "value": 23.27
+        },
+        {
+          "label": "2026-06",
+          "value": 24.95
+        },
+        {
+          "label": "2026-07",
+          "value": 25.19
+        },
+        {
+          "label": "2026-08",
+          "value": 24.61
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "NJ residential electricity price, monthly (EIA)",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Jan 2023",
+            "value": 16.89
+          },
+          {
+            "label": "Feb 2023",
+            "value": 16.97
+          },
+          {
+            "label": "Mar 2023",
+            "value": 17.12
+          },
+          {
+            "label": "Apr 2023",
+            "value": 17.37
+          },
+          {
+            "label": "May 2023",
+            "value": 17.13
+          },
+          {
+            "label": "Jun 2023",
+            "value": 18.19
+          },
+          {
+            "label": "Jul 2023",
+            "value": 18.42
+          },
+          {
+            "label": "Aug 2023",
+            "value": 18.51
+          },
+          {
+            "label": "Sep 2023",
+            "value": 17.97
+          },
+          {
+            "label": "Oct 2023",
+            "value": 17.46
+          },
+          {
+            "label": "Nov 2023",
+            "value": 17.47
+          },
+          {
+            "label": "Dec 2023",
+            "value": 17.56
+          },
+          {
+            "label": "Jan 2024",
+            "value": 17.82
+          },
+          {
+            "label": "Feb 2024",
+            "value": 17.65
+          },
+          {
+            "label": "Mar 2024",
+            "value": 18.01
+          },
+          {
+            "label": "Apr 2024",
+            "value": 18.46
+          },
+          {
+            "label": "May 2024",
+            "value": 18.57
+          },
+          {
+            "label": "Jun 2024",
+            "value": 19.9
+          },
+          {
+            "label": "Jul 2024",
+            "value": 20.7
+          },
+          {
+            "label": "Aug 2024",
+            "value": 20.63
+          },
+          {
+            "label": "Sep 2024",
+            "value": 19.32
+          },
+          {
+            "label": "Oct 2024",
+            "value": 19.56
+          },
+          {
+            "label": "Nov 2024",
+            "value": 19.58
+          },
+          {
+            "label": "Dec 2024",
+            "value": 19.41
+          },
+          {
+            "label": "Jan 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Feb 2025",
+            "value": 19.7
+          },
+          {
+            "label": "Mar 2025",
+            "value": 19.65
+          },
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "May 2025",
+            "value": 20.24
+          },
+          {
+            "label": "Jun 2025",
+            "value": 24.65
+          },
+          {
+            "label": "Jul 2025",
+            "value": 25.11
+          },
+          {
+            "label": "Aug 2025",
+            "value": 24.7
+          },
+          {
+            "label": "Sep 2025",
+            "value": 23.32
+          },
+          {
+            "label": "Oct 2025",
+            "value": 22.49
+          },
+          {
+            "label": "Nov 2025",
+            "value": 22.68
+          },
+          {
+            "label": "Dec 2025",
+            "value": 22.92
+          },
+          {
+            "label": "Jan 2026",
+            "value": 23.13
+          },
+          {
+            "label": "Feb 2026",
+            "value": 23.12
+          },
+          {
+            "label": "Mar 2026",
+            "value": 23.48
+          },
+          {
+            "label": "Apr 2026",
+            "value": 23.53
+          },
+          {
+            "label": "May 2026",
+            "value": 23.27
+          },
+          {
+            "label": "Jun 2026",
+            "value": 24.95
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          },
+          {
+            "label": "Aug 2026",
+            "value": 24.61
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Same month a year apart: Jul 2025 25.11 → Jul 2026 25.19 (+0.3%) ¢/kWh."
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+      "before": "",
+      "highlight": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "after": "Brain scientists set up \"gladiator style\" cage matches for mice — and found that simply observing fighting matches can rewire a mouse's brain to resemble those who actually fought."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-09",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+      "before": "",
+      "highlight": "Scientists think they've found ancient remnants of dinosaur blood",
+      "after": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood."
+    },
+    "account": {
+      "name": "Scroll Patrol",
+      "handle": "@scrollpatrol",
+      "created": "June 2019",
+      "followers": 22400,
+      "verified": false,
+      "bio": "I read the whole feed so you don't have to. 📱",
+      "recent_posts": [
+        "Today's feed, ranked.",
+        "Not a bot. Probably."
+      ]
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "",
+      "highlight": "Candy prices got you scared stiff? What to know about the cost of Halloween this year",
+      "after": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data. (Image credit: Stephanie Scarbrough)"
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

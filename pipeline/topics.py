@@ -61,6 +61,25 @@ TOPIC_HINTS: dict[str, dict[str, list[str]]] = {
     },
 }
 
+# HackPrinceton judging-day daily: odd science, food and Jersey news, plus NJ power data for one chart trick.
+TOPIC_HINTS["hackprinceton special"] = {
+    "feeds": ["https://feeds.npr.org/1007/rss.xml", "https://feeds.npr.org/1053/rss.xml", "https://nj1015.com/feed/"],
+    "articles": [], "known_stories": [],
+    "query": ["Princeton study scientists strange record prices New Jersey"],
+    "data": ["get_eia_series (NJ residential price, monthly, through 2026-08)"],
+    "theme": ["HackPrinceton Special"],
+    "tricks": ["misleading-chart", "out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+}
+
+# The same mix with no chart data: odd science, food and Jersey stories only, so nothing repeats the power-bill chart.
+TOPIC_HINTS["hackprinceton fun"] = {
+    "feeds": ["https://feeds.npr.org/1007/rss.xml", "https://feeds.npr.org/1053/rss.xml", "https://nj1015.com/feed/"],
+    "articles": [], "known_stories": [],
+    "query": ["Princeton study scientists strange record weird New Jersey food"],
+    "data": [], "theme": ["HackPrinceton Special"],
+    "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+}
+
 # Doctored posts per weekday, like NYT puzzles (Monday easy ... Saturday hard). Mon=0.
 DAILY_DOCTORED_BY_WEEKDAY = {0: (0, 1), 1: (1, 1), 2: (1, 2), 3: (1, 2), 4: (2, 2), 5: (2, 3), 6: (0, 2)}
 

@@ -1241,11 +1241,16 @@ def main() -> int:
                 f.unlink()
             folder.rmdir()
             print(f"removed stale data/cases/{stale}")
-    for cid, case, ev, key, meta in days:
-        for name, obj in [("case.json", case), ("evidence.json", ev), ("answer_key.json", key), ("meta.json", meta)]:
-            write_json(CASES / cid / name, obj)
-        n = sum(a["doctored"] for a in key["posts"].values())
-        print(f"wrote data/cases/{cid}  ({meta['theme']}, {n} doctored)")
+    # The hand-built launch-week dailies were retired: every live daily now comes from the Deep Agents pipeline.
+    # They are still built and checked above (the deck shares their verified bank), but written only on request.
+    if "--with-dailies" in sys.argv:
+        for cid, case, ev, key, meta in days:
+            for name, obj in [("case.json", case), ("evidence.json", ev), ("answer_key.json", key), ("meta.json", meta)]:
+                write_json(CASES / cid / name, obj)
+            n = sum(a["doctored"] for a in key["posts"].values())
+            print(f"wrote data/cases/{cid}  ({meta['theme']}, {n} doctored)")
+    else:
+        print("skipped the retired hand-built dailies (pass --with-dailies to write them)")
     for d in deck:
         write_json(DECK / f"{d['id']}.json", d)
     print(f"wrote data/fool_deck/ ({len(deck)} items)")

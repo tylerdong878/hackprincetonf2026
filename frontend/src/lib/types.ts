@@ -325,6 +325,8 @@ export interface CaseMeta {
 export interface QueueItem {
   id: string
   number?: number
+  /** The day number (No. 1, No. 2…) for an approved daily; null otherwise. */
+  daily_number?: number | null
   title?: string
   topic?: string
   meta?: CaseMeta

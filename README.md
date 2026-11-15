@@ -40,7 +40,7 @@ Earlier fake-news games mostly trained suspicion. A [2023 reanalysis](https://pu
 
 ## How the puzzles get made
 
-New puzzles are built by a team of **LangChain Deep Agents**, and a human editor approves each one before it goes live. Players never see unreviewed AI output. Launch week's dailies were curated by the team instead, with a scripted builder that re-checks every excerpt against its source under the same rules.
+Every puzzle is built by a team of **LangChain Deep Agents**, and a human editor approves each one before it goes live. Players never see unreviewed AI output.
 
 ```mermaid
 flowchart LR
@@ -73,7 +73,7 @@ The look comes from our designer's Figma file: one light newsprint theme, press 
 
 ## Ground rules
 
-- **Real posts are real.** Every real card is verbatim from a published source and links to it. Sources are listed in [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), and `--verify` re-checks every excerpt against the live page.
+- **Real posts are real.** Every real card is verbatim from a page the researcher fetched, and links to it. The Con the Con deck's sources are listed in [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), and `--verify` re-checks every excerpt against the live page.
 - **Doctored posts only come from made-up accounts** with invented handles. We never invent quotes from real people, and only ever cut or reframe real material.
 - **Every doctored post is stamped at the reveal.** Share grids contain no post content.
 - **Off-limits topics:** tragedies, minors, private individuals, elections and active emergencies.
@@ -86,7 +86,7 @@ You need Python 3.12 with [uv](https://docs.astral.sh/uv/), and Node 20.19+ or 2
 ```bash
 uv sync
 cd frontend && npm install && npm run build && cd ..
-uv run uvicorn backend.app.main:app --port 8000
+uv run python -m uvicorn backend.app.main:app --port 8000
 # open http://localhost:8000
 ```
 
@@ -106,7 +106,7 @@ For a public link, set `GOS_PUBLIC=1`. That hides the API docs, puts a password 
 ## Tests
 
 ```bash
-uv run pytest -q              # 402 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
+uv run python -m pytest -q              # 405 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
 cd frontend && npm run build  # typecheck + production build
 ```
 
@@ -120,7 +120,7 @@ cd frontend && npm run build  # typecheck + production build
 | `pipeline/` | The Deep Agents puzzle builder, its guardrails, and the live judge |
 | `data/skills/` | One `SKILL.md` per trick |
 | `data/cases/`, `data/fool_deck/` | The puzzle bank and the Con the Con deck |
-| `scripts/` | The hand-built content builder (with source verification) and the nightly builder |
+| `scripts/` | The nightly puzzle builder, and the builder for the Con the Con deck (with source verification) |
 | `docs/` | Design, API contract, research, sources and development notes. Start at [docs/README.md](docs/README.md) |
 
 ## Built with

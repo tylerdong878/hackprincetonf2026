@@ -6,7 +6,7 @@ import { IconArrowLeft, IconCheck, IconGear, IconLock, IconX } from '../componen
 import { Workshop } from '../components/Workshop'
 import { Button, Chip, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
 import { api, ApiError, getEditorToken, setEditorToken } from '../lib/api'
-import { caseNo, shortDate, trickLabel } from '../lib/format'
+import { caseNo, trickLabel } from '../lib/format'
 import { useAsync } from '../lib/hooks'
 import { href } from '../lib/router'
 import type { CaseMeta, EditorCase, QueueItem } from '../lib/types'
@@ -98,8 +98,41 @@ function deskTitle(e: unknown, fallback: string) {
   return fallback
 }
 
+/** Desk tabs: Official = approved (what players get, by release day), Pending = waiting on an editor, Rejected = kept with reasons. */
+const DESK_TABS = [
+  { key: 'official', label: 'Official', note: 'Approved puzzles and the day each one goes live.' },
+  { key: 'pending', label: 'Pending', note: 'Built by the agents and waiting for an editor.' },
+  { key: 'rejected', label: 'Rejected', note: 'Never shown to players. The reason stays on file.' },
+] as const
+type DeskTab = (typeof DESK_TABS)[number]['key']
+const tabOf = (status?: string | null): DeskTab =>
+  status === 'approved' ? 'official' : status === 'rejected' ? 'rejected' : 'pending'
+const dailyDateOf = (m: CaseMeta) => (m as { daily_date?: string | null }).daily_date ?? null
+/** "2026-11-15" -> "Sun, Nov 15", read as a calendar day (no time-zone shift). */
+function releaseDay(iso: string) {
+  const [y, mo, d] = iso.split('-').map(Number)
+  if (!y || !mo || !d) return iso
+  return new Date(y, mo - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
+
 export function EditorQueue() {
   const q = useAsync(() => api.editorQueue().then(normalizeQueue), [])
+  const [tab, setTab] = useState<DeskTab>('official')
+  const rows =
+    q.status === 'ok'
+      ? q.data
+          .filter((item) => tabOf(metaOf(item).status) === tab)
+          .sort((a, b) => {
+            if (tab === 'official') {
+              // Case Files (always live) first, then dailies by release day.
+              const da = dailyDateOf(metaOf(a)) ?? '0000-00-00'
+              const db = dailyDateOf(metaOf(b)) ?? '0000-00-00'
+              return da.localeCompare(db)
+            }
+            return (b.number ?? 0) - (a.number ?? 0) // newest first
+          })
+      : []
+  const countOf = (k: DeskTab) => (q.status === 'ok' ? q.data.filter((i) => tabOf(metaOf(i).status) === k).length : 0)
   return (
     <>
       <SiteHeader active="editor" />
@@ -117,9 +150,32 @@ export function EditorQueue() {
               <ErrorState error={q.error} onRetry={q.reload} title={deskTitle(q.error, 'Couldn’t load the puzzle queue.')} />
             </DeskGate>
           )}
+          {q.status === 'ok' && (
+            <div className="mb-5">
+              <div role="tablist" aria-label="Puzzle status" className="flex flex-wrap gap-2">
+                {DESK_TABS.map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t.key}
+                    onClick={() => setTab(t.key)}
+                    className={`caps border-2 border-ink px-4 py-2 text-[14px] font-semibold tracking-[0.06em] ${
+                      tab === t.key ? 'bg-ink text-sheet' : 'bg-sheet text-ink shadow-[var(--hard)] hover:bg-[#EFE5CF]'
+                    }`}
+                  >
+                    {t.label} <span className="num ml-1 opacity-80">{countOf(t.key)}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[14px] text-muted italic">{DESK_TABS.find((t) => t.key === tab)?.note}</p>
+            </div>
+          )}
           {q.status === 'ok' &&
-            (q.data.length === 0 ? (
-              <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">No cases on file yet.</p>
+            (rows.length === 0 ? (
+              <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">
+                {tab === 'pending' ? 'Nothing waiting for review.' : tab === 'rejected' ? 'Nothing rejected yet.' : 'No approved puzzles yet.'}
+              </p>
             ) : (
               <div className="overflow-x-auto border-2 border-ink bg-sheet shadow-[var(--hard)] thin-scroll">
                 <table className="w-full min-w-[900px] border-collapse text-[15px]">
@@ -127,27 +183,36 @@ export function EditorQueue() {
                     <tr>
                       <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Case</th>
                       <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Topic</th>
-                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Date</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Release</th>
                       <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Tricks used</th>
                       <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Blind solver</th>
                       <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {q.data.map((item) => {
+                    {rows.map((item) => {
                       const m = metaOf(item)
                       const solver = item.solver
+                      const day = dailyDateOf(m)
                       return (
                         <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet even:bg-[#F4ECDB] hover:bg-[#EFE5CF]">
                           <td className="px-4 py-3">
                             <a href={href(`/editor/${item.id}`)} className="text-[16px] font-bold underline-offset-4 hover:underline hover:decoration-2">
-                              {item.number != null && <span className="num mr-1.5 text-[13px] font-semibold text-muted">{caseNo(item.number)}</span>}
+                              {item.daily_number != null ? (
+                                <span className="num mr-1.5 text-[13px] font-bold text-press" title={item.number != null ? `Build ${caseNo(item.number)}` : undefined}>
+                                  No. {item.daily_number}
+                                </span>
+                              ) : (
+                                item.number != null && <span className="num mr-1.5 text-[13px] font-semibold text-muted">{caseNo(item.number)}</span>
+                              )}
                               {item.title ?? item.id}
                             </a>
                             {m.daily && <span className="caps ml-2 bg-press px-1.5 py-0.5 text-[11px] font-semibold tracking-[0.06em] text-white">daily</span>}
                           </td>
                           <td className="px-4 py-3 text-muted">{item.topic ?? '—'}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-muted">{shortDate(m.created_at ?? undefined) || '—'}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-muted">
+                            {day ? releaseDay(day) : <span title="Case Files go live the moment they're approved">Case File · on approval</span>}
+                          </td>
                           <td className="px-4 py-3">
                             <div className="flex flex-wrap gap-1">
                               {(m.tricks ?? []).length ? (
