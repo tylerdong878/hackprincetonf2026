@@ -34,6 +34,8 @@ A 2-minute daily game, laid out like a newspaper front page. An AI con artist ca
 
 **💬 Play over iMessage.** Text the Grain of Salt number "play" and today's puzzle arrives one card at a time. Reply REAL or FAKE ("sus", "cap" and 👎 work too), name the trick, text CHECK for a clue, or ask for a HINT. It's the same game: the same scoring and the same crowd stats. It also sends a 9am reminder, and a dry detective partner chats back.
 
+TO PLAY ON iMESSAGE YOU NEED A .ENV WITH OPENROUTER/GEMINI API KEYS AND A PHOTON 2.0 BETA KEY. YOU ALSO HAVE TO ADD PHONE NUMBERS TO A LINE ON THE PHOTON 2.0 DASHBOARD BEFORE YOU CAN PLAY.
+
 *Screenshots are from test runs; any crowd numbers in them are test data.*
 
 ## Why paranoia loses points
