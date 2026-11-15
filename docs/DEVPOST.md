@@ -3,7 +3,7 @@ We're all hooked on daily games. **Wordle**, **Krillion**, the kind you play in 
 
 Then we read up on the fake-news games that already exist. _Bad News_ is the famous one: you play a fake-news tycoon and learn the tricks by using them. But a [2023 reanalysis](https://pubmed.ncbi.nlm.nih.gov/36996156/) (Modirrousta-Galian & Higham) found it mostly made people call everything fake, real news included. Players weren't getting better at spotting fakes. They were just getting more suspicious of everything.
 
-That flipped our whole design. **In Grain of Salt, doubting a true post costs you points, same as falling for a fake one.** _Don't believe everything. Don't doubt everything._
+That flipped our whole design. **In Grain of Salt, doubting a true post costs you points, same as falling for a fake one.** Fake news is a problem, but so is the cynicism that follows it: if people stop trusting real news, the fakes win anyway. _Don't believe everything. Don't doubt everything._
 
 ## What it does
 **🧂 The Daily Grain.** Every day there are five real news posts, and the Con (our cartoon villain) has doctored some of them. Maybe he cut half a quote, or started a chart's axis at 19 instead of 0, or dropped the "in two years" off a statistic. Some days he doesn't touch anything, and those days are weirdly the hardest.
@@ -26,6 +26,8 @@ Too negative and you're gullible. Too positive and you're paranoid. The share gr
 - **Street Con** gets to check one piece of evidence.
 - **Master Con** gets the evidence and the big model, and he's tough.
 
+**💬 Play over iMessage.** Text our number "play" and today's Grain arrives one card at a time. Reply REAL or FAKE ("sus", "cap" and 👎 work too), name the trick, text CHECK to open a clue, or ask for a HINT. It uses the same scoring and crowd stats as the website, sends a 9am reminder, and a dry detective partner chats back if you just want to talk it through.
+
 ## How we built it
 The puzzles come from a pipeline we built on [LangChain Deep Agents](https://github.com/langchain-ai/deepagents). An orchestrator plans each puzzle as a todo list and hands the work to three sub-agents:
 
@@ -35,7 +37,9 @@ The puzzles come from a pipeline we built on [LangChain Deep Agents](https://git
 
 When a puzzle is done, a human-in-the-loop interrupt holds it until someone at our **Editor's Desk** approves it. Every build and every Con verdict is traced in [LangSmith](https://smith.langchain.com/), so you can watch the agents work step by step.
 
-The game itself is **React, TypeScript and Tailwind** on a **FastAPI** backend. Scoring runs on the server, so answers never reach your browser early. Everything runs on free **NVIDIA Nemotron** models through [OpenRouter](https://openrouter.ai/), and the solver uses a vision model so it can actually read the charts.
+The look came from our designer's Figma file: the whole game is laid out like a newspaper front page, with a noir silhouette of the Con as the cover photo. The game itself is **React, TypeScript and Tailwind** on a **FastAPI** backend. Scoring runs on the server, so answers never reach your browser early. Everything runs on free **NVIDIA Nemotron** models through [OpenRouter](https://openrouter.ai/), and the solver uses a vision model so it can actually read the charts.
+
+The iMessage bot runs on [Photon](https://photon.codes)'s API and plays through the same game server, so a text and a tap count toward the same crowd stats.
 
 _One honest note:_ we put together the first week of dailies ourselves, with a script that re-fetches every source page and checks every quote word for word. The agent pipeline builds the new ones.
 
@@ -53,6 +57,7 @@ _One honest note:_ we put together the first week of dailies ourselves, with a s
 - **The blind solver.** Every puzzle has to survive an AI attempt before a person even looks at it.
 - **The scoring.** Being paranoid costs you, which is kind of the whole point.
 - **Every real quote in the game matches its source word for word**, and we check.
+- **It looks like a newspaper.** We went from a boring first version to a full front-page redesign in one weekend.
 
 ## What we learned
 We came in thinking the hard part would be making convincing fakes. It turned out the hard part was making _fair_ ones, and making sure people weren't just learning to distrust everything.
@@ -61,7 +66,7 @@ We also learned that agents are great at the grind: digging up sources, applying
 
 ## What's next for Grain of Salt
 - **Nightly drops:** a fresh AI-built puzzle every night, waiting for the editor in the morning
-- **iMessage:** play the daily right in your group chat
+- **iMessage for everyone:** right now each player has to be added to the line first
 - **New tricks:** AI-written posts and fake experts
 - **Themed weeks** with local newsrooms and libraries
 
