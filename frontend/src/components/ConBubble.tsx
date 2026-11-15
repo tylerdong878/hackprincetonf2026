@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '../lib/hooks'
 
 /**
- * The Con's speech bubble (Figma "Speech bubble"): ink sheet, press-red left rule, Old Standard italic.
+ * The Con's lines (Figma v2): a black slip with a fine paper rule inside, "THE CON" over the first line, italic.
  * Text types out (skippable with click / Enter / Space / Escape); screen readers get the full line at once.
  */
 export function ConBubble({
@@ -55,7 +55,7 @@ export function ConBubble({
     }
   }
 
-  const sizes = { sm: 'text-[15px] px-3 py-2', md: 'text-[17px] px-4 py-3 leading-snug', lg: 'text-lg md:text-xl px-5 py-4 leading-relaxed' }
+  const sizes = { sm: 'text-[16px] px-3.5 py-2.5', md: 'text-[17px] px-4 py-3 leading-snug', lg: 'text-lg md:text-xl px-5 py-4 leading-relaxed' }
 
   return (
     <div className={`con-bubble relative ${sizes[size]} ${className}`}>
@@ -63,7 +63,7 @@ export function ConBubble({
         {label}: {text}
       </span>
       {size !== 'sm' && (
-        <span aria-hidden="true" className="caps mb-1 block text-[11.5px] font-semibold tracking-[0.1em] text-press-soft not-italic">
+        <span aria-hidden="true" className="caps block text-[19px] leading-tight font-medium tracking-[0.01em] text-paper-white not-italic">
           {label}
         </span>
       )}
@@ -82,7 +82,7 @@ export function ConBubble({
         <button
           type="button"
           onClick={skip}
-          className="caps absolute right-2 bottom-1 text-[11px] font-semibold tracking-[0.1em] text-press-soft not-italic hover:text-white"
+          className="caps absolute right-3 bottom-1.5 text-[11px] font-bold tracking-[0.1em] text-press-soft not-italic hover:text-white"
         >
           Skip
         </button>

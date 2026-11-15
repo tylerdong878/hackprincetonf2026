@@ -146,7 +146,7 @@ function TodoMark({ status }: { status: string }) {
         <path d="M11 1.4a9.6 9.6 0 0 0 0 19.2Z" fill="var(--press)" />
       </svg>
     )
-  return <span className="block h-[22px] w-[22px] rounded-full border-2 border-[#8C8270]" aria-hidden="true" />
+  return <span className="block h-[22px] w-[22px] rounded-full border-2 border-[#8a8a8a]" aria-hidden="true" />
 }
 
 /** Workshop section heading: Bodoni over the thin double rule. */
@@ -259,7 +259,7 @@ export function Workshop({
   return (
     <>
       {/* Full screen: the page dims behind the sheet; the case bar stays visible above it. */}
-      {open && full && <div aria-hidden="true" className="fade-in fixed inset-0 z-40 bg-[#87806F]/80" onClick={onClose} />}
+      {open && full && <div aria-hidden="true" className="fade-in fixed inset-0 z-40 bg-[#808080]/80" onClick={onClose} />}
       <aside
         aria-label="The Con's Workshop"
         aria-hidden={!open}
@@ -383,8 +383,8 @@ export function Workshop({
                   }}
                   aria-label="Scrub through the agent run"
                   aria-valuetext={`${mmss(clock)} of ${mmss(end)}`}
-                  className="mt-2 h-2 w-full cursor-pointer"
-                  style={{ accentColor: '#C8231B' }}
+                  className="mt-2 h-1.5 w-full cursor-pointer"
+                  style={{ accentColor: 'var(--press)' }}
                 />
               </div>
 
@@ -436,7 +436,7 @@ export function Workshop({
                             {l.calls.slice(-6).map((c, i) => (
                               <li key={`${c.t}-${i}`} className="fade-in text-[13.5px] break-words">
                                 <span className="font-bold">{c.tool}</span>
-                                {c.summary && <span> · {txt(c.summary, c.spoiler, 12)}</span>}
+                                {c.summary && <span>: {txt(c.summary, c.spoiler, 12)}</span>}
                               </li>
                             ))}
                             {l.calls.length > 6 && <li className="text-[12px] text-muted italic">+{l.calls.length - 6} earlier calls</li>}
@@ -470,7 +470,7 @@ export function Workshop({
               <section>
                 <WsHead>Blind solver</WsHead>
                 {state.solver.length === 0 ? (
-                  <p className="border-[1.5px] border-dashed border-ink px-4 py-5 text-[15px] text-muted italic">Not run yet.</p>
+                  <p className="border-[1.5px] border-[#cfcfcf] px-4 py-5 text-[15px] text-muted italic">Not run yet.</p>
                 ) : (
                   <ul className="flex flex-col gap-2">
                     {state.solver.map((s, i) => (
@@ -482,8 +482,8 @@ export function Workshop({
                             <span className="caps font-semibold" style={{ color: s.pass ? 'var(--ink)' : 'var(--press)' }}>
                               {s.pass ? '✓ Pass' : '✗ Fail'}
                             </span>
-                            {s.attempt != null && <span className="text-muted"> · attempt {s.attempt}</span>}
-                            {s.difficulty && <span className="text-muted"> · {s.difficulty}</span>}
+                            {s.attempt != null && <span className="text-muted">, attempt {s.attempt}</span>}
+                            {s.difficulty && <span className="text-muted">, {s.difficulty}</span>}
                             {s.tools_used && (
                               <div className="mt-1 text-[13.5px] text-muted">
                                 Tools used: {s.tools_used.length ? s.tools_used.join(', ') : 'none'}
@@ -517,7 +517,7 @@ export function Workshop({
                     ))}
                 </ol>
                 {!unmasked && events.some((e) => e.spoiler) && (
-                  <p className="mt-4 border-[1.5px] border-press bg-[#F8E1DC] px-4 py-3 text-[14.5px]">
+                  <p className="mt-4 border-[1.5px] border-press bg-[#f6e1dc] px-4 py-3 text-[14.5px]">
                     Redacted lines would give away the answers. They unlock after you submit.
                   </p>
                 )}

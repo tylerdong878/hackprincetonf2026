@@ -29,9 +29,9 @@ export function Casebook({ trickId }: { trickId?: string }) {
   return (
     <>
       <SiteHeader active="casebook" />
-      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
+      <main className="flex-1 pb-16">
         {page ? (
-          <article className="mx-auto max-w-4xl">
+          <article className="page-wrap max-w-[1000px] pt-8 sm:pt-10">
             <a
               href={href('/casebook')}
               className="caps -ml-1 inline-flex items-center gap-1.5 px-1 py-1 text-[14px] font-semibold hover:underline hover:decoration-2 hover:underline-offset-4"
@@ -41,7 +41,7 @@ export function Casebook({ trickId }: { trickId?: string }) {
             </a>
             <div className="mt-8 flex items-end gap-4">
               <TrickIcon trick={page.id} size={44} className="mb-2 hidden text-press sm:inline-block" />
-              <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">{page.name}</h1>
+              <h1 className="hero-title">{page.name}</h1>
             </div>
             <div className="double-rule mt-2" aria-hidden="true" />
             <p className="mt-4 text-xl leading-relaxed italic sm:text-[22px]">{page.what}</p>
@@ -58,19 +58,23 @@ export function Casebook({ trickId }: { trickId?: string }) {
                   )}
                 </div>
               </section>
-              <section className="relative border-l-[6px] border-press py-2 pr-10 pl-6">
-                <IconWarn size={24} className="absolute top-2 right-2 text-press" />
+              <section className="relative border-2 border-ink bg-sheet p-6 pr-14">
+                <IconWarn size={24} className="absolute top-6 right-6 text-press" />
                 <SectionLabel className="!text-press">The tell</SectionLabel>
-                <p className="mt-2 text-xl leading-snug font-bold sm:text-[22px]">{page.tell}</p>
+                <p className="mt-3 max-w-[60ch] text-[19px] leading-[1.6] font-semibold sm:text-[20px]">{page.tell}</p>
               </section>
-              <section className="relative border-l-[6px] border-ink py-2 pr-10 pl-6">
-                <IconLens size={24} className="absolute top-2 right-2 text-ink" />
+              <section className="relative border-2 border-ink bg-sheet p-6 pr-14">
+                <IconLens size={24} className="absolute top-6 right-6 text-ink" />
                 <SectionLabel className="!text-ink">How to check it</SectionLabel>
-                <dl className="mt-3 grid gap-x-5 gap-y-3 text-[17px] sm:grid-cols-[auto_1fr]">
-                  <dt className="font-bold">In the game:</dt>
-                  <dd>{noEmoji(page.tool)}</dd>
-                  <dt className="font-bold">In real life:</dt>
-                  <dd>{page.realWorld}</dd>
+                <dl className="mt-4 grid max-w-[64ch] gap-5 text-[17px] leading-[1.6]">
+                  <div>
+                    <dt className="caps text-[12.5px] font-bold tracking-[0.08em] text-muted">In the game</dt>
+                    <dd className="mt-1">{noEmoji(page.tool)}</dd>
+                  </div>
+                  <div className="border-t border-[#cfcfcf] pt-5">
+                    <dt className="caps text-[12.5px] font-bold tracking-[0.08em] text-muted">In real life</dt>
+                    <dd className="mt-1">{page.realWorld}</dd>
+                  </div>
                 </dl>
               </section>
             </div>
@@ -87,20 +91,25 @@ export function Casebook({ trickId }: { trickId?: string }) {
           </article>
         ) : (
           <>
-            <p className="caps mb-4 inline-block bg-press px-3 py-1 text-[12.5px] font-semibold tracking-[0.08em] text-white">
-              The trick library
-            </p>
-            <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">The Con’s Tricks</h1>
-            <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
-            <p className="mt-3 max-w-3xl text-[17px] italic">
-              Misinformation mostly runs on a handful of repeatable tricks. Learn the tell for each, and which check exposes it.
-            </p>
+            <section className="torn-hero">
+              <div className="page-wrap pt-8 md:pt-[30px]">
+                <div className="on-night max-w-[830px]">
+                  <p className="kicker">The casebook</p>
+                  <h1 className="hero-title mt-1">The Con’s Tricks</h1>
+                  <div className="double-rule mt-1" aria-hidden="true" />
+                  <p className="mt-3 text-[17px] leading-[1.5] italic">
+                    Misinformation mostly runs on a handful of repeatable tricks. Learn the tell for each, and which check exposes it.
+                  </p>
+                </div>
+              </div>
+            </section>
+            <div className="page-wrap">
             {trickId && (
-              <p className="mt-6 border-2 border-ink bg-sheet px-4 py-3 text-[15px] text-muted">
+              <p className="mb-6 border-2 border-ink bg-white px-4 py-3 text-[15px] text-muted">
                 That trick isn’t on the Con’s list yet. Here are the ones that are.
               </p>
             )}
-            <ul className="mt-10 grid gap-8 md:grid-cols-2">
+            <ul className="grid gap-8 md:grid-cols-2">
               {CASEBOOK.map((t, i) => (
                 <li key={t.id}>
                   <a
@@ -123,6 +132,7 @@ export function Casebook({ trickId }: { trickId?: string }) {
                 </li>
               ))}
             </ul>
+            </div>
           </>
         )}
       </main>

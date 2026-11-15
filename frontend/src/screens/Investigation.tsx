@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ConMascot } from '../components/Art'
 import { BottomSheet } from '../components/BottomSheet'
 import { ConBubble } from '../components/ConBubble'
 import { ClueTokens, EvidenceKit, type KitNotice } from '../components/EvidenceKit'
@@ -152,14 +151,12 @@ export function Investigation({
     />
   )
 
-  const trickKeys = `1–${Math.max(1, Math.min(9, game.trick_options.length))}`
-
   const submitBtn = (
     <button
       type="button"
       onClick={onSubmit}
       disabled={!allMarked || submitting}
-      className="press caps inline-flex shrink-0 items-center gap-2 border-2 border-sheet bg-press px-4 py-2.5 text-[16px] font-bold text-white hover:bg-press-dark disabled:border-dashed disabled:border-[#8C8270] disabled:bg-transparent disabled:text-[#8C8270]"
+      className="press caps inline-flex shrink-0 items-center gap-2 border-2 border-sheet bg-press px-4 py-2.5 text-[16px] font-bold text-white hover:bg-press-dark disabled:border-[#8a8a8a] disabled:bg-transparent disabled:text-[#8a8a8a]"
       title={allMarked ? 'Submit your verdicts' : 'Mark every post Real or Doctored first'}
     >
       {submitting ? 'Closing the case…' : 'Submit verdicts'} <IconArrow size={17} />
@@ -183,9 +180,6 @@ export function Investigation({
               <SectionLabel>
                 <span id="feed-heading">The feed</span>
               </SectionLabel>
-              <p className="hidden text-[12px] text-muted lg:block">
-                <kbd>Tab</kbd> move · <kbd>R</kbd> real · <kbd>D</kbd> doctored · <kbd>{trickKeys}</kbd> trick · <kbd>E</kbd> evidence
-              </p>
             </div>
             {/* jump strip: one tab per post */}
             <nav aria-label="Posts in this case" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -214,7 +208,7 @@ export function Investigation({
                 )
               })}
             </nav>
-            <p className="mt-3 mb-6 border-[1.5px] border-dashed border-press px-3 py-2.5 text-center text-[17px] text-press italic">
+            <p className="mt-3 mb-6 bg-press-wash px-3 py-2.5 text-center text-[17px] text-press italic">
               Some posts may be doctored. Maybe none are.
             </p>
           </div>
@@ -252,7 +246,7 @@ export function Investigation({
         </section>
 
         {!isMobile && (
-          <aside aria-label="Evidence Kit" className="hidden min-w-0 border-l border-ink pl-6 md:block">
+          <aside aria-label="Evidence Kit" className="hidden min-w-0 pl-6 md:block">
             <div
               ref={kitRef}
               className="panel sticky top-[88px] max-h-[calc(100vh-88px-120px)] overflow-y-auto p-5 thin-scroll"
@@ -263,11 +257,9 @@ export function Investigation({
         )}
       </main>
 
-      {/* Bottom dock (desktop): the Con on an ink bar */}
+      {/* Bottom bar (desktop): progress and submit */}
       <div className="fixed inset-x-0 bottom-0 z-20 hidden border-t-4 border-press bg-ink text-sheet md:block">
         <div className="mx-auto flex max-w-[1360px] items-center gap-4 px-6 py-3">
-          <ConMascot size={56} className="shrink-0 border-sheet" />
-          <ConBubble key={conLine} text={conLine} size="md" speed={18} className="min-w-0 flex-1 !border-l-0 !px-0 !shadow-none md:max-w-2xl" />
           <div className="ml-auto flex shrink-0 flex-col items-start gap-1.5" aria-live="polite">
             <p className="caps text-[12.5px] font-semibold tracking-[0.06em]">
               <span className="num">{marked}</span> of {posts.length} marked
@@ -278,14 +270,8 @@ export function Investigation({
         </div>
       </div>
 
-      {/* Sticky bar + Con toast (mobile) */}
+      {/* Sticky bar (mobile) */}
       <div className="fixed inset-x-0 bottom-0 z-20 md:hidden">
-        {toastVisible && (
-          <div className="fade-in pointer-events-none mx-4 mb-2 flex items-end gap-2">
-            <ConMascot size={40} className="shrink-0" />
-            <ConBubble key={conLine} text={conLine} size="sm" typewriter={false} className="min-w-0 flex-1" />
-          </div>
-        )}
         <div className="flex items-center gap-3 border-t-4 border-press bg-ink px-4 py-3 text-sheet">
           <span className="bg-sheet px-1.5 py-1">
             <ClueTokens left={cluesLeft} total={game.clue_budget} />

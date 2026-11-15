@@ -136,14 +136,21 @@ export function EditorQueue() {
   return (
     <>
       <SiteHeader active="editor" />
-      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
-        <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">Editor’s Desk</h1>
-        <div className="double-rule mt-2 max-w-[860px]" aria-hidden="true" />
-        <p className="mt-3 max-w-[860px] text-[17px] leading-relaxed italic">
-          A human puzzle editor approves every puzzle before it goes live. Open one to play-test it, check the answer key, the diffs
-          and the blind-solver log, then approve or reject it.
-        </p>
-        <div className="mt-10">
+      <main className="flex-1 pb-16">
+        <section className="torn-hero">
+          <div className="page-wrap pt-8 md:pt-[30px]">
+            <div className="on-night max-w-[860px]">
+              <p className="kicker">Behind the scenes</p>
+              <h1 className="hero-title mt-1">Editor’s Desk</h1>
+              <div className="double-rule mt-1" aria-hidden="true" />
+              <p className="mt-3 text-[17px] leading-[1.5] italic">
+                A human puzzle editor approves every puzzle before it goes live. Open one to play-test it, check the answer key, the diffs
+                and the blind-solver log, then approve or reject it.
+              </p>
+            </div>
+          </div>
+        </section>
+        <div className="page-wrap">
           {q.status === 'loading' && <Loading label="Loading the puzzle queue…" />}
           {q.status === 'error' && (
             <DeskGate error={q.error} onToken={q.reload}>
@@ -173,7 +180,7 @@ export function EditorQueue() {
           )}
           {q.status === 'ok' &&
             (rows.length === 0 ? (
-              <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">
+              <p className="border-[1.5px] border-[#cfcfcf] p-6 text-center text-[15px] text-muted">
                 {tab === 'pending' ? 'Nothing waiting for review.' : tab === 'rejected' ? 'Nothing rejected yet.' : 'No approved puzzles yet.'}
               </p>
             ) : (
@@ -195,7 +202,7 @@ export function EditorQueue() {
                       const solver = item.solver
                       const day = dailyDateOf(m)
                       return (
-                        <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet even:bg-[#F4ECDB] hover:bg-[#EFE5CF]">
+                        <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet even:bg-[#f0f0f0] hover:bg-[#ececec]">
                           <td className="px-4 py-3">
                             <a href={href(`/editor/${item.id}`)} className="text-[16px] font-bold underline-offset-4 hover:underline hover:decoration-2">
                               {item.daily_number != null ? (
@@ -211,7 +218,7 @@ export function EditorQueue() {
                           </td>
                           <td className="px-4 py-3 text-muted">{item.topic ?? '—'}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-muted">
-                            {day ? releaseDay(day) : <span title="Case Files go live the moment they're approved">Case File · on approval</span>}
+                            {day ? releaseDay(day) : <span title="Case Files go live the moment they're approved">Case File, on approval</span>}
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex flex-wrap gap-1">
@@ -239,7 +246,7 @@ export function EditorQueue() {
                               <span className="text-muted">—</span>
                             )}
                             {(solver?.difficulty ?? m.difficulty) && (
-                              <span className="text-muted"> · {solver?.difficulty ?? m.difficulty}</span>
+                              <span className="text-muted">, {solver?.difficulty ?? m.difficulty}</span>
                             )}
                             {item.has_pipeline_log && <span className="block font-bold text-press">agent run logged</span>}
                           </td>
@@ -317,24 +324,24 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
       <div className="relative pt-8">
         <div
           aria-hidden="true"
-          className="absolute top-0 left-6 flex h-9 w-56 items-center justify-center border-[1.5px] border-b-0 border-[#C9AE73] bg-manila text-[15px] italic sm:left-10"
+          className="absolute top-0 left-6 flex h-9 w-56 items-center justify-center border-[1.5px] border-b-0 border-[#141414] bg-manila text-[15px] italic sm:left-10"
           style={{ clipPath: 'polygon(9% 0, 91% 0, 100% 100%, 0 100%)' }}
         >
           Case file
         </div>
-        <div className="border-[1.5px] border-[#C9AE73] bg-manila p-3 sm:p-6">
+        <div className="border-[1.5px] border-[#141414] bg-manila p-3 sm:p-6">
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-2 border-ink bg-sheet p-5 shadow-[var(--hard)] sm:p-7">
         <div className="min-w-0 flex-1">
           <p className="caps text-[12px] font-semibold tracking-[0.08em] text-ink">
-            Case {caseNo(game.number)} · {game.id}
+            Case {caseNo(game.number)} ({game.id})
           </p>
           <div className="double-rule-thin mt-1.5" aria-hidden="true" />
           <h1 className="mt-3 font-display text-4xl leading-[1.05] font-bold sm:text-5xl">{game.title}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[15px] text-muted">
             <StatusBadge status={meta.status} />
             <span>{meta.origin === 'pipeline' ? 'Built by the pipeline' : meta.origin === 'seed' ? 'Hand-built by the team' : meta.origin}</span>
-            {meta.difficulty && <span>· {meta.difficulty}</span>}
-            {meta.daily && <span className="font-bold text-press">· daily case</span>}
+            {meta.difficulty && <span>{meta.difficulty}</span>}
+            {meta.daily && <span className="font-bold text-press">daily case</span>}
           </div>
           {meta.status === 'rejected' && meta.rejection_reason && (
             <p className="mt-2 text-sm">
@@ -397,8 +404,8 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
           <DeskSection id="preview-h">Player preview</DeskSection>
           <div className="con-bubble mb-5 px-4 py-3">
             <p className="text-[17px] leading-snug">{game.briefing}</p>
-            <p className="mt-2 text-[12.5px] text-[#C9C2B5] not-italic">
-              {game.posts.length} posts · {game.clue_budget} clues · topic: {game.topic}
+            <p className="mt-2 text-[12.5px] text-[#c9c9c9] not-italic">
+              {game.posts.length} posts, {game.clue_budget} clues. Topic: {game.topic}
             </p>
           </div>
           <div className="flex flex-col gap-4">
@@ -429,11 +436,11 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
                     <span className="caps text-[12px] font-semibold tracking-[0.1em] text-muted">Post {i + 1}</span>
                     {k.doctored ? (
                       <Chip color="var(--doctored)">
-                        <IconX size={13} strokeWidth={2.6} /> Doctored · {trickLabel(k.trick)}
+                        <IconX size={13} strokeWidth={2.6} /> Doctored: {trickLabel(k.trick)}
                       </Chip>
                     ) : (
                       <Chip color="var(--real)">
-                        <IconCheck size={13} strokeWidth={2.6} /> Real{k.suspicious_real ? ' · built to look fake' : ''}
+                        <IconCheck size={13} strokeWidth={2.6} /> Real{k.suspicious_real ? ', built to look fake' : ''}
                       </Chip>
                     )}
                   </div>

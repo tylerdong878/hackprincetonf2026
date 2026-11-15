@@ -6,20 +6,24 @@ import { BrandIcon, Spinner } from './Art'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'real' | 'con' | 'ink'
 
-// One button system (Figma "Controls"): Oswald caps, 2px ink rule, the one hard shadow.
+// One button system (Figma "button-primary" / "button-secondary"): Iosevka caps, 2px ink rule, flat.
 const VARIANTS: Record<Variant, string> = {
-  primary: 'press border-2 border-ink bg-press text-white shadow-[var(--hard)] hover:bg-press-dark',
-  secondary: 'press border-2 border-ink bg-sheet text-ink shadow-[var(--hard)] hover:bg-surface-2',
+  primary: 'press border-2 border-ink bg-press text-white hover:bg-press-dark',
+  secondary: 'press border-2 border-ink bg-white text-ink hover:bg-surface-2',
   ghost: 'text-ink hover:bg-ink/[0.06]',
-  danger: 'press border-2 border-ink bg-press text-white shadow-[var(--hard)] hover:bg-press-dark',
-  real: 'press border-2 border-ink bg-ink text-sheet shadow-[var(--hard)] hover:bg-[#2a2a2a]',
-  con: 'press border-2 border-press bg-sheet text-press shadow-[var(--hard)] hover:bg-press/[0.06]',
-  ink: 'press border-2 border-ink bg-ink text-sheet shadow-[var(--hard)] hover:bg-[#2a2a2a]',
+  danger: 'press border-2 border-ink bg-press text-white hover:bg-press-dark',
+  real: 'press border-2 border-ink bg-ink text-white hover:bg-[#2a2a2a]',
+  con: 'press border-2 border-press bg-white text-press hover:bg-press/[0.06]',
+  ink: 'press border-2 border-ink bg-ink text-white hover:bg-[#2a2a2a]',
 }
 
 export function btnClass(variant: Variant = 'secondary', size: 'sm' | 'md' | 'lg' = 'md') {
-  const sizes = { sm: 'px-3 py-1.5 text-[13px]', md: 'px-4 py-2.5 text-[15px]', lg: 'px-6 py-3.5 text-lg' }
-  return `caps inline-flex items-center justify-center gap-2 font-semibold disabled:opacity-45 disabled:shadow-none ${VARIANTS[variant]} ${sizes[size]}`
+  const sizes = {
+    sm: 'px-3 py-1.5 text-[13px]',
+    md: 'min-h-11 px-4 py-2 text-[15px]',
+    lg: 'min-h-14 px-6 py-2.5 text-[19px] sm:text-[21px]',
+  }
+  return `caps inline-flex items-center justify-center gap-2.5 font-bold disabled:opacity-45 ${VARIANTS[variant]} ${sizes[size]}`
 }
 
 export function Button({
@@ -63,13 +67,13 @@ export function Loading({ label = 'Loading…', className = '' }: { label?: stri
 export function CommandLine({ cmd }: { cmd: string }) {
   const [copied, setCopied] = useState(false)
   return (
-    <div className="flex max-w-full items-stretch overflow-hidden border-2 border-ink bg-sheet text-left">
+    <div className="flex max-w-full items-stretch overflow-hidden border-2 border-ink bg-white text-left">
       <code className="min-w-0 flex-1 overflow-x-auto px-3 py-2 font-code text-[13px] whitespace-nowrap text-text thin-scroll">
         {cmd}
       </code>
       <button
         type="button"
-        className="caps shrink-0 border-l-2 border-ink px-3 text-xs font-semibold text-ink hover:bg-ink hover:text-sheet"
+        className="caps shrink-0 border-l-2 border-ink px-3 text-xs font-semibold text-ink hover:bg-ink hover:text-white"
         onClick={async () => {
           setCopied(await copyText(cmd))
           window.setTimeout(() => setCopied(false), 1600)
@@ -96,11 +100,11 @@ export function ErrorState({
   const down = error instanceof ApiError ? error.backendDown : error instanceof TypeError
   const message = error instanceof Error ? error.message : String(error)
   return (
-    <div role="alert" className={`panel mx-auto w-full max-w-lg p-6 text-center ${className}`}>
+    <div role="alert" className={`panel mx-auto w-full max-w-lg p-6 text-center text-ink ${className}`}>
       <BrandIcon size={56} className="mx-auto mb-3" />
       {down ? (
         <>
-          <h2 className="font-display text-2xl font-bold">The case room is dark.</h2>
+          <h2 className="text-2xl font-bold">The case room is dark.</h2>
           <p className="mt-2 text-sm text-muted">
             The game server isn’t answering. Start it from the repo root, then try again:
           </p>
@@ -110,7 +114,7 @@ export function ErrorState({
         </>
       ) : (
         <>
-          <h2 className="font-display text-2xl font-bold">{title ?? 'Something went sideways.'}</h2>
+          <h2 className="text-2xl font-bold">{title ?? 'Something went sideways.'}</h2>
           <p className="mt-2 text-sm text-muted">{message}</p>
         </>
       )}
@@ -124,7 +128,7 @@ export function ErrorState({
 }
 
 export function SectionLabel({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <h2 className={`caps text-[12px] font-semibold tracking-[0.12em] text-muted ${className}`}>{children}</h2>
+  return <h2 className={`caps text-[13px] font-bold tracking-[0.06em] text-ink ${className}`}>{children}</h2>
 }
 
 export function Chip({
@@ -139,7 +143,7 @@ export function Chip({
   return (
     <span
       className={`caps inline-flex items-center gap-1 border-[1.5px] px-2 py-0.5 text-[12px] font-semibold ${className}`}
-      style={{ borderColor: color, color, background: `color-mix(in srgb, ${color} 8%, var(--sheet))` }}
+      style={{ borderColor: color, color, background: `color-mix(in srgb, ${color} 8%, #fff)` }}
     >
       {children}
     </span>

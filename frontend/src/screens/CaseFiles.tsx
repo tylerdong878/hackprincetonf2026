@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
-import { ConMascot } from '../components/Art'
 import { SiteHeader } from '../components/Header'
 import { IconArrow, IconFolder, IconLens } from '../components/Icon'
-import { Button, ErrorState, LinkButton, Loading } from '../components/ui'
+import { Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, caseCache } from '../lib/api'
 import { caseNo } from '../lib/format'
 import { useAsync } from '../lib/hooks'
@@ -26,98 +25,98 @@ export function CaseFiles() {
   return (
     <>
       <SiteHeader active="casefiles" />
-      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
-        {/* Masthead: red tag, Oswald caps title over the double rule, the Con's round portrait on the right */}
-        <div className="flex items-start justify-between gap-8">
-          <div className="min-w-0 max-w-[860px] flex-1">
-            <p className="caps mb-4 inline-block bg-press px-3 py-1 text-[12.5px] font-semibold tracking-[0.08em] text-white">
-              Extra cases
-            </p>
-            <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">Case Files</h1>
-            <div className="double-rule mt-2" aria-hidden="true" />
-            <p className="mt-3 text-[17px] leading-relaxed italic">
-              Done with today’s Grain? Crack a whole feed: four posts, a few clue tokens, one verdict. Then watch how the AI forged the
-              case in the Workshop replay.
-            </p>
-          </div>
-          <div className="hidden shrink-0 md:block">
-            <ConMascot size={200} shape="circle" />
-          </div>
-        </div>
-
-        {noCases && (
-          <div className="mt-8 max-w-[860px] border-2 border-dashed border-ink bg-sheet px-6 py-6">
-            <p className="font-display text-2xl font-bold">No Case Files on the shelf yet.</p>
-            <p className="mt-2 text-[16px] leading-relaxed">
-              The Con’s agents build every case, and a human editor approves each one before it goes live. The next one is
-              waiting on the Editor’s Desk.
-            </p>
-          </div>
-        )}
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          {!noCases && (
-          <>
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={featured.status !== 'ok'}
-            onClick={() => featured.status === 'ok' && navigate(`/case/${featured.data.id}`)}
-          >
-            <IconFolder size={20} />
-            {featured.status === 'ok' ? (
-              <>
-                Open the featured case <span className="num">{caseNo(featured.data.number)}</span>
-              </>
-            ) : (
-              'Loading the featured case…'
+      <main className="flex-1 pb-16">
+        {/* Masthead on the black paper: red kicker, Iosevka caps title over the double rule, the two ways in. */}
+        <section className="torn-hero">
+          <div className="page-wrap pt-8 md:pt-[30px]">
+            <div className="on-night max-w-[830px]">
+              <p className="kicker">Learn more</p>
+              <h1 className="hero-title mt-1">Case Files</h1>
+              <div className="double-rule mt-1 max-w-[780px]" aria-hidden="true" />
+              <p className="mt-3 text-[17px] leading-[1.5] italic">
+                Four posts to investigate one at a time: spend clue tokens on real evidence, mark every post, then walk through the
+                side-by-side reveal. You can replay how the AI built each case in the Workshop.
+              </p>
+            </div>
+            {!noCases && (
+            <div className="mt-6 flex flex-wrap items-center gap-5">
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto sm:min-w-[400px]"
+                disabled={featured.status !== 'ok'}
+                onClick={() => featured.status === 'ok' && navigate(`/case/${featured.data.id}`)}
+              >
+                <IconFolder size={20} />
+                {featured.status === 'ok' ? (
+                  <>
+                    Open the featured case <span className="num">{caseNo(featured.data.number)}</span>
+                  </>
+                ) : (
+                  'Loading the featured case…'
+                )}
+              </Button>
+              <Button size="lg" className="w-full sm:w-auto sm:min-w-[300px]" onClick={next.open} disabled={next.loading}>
+                <IconLens size={20} />
+                {next.loading ? 'Finding…' : 'A case picked for me'}
+              </Button>
+            </div>
             )}
-          </Button>
-          <Button size="lg" onClick={next.open} disabled={next.loading}>
-            <IconLens size={18} />
-            {next.loading ? 'Finding…' : 'A case picked for me'}
-          </Button>
-          </>
-          )}
-          <LinkButton to="/editor" size="lg" variant="ghost">
-            Editor’s Desk <IconArrow size={18} />
-          </LinkButton>
-        </div>
-        {featured.status === 'error' && !noCases && <ErrorState error={featured.error} onRetry={featured.reload} className="mt-6" />}
-        <NextCaseError error={next.error} onRetry={next.open} />
-
-        {!noCases && (
-        <section className="mt-12" aria-labelledby="all-h">
-          <div className="mb-6">
-            <h2 id="all-h" className="font-display text-3xl font-bold sm:text-[34px]">
-              All approved cases
-            </h2>
-            <div className="double-rule-thin mt-1.5" aria-hidden="true" />
+            {featured.status === 'error' && !noCases && <ErrorState error={featured.error} onRetry={featured.reload} className="mt-6" />}
           </div>
-          {list.status === 'loading' && <Loading label="Opening the filing cabinet…" />}
-          {list.status === 'error' && <ErrorState error={list.error} onRetry={list.reload} />}
-          {list.status === 'ok' && (
-            <ul className="grid gap-6 sm:grid-cols-2 sm:gap-7">
-              {list.data.map((c) => (
-                <li key={c.id}>
-                  <a
-                    href={href(`/case/${c.id}`)}
-                    className="press group flex h-full items-center gap-4 border-2 border-ink bg-sheet px-6 py-5 shadow-[var(--hard)] hover:bg-surface-2"
-                  >
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">
-                        {caseNo(c.number)} {c.difficulty ? `· ${c.difficulty}` : ''} {c.origin === 'pipeline' ? '· built by the AI pipeline' : ''}
-                      </span>
-                      <span className="mt-1.5 font-display text-2xl leading-tight font-bold sm:text-[30px]">{c.title}</span>
-                      <span className="mt-1.5 text-[15px] text-muted italic">{c.topic}</span>
-                    </span>
-                    <IconArrow size={24} className="shrink-0 text-press transition-transform group-hover:translate-x-1" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
         </section>
-        )}
+
+        <div className="page-wrap">
+          <NextCaseError error={next.error} onRetry={next.open} />
+
+          {noCases && (
+            <div className="paper-card mb-10 max-w-[860px] bg-white/90 px-6 py-6">
+              <p className="text-2xl font-bold">No Case Files on the shelf yet.</p>
+              <p className="mt-2 text-[16px] leading-relaxed">
+                The Con’s agents build every case, and a human editor approves each one before it goes live. The next one is waiting on
+                the Editor’s Desk.
+              </p>
+            </div>
+          )}
+          <section aria-labelledby="all-h">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+              <h2 id="all-h" className="text-[34px] leading-tight font-bold">
+                All approved cases
+              </h2>
+              <a href={href('/editor')} className="caps inline-flex items-center gap-1.5 pb-1 text-[13px] font-bold hover:underline">
+                Editor’s Desk <IconArrow size={15} />
+              </a>
+              <div className="double-rule-thin w-full" aria-hidden="true" />
+            </div>
+            {list.status === 'loading' && <Loading label="Opening the filing cabinet…" />}
+            {list.status === 'error' && <ErrorState error={list.error} onRetry={list.reload} />}
+            {list.status === 'ok' && !noCases && (
+              <ul className="grid gap-6 md:grid-cols-2 md:gap-x-8">
+                {list.data.map((c) => (
+                  <li key={c.id}>
+                    <a href={href(`/case/${c.id}`)} className="press paper-card group flex h-full min-h-[140px] items-center gap-4 px-6 py-5 hover:bg-white/90">
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="text-[28px] leading-tight font-bold sm:text-[32px]">{c.title}</span>
+                        <span className="mt-1.5 text-[16px] text-muted italic">{c.topic}</span>
+                        <span className="caps mt-2 text-[11.5px] font-bold tracking-[0.06em] text-muted">
+                          {caseNo(c.number)}{c.difficulty ? `, ${c.difficulty}` : ''}
+                        </span>
+                      </span>
+                      <IconArrow size={26} className="shrink-0 text-press transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <footer className="mt-9">
+            <div className="double-rule" aria-hidden="true" />
+            <p className="mt-6 text-[19px] italic">
+              All solved? “You’ve solved every case file on record. The Con is preparing new ones.”
+            </p>
+          </footer>
+        </div>
       </main>
     </>
   )

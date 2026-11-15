@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { LeanMeter } from '../components/LeanMeter'
 import { SiteHeader } from '../components/Header'
@@ -24,7 +23,7 @@ function RateBar({ label, rate, color }: { label: string; rate: number; color: s
         <span className="num text-[14px] font-semibold">{v}%</span>
       </div>
       <div
-        className="mt-1 h-3 min-w-0 overflow-hidden border-[1.5px] border-ink bg-[#E6DDCB]"
+        className="mt-1 h-3 min-w-0 overflow-hidden border-[1.5px] border-ink bg-[#dcdcdc]"
         role="meter"
         aria-label={label}
         aria-valuemin={0}
@@ -89,7 +88,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
             <span className="num text-[96px] leading-[0.95] font-bold sm:text-[112px]">{rating}</span>
             <span className="mb-3 font-display text-4xl font-semibold text-press italic sm:text-5xl">{profile.rank}</span>
           </div>
-          <div className="mt-2 h-3.5 overflow-hidden border-[1.5px] border-ink bg-[#E6DDCB]" aria-hidden="true">
+          <div className="mt-2 h-3.5 overflow-hidden border-[1.5px] border-ink bg-[#dcdcdc]" aria-hidden="true">
             <div className="h-full bg-press" style={{ width: `${rating}%` }} />
           </div>
           <p className="mt-3 text-[15px] italic">
@@ -117,7 +116,6 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
         <div className="flex flex-col gap-3">
           <SectionLabel>What the Con thinks of you</SectionLabel>
           <div className="flex flex-col items-center gap-5 sm:flex-row">
-            <ConMascot size={176} shape="circle" className="shrink-0" />
             <ConBubble text={conVerdictOnPlayer(profile.per_trick, history.length)} className="w-full min-w-0 flex-1" />
           </div>
         </div>
@@ -152,7 +150,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
                 </div>
                 {counts && (
                   <p className="mt-4 text-[12.5px] text-muted">
-                    seen {counts.shown ?? 0} fake · caught {counts.caught ?? 0} · honest {counts.honest_shown ?? 0} · false alarms{' '}
+                    seen {counts.shown ?? 0} fake, caught {counts.caught ?? 0}, honest {counts.honest_shown ?? 0}, false alarms{' '}
                     {counts.false_alarms ?? 0}
                   </p>
                 )}
@@ -165,7 +163,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
       <section className="mt-12" aria-labelledby="history-h">
         <SectionTitle id="history-h">Case history</SectionTitle>
         {history.length === 0 ? (
-          <div className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">
+          <div className="border-[1.5px] border-[#cfcfcf] p-6 text-center text-[15px] text-muted">
             No cases closed yet.{' '}
             <a href="#/daily" className="font-bold text-ink underline decoration-2 underline-offset-4 hover:text-press">
               Open today’s case
@@ -191,7 +189,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
                     const c = caseById.get(h.case_id)
                     const outs = Object.entries(h.outcomes ?? {}).sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
                     return (
-                      <tr key={`${h.case_id}-${i}`} className={`border-t border-[#CFC6B4] ${i % 2 ? 'bg-[#F4ECDB]' : 'bg-sheet'}`}>
+                      <tr key={`${h.case_id}-${i}`} className={`border-t border-[#CFC6B4] ${i % 2 ? 'bg-[#f0f0f0]' : 'bg-sheet'}`}>
                         <td className="px-4 py-3 whitespace-nowrap">{shortDate(h.at)}</td>
                         <td className="px-4 py-3 font-bold">
                           {c ? (
@@ -260,19 +258,16 @@ export function Dossier() {
   return (
     <>
       <SiteHeader active="dossier" />
-      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
-          <div className="min-w-0">
-            {fileNo && (
-              <p className="caps mb-4 inline-block bg-press px-3 py-1 text-[12.5px] font-semibold tracking-[0.08em] text-white">
-                File: Detective #{fileNo}
-              </p>
-            )}
-            <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">Your Stats</h1>
-            <div className="double-rule mt-2 w-full max-w-[44rem]" aria-hidden="true" />
+      <main className="flex-1 pb-16">
+        <section className="torn-hero">
+        <div className="page-wrap flex flex-wrap items-end justify-between gap-6 pt-8 md:pt-[30px]">
+          <div className="on-night min-w-0 md:w-[min(780px,60%)]">
+            <p className="kicker">{fileNo ? `Detective #${fileNo}` : 'Dossier'}</p>
+            <h1 className="hero-title mt-1">Your Stats</h1>
+            <div className="double-rule mt-1" aria-hidden="true" />
             <p className="mt-3 text-[17px] italic">What the Con has learned about you, trick by trick.</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 bg-white/80 p-2 md:bg-transparent md:p-0">
             <LinkButton to="/" variant="primary" size="lg">
               <IconArrow size={20} />
               Play a case
@@ -296,9 +291,12 @@ export function Dossier() {
             </Button>
           </div>
         </div>
+        </section>
+        <div className="page-wrap">
         {data.status === 'loading' && <Loading label="Pulling up your stats…" />}
         {data.status === 'error' && <ErrorState error={data.error} onRetry={data.reload} title="Couldn’t load your stats." />}
         {data.status === 'ok' && <DossierBody profile={data.data.profile} cases={data.data.cases} />}
+        </div>
       </main>
     </>
   )

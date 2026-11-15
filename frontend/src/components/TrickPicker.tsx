@@ -88,7 +88,7 @@ export function TrickPicker({
           disabled={disabled}
           aria-pressed={notSure}
           onClick={() => onPick(null)}
-          className={`flex min-h-[44px] items-center justify-center border-[1.5px] border-dashed px-3 py-2 text-[15px] ${
+          className={`flex min-h-[44px] items-center justify-center border-[1.5px] px-3 py-2 text-[15px] ${
             notSure ? 'border-ink bg-ink text-sheet' : 'border-ink bg-transparent text-ink hover:bg-ink/[0.05]'
           } ${columns === 2 ? 'sm:col-span-2' : ''}`}
         >

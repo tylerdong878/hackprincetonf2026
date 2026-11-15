@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { IconArrow, IconCheck, IconChevron, IconFlame, IconMask, IconShare, IconSparkles, OutcomeSquare, SaltCrystal } from '../components/Icon'
 import { LeanMeter } from '../components/LeanMeter'
@@ -15,10 +14,10 @@ export function Countdown({ className = '' }: { className?: string }) {
   return (
     <p className={`flex flex-wrap items-end justify-between gap-x-3 bg-ink px-4 py-3 text-sheet ${className}`}>
       <span className="flex flex-col">
-        <span className="caps text-[12.5px] font-semibold tracking-[0.08em] text-[#C9C2B5]">Next Grain in</span>
+        <span className="caps text-[12.5px] font-semibold tracking-[0.08em] text-[#c9c9c9]">Next Grain in</span>
         <span className="num text-[34px] leading-none font-bold">{hms(msUntilMidnightET(now))}</span>
       </span>
-      <span className="caps text-[12.5px] font-semibold tracking-[0.08em] text-[#C9C2B5]"> (midnight ET)</span>
+      <span className="caps text-[12.5px] font-semibold tracking-[0.08em] text-[#c9c9c9]"> (midnight ET)</span>
     </p>
   )
 }
@@ -117,23 +116,37 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
   const bonusTotal = ordered.reduce((s, x) => s + (x.r?.rarity_bonus?.points ?? 0), 0)
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 pt-6 pb-16 lg:grid lg:max-w-[1160px] lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:px-6 lg:pt-10">
-      {alreadyPlayed && (
-        <p className="border-2 border-ink bg-sheet px-4 py-2.5 text-center text-sm lg:col-span-2">
-          You’ve played today’s Grain. <b>Come back tomorrow</b> for #{n + 1}.
-        </p>
-      )}
+    <main className="flex-1 pb-16">
+      {/* Masthead on the black paper (as on every page). */}
+      <section className="torn-hero">
+        <div className="page-wrap pt-8 md:pt-[30px]">
+          <div className="on-night max-w-[830px]">
+            <p className="kicker">{shortDate(`${daily.date}T12:00:00`)}</p>
+            <h1 id="end-h" className="hero-title mt-1">
+              Grain #{n}
+            </h1>
+            <div className="double-rule mt-1 max-w-[780px]" aria-hidden="true" />
+            <p className="mt-3 text-[17px] leading-[1.5] italic">
+              {alreadyPlayed ? (
+                <>
+                  You’ve played today’s Grain. <b className="not-italic">Come back tomorrow</b> for #{n + 1}.
+                </>
+              ) : (
+                <>Case closed.</>
+              )}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="page-wrap -mt-10 flex flex-col gap-5 md:-mt-16 lg:grid lg:max-w-[1240px] lg:grid-cols-2 lg:items-start lg:gap-x-10">
 
       {/* Laptop: the result on the left, what to do next on the right. Phones: one column, same order. */}
       <div className="flex flex-col gap-5">
         {/* Lead with the grid and the lean meter. */}
-        <section className="panel rise-in relative px-5 pt-5 pb-16 sm:px-6" aria-labelledby="end-h">
-          <p className="dateline font-bold">
-            {shortDate(`${daily.date}T12:00:00`)} {daily.theme ? `· ${daily.theme}` : ''}
-          </p>
-          <h1 id="end-h" className="logotype mt-2 text-[40px] text-ink sm:text-[44px]">
-            Grain of Salt #{n}
-          </h1>
+        <section className="paper-card rise-in relative bg-white/90 px-5 pt-5 pb-16 sm:px-6" aria-labelledby="end-h">
+          <p className="caps text-[13px] font-bold tracking-[0.06em]">Your score</p>
+          <div className="double-rule-thin mt-1.5" aria-hidden="true" />
           <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-1" aria-label={`${correct} of ${outcomes.length} right, ${result.score} points`}>
             <p className="flex items-baseline gap-1.5">
               <b className="num text-[76px] leading-[0.85] font-bold text-ink">{score}</b>
@@ -149,7 +162,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
               {(result.clue_bonus || bonusTotal > 0) && (
                 <p className="text-[14px] text-muted">
                   {result.clue_bonus ? <>+{result.clue_bonus} unused checks</> : null}
-                  {result.clue_bonus && bonusTotal ? ' · ' : null}
+                  {result.clue_bonus && bonusTotal ? ', ' : null}
                   {bonusTotal ? <>+{bonusTotal} rarity bonus</> : null}
                 </p>
               )}
@@ -181,13 +194,13 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
 
         {/* Rating and streak. */}
         <div className="grid grid-cols-2 gap-3">
-          <a href="#/dossier" className="panel press flex flex-col justify-center px-4 py-3 hover:bg-surface-2">
+          <a href="#/dossier" className="paper-card press flex flex-col justify-center bg-white/90 px-4 py-3 hover:bg-white">
             <span className="flex items-baseline gap-2">
               <span className="num text-[40px] leading-none font-bold">{result.rating}</span>
               <span className="truncate text-lg text-press italic">{result.rank}</span>
             </span>
           </a>
-          <div className="panel flex items-center gap-2 px-4 py-3">
+          <div className="paper-card flex items-center gap-2 bg-white/90 px-4 py-3">
             <IconFlame size={30} className={streak > 0 ? 'flame text-press' : 'text-muted opacity-50'} />
             <span className="num leading-none whitespace-nowrap">
               <span className="text-[40px] font-bold">{streak}</span>
@@ -197,7 +210,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
         </div>
 
         {rare && (
-          <section className="pop panel flex items-center gap-3 px-4 py-3" aria-label="Your rarest catch today">
+          <section className="pop paper-card flex items-center gap-3 bg-white/90 px-4 py-3" aria-label="Your rarest catch today">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-ink bg-highlight text-ink" aria-hidden="true">
               {rare.r.rarity_bonus && rare.r.rarity_bonus.points >= 100 ? <SaltCrystal size={26} /> : <IconSparkles size={22} />}
             </span>
@@ -213,7 +226,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
               <p className="truncate text-muted">
                 {rare.pct != null && (
                   <>
-                    Only <b className="num text-ink">{Math.round(rare.pct)}%</b> {rare.r.doctored ? 'caught' : 'trusted'} this ·{' '}
+                    Only <b className="num text-ink">{Math.round(rare.pct)}%</b> {rare.r.doctored ? 'caught' : 'trusted'} this.{' '}
                   </>
                 )}
                 {rare.post.author.name}
@@ -224,7 +237,6 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
 
         {result.adaptation_message && (
           <div className="flex items-start gap-3">
-            <ConMascot size={56} shape="circle" className="mt-1 shrink-0" />
             <ConBubble text={result.adaptation_message} size="md" className="min-w-0 flex-1" />
           </div>
         )}
@@ -252,24 +264,24 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
             )}
           </button>
           <p className="text-[13px] text-muted" role="status">
-            {copied === 'fail' ? `Copy this instead: ${shareText.replace(/\n/g, ' · ')}` : 'Shares the number, grid and lean. Never the doctored posts.'}
+            {copied === 'fail' ? `Copy this instead: ${shareText.replace(/\n/g, ' ')}` : null}
           </p>
           <Countdown className="mt-3" />
         </section>
 
         <a
           href="#/con"
-          className="group press flex w-full items-center gap-3.5 border-2 border-press bg-sheet px-4 py-4 shadow-[var(--hard)] hover:bg-press/[0.04]"
+          className="group press flex w-full items-center gap-3.5 border-2 border-press bg-white/90 px-4 py-4 hover:bg-white"
         >
           <IconMask size={34} className="shrink-0 text-press" />
           <span className="min-w-0 flex-1">
-            <span className="block font-display text-[21px] leading-tight font-bold">Bonus round: con the Con</span>
+            <span className="block text-[21px] leading-tight font-bold">Bonus round: Con the Con</span>
             <span className="block text-[14px] text-muted">Doctor a real post. Our AI tries to bust you, live.</span>
           </span>
           <IconArrow size={24} className="shrink-0 text-press transition group-hover:translate-x-1" />
         </a>
 
-        <section className="border-2 border-ink bg-sheet">
+        <section className="paper-card bg-white/90">
           <button
             type="button"
             aria-expanded={showCards}
@@ -285,8 +297,8 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
                   <OutcomeSquare outcome={r!.outcome} size={26} className="mt-0.5" />
                   <div className="min-w-0">
                     <p className="font-bold">
-                      {i + 1}. {post.author.name} · {outcomeStyle(r!.outcome).word}
-                      {r!.doctored && <span className="text-muted"> · {trickLabel(r!.trick)}</span>}
+                      {i + 1}. {post.author.name}: {outcomeStyle(r!.outcome).word}
+                      {r!.doctored && <span className="text-muted"> ({trickLabel(r!.trick)})</span>}
                     </p>
                     <p className="text-muted">{r!.tell || r!.explanation}</p>
                   </div>
@@ -307,6 +319,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
             Home
           </LinkButton>
         </div>
+      </div>
       </div>
     </main>
   )

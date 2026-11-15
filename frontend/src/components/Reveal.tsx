@@ -113,7 +113,7 @@ function ShownCaption({ pair }: { pair: ChartPair }) {
       {a && (
         <>
           {' '}
-          · shows <b className="num text-text">{a.text}</b> ({a.from} → {a.to})
+          shows <b className="num text-text">{a.text}</b> ({a.from} → {a.to})
         </>
       )}
       {pair.picked.length > 0 && (
@@ -133,7 +133,7 @@ function HonestCaption({ pair, onLight = false }: { pair: ChartPair; onLight?: b
       {b && (
         <>
           {' '}
-          · {b.from} → {b.to}: <b className={`num ${onLight ? 'text-[#1B1B1F]' : 'text-text'}`}>{b.text}</b>
+          {b.from} → {b.to}: <b className={`num ${onLight ? 'text-[#1B1B1F]' : 'text-text'}`}>{b.text}</b>
         </>
       )}
     </p>
@@ -202,7 +202,7 @@ export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
         r.hit ? (
           <mark
             key={i}
-            className="rounded-sm px-0.5 text-inherit underline decoration-2 underline-offset-[3px]"
+            className="px-1 font-bold text-inherit underline decoration-2 underline-offset-[5px] [box-decoration-break:clone]"
             style={{ background: 'var(--highlight)', textDecorationColor: '#141414' }}
           >
             <span className="sr-only">[restored: </span>
@@ -220,7 +220,7 @@ export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
 /** "NPR · Nov 14, 2026": where the real story a made-up post was modeled on ran. */
 function storyByline(diff: MadeUpDiff): string {
   const date = diff.date ? shortDate(/^\d{4}-\d{2}-\d{2}$/.test(diff.date) ? `${diff.date}T12:00:00` : diff.date) : ''
-  return [diff.outlet, date].filter(Boolean).join(' · ')
+  return [diff.outlet, date].filter(Boolean).join(', ')
 }
 
 function StoryLink({ url }: { url?: string | null }) {
@@ -235,8 +235,8 @@ function StoryLink({ url }: { url?: string | null }) {
 function OriginalPanel({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
     <div className="flex h-full flex-col overflow-hidden border-2 border-ink bg-white text-[#1B1B1F]">
-      <div className="flex-1 p-4">{children}</div>
-      {note && <div className="border-t border-dashed border-[#CFC6B4] bg-sheet px-4 py-2 text-[13px] text-[#4A4A55]">{note}</div>}
+      <div className="feed-font flex-1 px-6 py-5 [&_p]:text-[18px] [&_p]:leading-[1.85]">{children}</div>
+      {note && <div className="feed-font bg-[#ececec] px-6 py-2.5 text-[13px] text-[#333]">{note}</div>}
     </div>
   )
 }
@@ -251,12 +251,15 @@ export function DiffView({
   diff,
   shownLabel = 'What you saw',
   watermarkText,
+  stamp = true,
 }: {
   post: Post
   caseNumber: number
   diff: Diff
   shownLabel?: string
   watermarkText?: string
+  /** Stamp the shown post DOCTORED (the Daily reveal). Con the Con shows it plain, as the Con saw it. */
+  stamp?: boolean
 }) {
   const pair = diff.type === 'chart' ? chartPair(diff, post) : null
   const axis = useAxisDrop(pair)
@@ -308,17 +311,14 @@ export function DiffView({
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2 md:gap-24">
       <div className="flex min-w-0 flex-col gap-2">
-        <SectionLabel>
-          {dot('var(--doctored)')}
-          {shownLabel}
-        </SectionLabel>
+        <SectionLabel className="!text-[17px] !font-bold !text-press">{shownLabel}</SectionLabel>
         <FeedCard
           post={shownPost}
           caseNumber={caseNumber}
           watermarkText={watermarkText}
-          doctoredStamp
+          doctoredStamp={stamp}
           stampCorner={!!pair}
           renderChart={
             pair
@@ -344,8 +344,7 @@ export function DiffView({
         {diff.type === 'made_up' && <p className="text-[13px] leading-snug text-muted">The Con made this up, account and all.</p>}
       </div>
       <div className="flex min-w-0 flex-col gap-2">
-        <SectionLabel>
-          {dot('var(--real)')}
+        <SectionLabel className="!text-[17px] !font-bold">
           {pair ? 'The honest view' : diff.type === 'made_up' ? 'The closest real story' : 'The original'}
         </SectionLabel>
         {right}
@@ -423,7 +422,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const runs = diff.removed?.length ? highlightRuns(diff.original, diff.removed) : restoredRuns(diff.shown, diff.original)
     return (
       <div className={box}>
-        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The full quote</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#555555]">The full quote</p>
         <p>
           “<Restored runs={runs} />”
         </p>
@@ -434,7 +433,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
     return (
       <div className={box}>
-        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The full numbers</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#555555]">The full numbers</p>
         <p>
           <Restored runs={runs} />
         </p>
@@ -450,7 +449,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const changed = diff.changed ?? []
     return (
       <div className={box}>
-        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The original</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#555555]">The original</p>
         <p>
           <Restored runs={highlightRuns(diff.original, changed.map((c) => c.from))} />
         </p>
@@ -466,7 +465,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
       <div className={box}>
         <p className="mb-1.5 font-bold">The Con made this up, account and all.</p>
         <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">
-          The closest real story{byline && ` · ${byline}`}
+          The closest real story{byline && `: ${byline}`}
         </p>
         <p>{diff.real}</p>
         {diff.url && (

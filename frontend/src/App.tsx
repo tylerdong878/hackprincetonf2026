@@ -17,7 +17,7 @@ function NotFound() {
     <>
       <SiteHeader />
       <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
-        <h1 className="font-display text-3xl font-bold">Nothing in this drawer.</h1>
+        <h1 className="hero-title !text-5xl">Nothing in this drawer.</h1>
         <p className="text-muted">That page isn’t on file.</p>
         <LinkButton to="/" variant="primary">
           Back to the case room
@@ -32,9 +32,9 @@ const TITLES: Record<string, string> = {
   con: 'Con the Con',
   casefiles: 'Case Files',
   case: 'Case',
-  dossier: 'Your Stats',
+  dossier: 'Dossier',
   editor: 'Editor’s Desk',
-  casebook: 'The Con’s Tricks',
+  casebook: 'Casebook',
 }
 
 export default function App() {
@@ -55,6 +55,16 @@ export default function App() {
     if (legacyDesk) window.location.replace(`#/editor${arg ? `/${encodeURIComponent(arg)}` : ''}`)
   }, [legacyDesk, arg])
 
+  return (
+    <>
+      {/* The newspaper collage over the whole page (Figma), under every screen's content. */}
+      <div className="collage-layer" aria-hidden="true" />
+      <Screen head={head} arg={arg} legacyDesk={legacyDesk} />
+    </>
+  )
+}
+
+function Screen({ head, arg, legacyDesk }: { head: string | undefined; arg: string | undefined; legacyDesk: boolean }) {
   if (!head) return <Home />
   if (head === 'daily') return <DailyScreen />
   if (head === 'con') return <ConTheCon />

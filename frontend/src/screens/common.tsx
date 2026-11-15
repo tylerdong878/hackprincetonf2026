@@ -51,16 +51,16 @@ export function RatingBadge({ profile }: { profile: Profile | null }) {
   return (
     <a
       href="#/dossier"
-      className="ml-1 hidden h-9 items-stretch border-2 border-ink bg-sheet text-[13px] text-ink hover:bg-surface-2 sm:inline-flex"
+      className="group ml-1 hidden items-center gap-3 text-ink sm:inline-flex lg:gap-12"
       aria-label={`Detective rating ${profile.rating}, ${profile.rank}${streak ? `, ${streak}-day streak` : ''}. Open your stats.`}
     >
       {streak > 0 && (
-        <span aria-hidden="true" className="flex items-center gap-1 border-r border-ink px-2">
+        <span aria-hidden="true" className="flex items-center gap-1.5">
           <IconFlame size={16} className="flame text-press" />
-          <span className="num font-semibold">{streak}</span>
+          <span className="num text-[14px] font-bold">{streak}</span>
         </span>
       )}
-      <span className="caps flex items-center gap-1.5 px-2.5 font-semibold">
+      <span className="caps flex h-[34px] items-center gap-1.5 border-2 border-ink px-4 text-[13px] font-bold group-hover:bg-ink group-hover:text-white">
         <span className="num">{profile.rating}</span>
         <span className="hidden lg:inline">{profile.rank}</span>
       </span>
@@ -88,7 +88,7 @@ export function NextCaseError({ error, onRetry }: { error: unknown; onRetry: () 
   if (!error) return null
   if (error instanceof ApiError && error.status === 404) {
     return (
-      <p role="status" className="mt-3 border-2 border-ink bg-surface px-4 py-3 text-sm text-muted">
+      <p role="status" className="mt-6 border-t-[3px] border-double border-ink pt-4 text-[17px] italic text-ink">
         You’ve solved every case file on record. The Con is preparing new ones. Try the featured case again, or start as a new
         detective.
       </p>

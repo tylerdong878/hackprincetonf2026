@@ -17,7 +17,7 @@ export type ToolRowState = 'ready' | 'open' | 'na' | 'out'
 /**
  * One evidence component (Figma "Evidence tool"): the same row everywhere.
  * ready = paper row, ink rule, hard shadow, "-1" + a clue token; open = black row tagged OPEN;
- * na (nothing to check) / out (no clues left) = dashed row with a dash.
+ * na (nothing to check) / out (no clues left) = grey row with a dash.
  */
 export function ToolRow({
   icon,
@@ -49,7 +49,7 @@ export function ToolRow({
       ? 'border-2 border-ink bg-ink text-sheet'
       : state === 'ready'
         ? 'press border-2 border-ink bg-sheet text-ink shadow-[var(--hard)] hover:bg-surface-2'
-        : 'border-[1.5px] border-dashed border-[#B9AE99] bg-transparent text-muted'
+        : 'border-[1.5px] border-[#d4d4d4] bg-surface-2 text-muted'
   return (
     <button
       type="button"
@@ -59,11 +59,11 @@ export function ToolRow({
       onClick={onClick}
       className={`flex w-full items-center gap-3 text-left ${compact ? 'px-3 py-2' : 'px-3.5 py-2.5'} ${look} disabled:cursor-not-allowed ${className}`}
     >
-      <span className={`flex w-6 justify-center ${state === 'open' ? 'text-sheet' : state === 'ready' ? 'text-ink' : 'text-[#8C8270]'}`}>{icon}</span>
+      <span className={`flex w-6 justify-center ${state === 'open' ? 'text-sheet' : state === 'ready' ? 'text-ink' : 'text-[#8a8a8a]'}`}>{icon}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-[15.5px] leading-tight font-bold">{label}</span>
         {sub && (
-          <span id={describedById} className={`block truncate text-[12.5px] ${state === 'open' ? 'text-[#C9C2B5]' : 'text-muted'}`}>
+          <span id={describedById} className={`block truncate text-[12.5px] ${state === 'open' ? 'text-[#c9c9c9]' : 'text-muted'}`}>
             {sub}
           </span>
         )}
@@ -159,7 +159,7 @@ export function EvidenceKit({
       </div>
 
       {!post ? (
-        <div className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-sm text-muted">
+        <div className="border-[1.5px] border-[#cfcfcf] p-6 text-center text-sm text-muted">
           <p className="flex justify-center text-ink" aria-hidden="true">
             <IconLens size={28} />
           </p>
@@ -169,7 +169,7 @@ export function EvidenceKit({
       ) : (
         <>
           <p className="text-sm text-muted">
-            <span className="font-semibold text-text">Post {postIndex + 1}</span> selected · {post.author.name}
+            <span className="font-semibold text-text">Post {postIndex + 1}</span> selected: {post.author.name}
           </p>
           <ul className="flex flex-col gap-2">
             {TOOLS.map((t) => {
@@ -271,7 +271,7 @@ export function DataView({ ev }: { ev: DataEvidence }) {
   const rows = ev.table ?? []
   return (
     <div className="flex flex-col gap-3">
-      {ev.note && <p className="border-l-4 border-ink bg-sheet px-3 py-2 text-sm">{ev.note}</p>}
+      {ev.note && <p className="bg-sheet px-3 py-2 text-sm">{ev.note}</p>}
       {ev.honest_chart && (
         <div className="border-2 border-ink bg-white p-3">
           <PostChart spec={ev.honest_chart} height={180} compact />
@@ -307,7 +307,7 @@ export function DataView({ ev }: { ev: DataEvidence }) {
         {ev.title}
         {ev.url && (
           <>
-            {' · '}
+            {', '}
             <a href={ev.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-text">
               data source ↗
             </a>
