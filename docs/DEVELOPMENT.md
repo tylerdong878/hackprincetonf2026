@@ -7,8 +7,8 @@ The technical details behind the [README](../README.md). The API and data shapes
 FastAPI game server in `backend/app/`. All routes are under `/api` (CONTRACT §5, §7, §8).
 
 ```
-uv run uvicorn backend.app.main:app --reload --port 8000   # dev server
-uv run pytest backend/tests -q                             # tests
+uv run python -m uvicorn backend.app.main:app --reload --port 8000   # dev server
+uv run python -m pytest backend/tests -q                             # tests
 ```
 
 **Data and serving:**
@@ -83,7 +83,7 @@ uv run python -m pipeline.build_case --clean --hold-for-editor    # approve late
 uv run python -m pipeline.build_case --trick misleading-chart     # or --player <id> to target a weak spot
 uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20   # a 5-card Daily Grain
 uv run python -m pipeline.build_case --dry-run                    # build the graph, no model calls
-uv run pytest pipeline/tests -q                                   # no network, no LLM
+uv run python -m pytest pipeline/tests -q                                   # no network, no LLM
 ```
 
 **Agents:** the **orchestrator** (`create_deep_agent`, planning with todos) delegates through `task` to three sub-agents:
@@ -138,7 +138,7 @@ uv run --env-file .env.build python scripts/nightly_build.py --dry-run  # say wh
 
 ```
 uv run python -m backend.imessage
-uv run pytest backend/tests/test_imessage.py -q
+uv run python -m pytest backend/tests/test_imessage.py -q
 ```
 
 - **Needs:** `PHOTON_API_KEY` and `PHOTON_PROJECT_ID` (a Photon 2.0 project), and `GOS_API_URL` pointing at the game server (default `http://127.0.0.1:8000`).
@@ -148,9 +148,9 @@ uv run pytest backend/tests/test_imessage.py -q
 - **Shared Photon lines:** each player must be added to the line and text it first before the bot can reply.
 - **Run one copy only,** or every text gets two replies.
 
-## Hand-built content
+## The Con the Con deck
 
-`scripts/build_daily_cases.py` assembles the Daily Grain cases and the Con the Con deck from a bank of excerpts, each copied word for word.
+`scripts/build_daily_cases.py` builds the Con the Con deck (`data/fool_deck/`) from a bank of excerpts, each copied word for word. Every live daily comes from the Deep Agents pipeline; the script's old hand-built launch-week dailies are retired and only written with `--with-dailies`.
 - `--verify` re-fetches every source page and confirms every excerpt is still on it.
 - Every source is listed in [CONTENT_SOURCES.md](CONTENT_SOURCES.md).
 - Before writing anything, the builder checks that crops only delete words, that charts match their data, and that no display field (account type, missing label) gives an answer away.

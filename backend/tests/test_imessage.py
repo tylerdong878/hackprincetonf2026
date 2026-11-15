@@ -10,7 +10,7 @@ from backend.app.main import create_app
 from backend.imessage.engine import Engine, GameAPI, Sessions
 from backend.imessage.parse import parse
 
-from .conftest import REPO
+from .conftest import FIXTURE_CASES, REPO  # noqa: F401
 
 DAILY = "2026-11-14-daily-food-prices"
 DAY = date(2026, 11, 14)
@@ -44,7 +44,7 @@ def test_parse_not_sure_and_tool():
 def engine(tmp_path, monkeypatch):
     monkeypatch.setattr("backend.imessage.render.chart_png", lambda chart: b"\x89PNG fake")
     d = tmp_path / "data"
-    shutil.copytree(REPO / "data" / "cases" / DAILY, d / "cases" / DAILY)
+    shutil.copytree(FIXTURE_CASES / DAILY, d / "cases" / DAILY)
     client = TestClient(create_app(data_dir=d, frontend_dist=tmp_path / "x", today=lambda: DAY))
     return Engine(GameAPI(client), Sessions(tmp_path / "imessage" / "sessions.json"))
 
@@ -54,7 +54,7 @@ def texts(outs):
 
 
 def key():
-    return json.loads((REPO / "data" / "cases" / DAILY / "answer_key.json").read_text())["posts"]
+    return json.loads((FIXTURE_CASES / DAILY / "answer_key.json").read_text())["posts"]
 
 
 def test_whole_daily_over_text(engine):

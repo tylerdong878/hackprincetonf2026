@@ -84,13 +84,30 @@ def test_daily_selection_by_date(client, data_dir):
     ]
 
     set_today(client, date(2026, 11, 16))
-    assert client.get("/api/daily").json()["daily_number"] == 3
+    assert client.get("/api/daily").json()["daily_number"] == 4  # days since launch: Nov 15 has no puzzle, so Nov 16 is #4
     assert client.get("/api/cases/d16").status_code == 200
 
     set_today(client, date(2026, 11, 12))  # the only one dated <= today is a draft
     assert client.get("/api/daily").status_code == 404
     # Dailies stay out of the Case Files list.
     assert all(not c["id"].startswith("d1") for c in client.get("/api/cases").json())
+
+
+def test_daily_numbers_count_days_since_launch_so_gaps_never_renumber(client, data_dir, monkeypatch):
+    monkeypatch.delenv("GOS_LAUNCH_DATE", raising=False)
+    make_daily(data_dir, "d13", "2026-11-13")
+    make_daily(data_dir, "d16", "2026-11-16")  # Nov 14 and 15 have no puzzle yet
+    set_today(client, date(2026, 11, 16))
+    assert client.get("/api/daily").json()["daily_number"] == 4
+    archive = {a["case_id"]: a["daily_number"] for a in client.get("/api/daily/archive").json()}
+    assert archive == {"d16": 4, "d13": 1}
+
+
+def test_launch_date_can_be_pinned(client, data_dir, monkeypatch):
+    monkeypatch.setenv("GOS_LAUNCH_DATE", "2026-11-10")
+    make_daily(data_dir, "d14", "2026-11-14")
+    set_today(client, date(2026, 11, 14))
+    assert client.get("/api/daily").json()["daily_number"] == 5
 
 
 def test_daily_number_override(client, data_dir):
@@ -410,3 +427,19 @@ def test_fool_judge_illegal_edits(client, deck, fool):
     assert judge(client, CROP, deck_id="nope").status_code == 404
     assert judge(client, CROP, player="../x").status_code == 422
     assert fool.calls == []  # the Con never saw an illegal edit
+
+
+def test_approving_a_daily_schedules_it_on_the_next_open_day(client, data_dir, monkeypatch):
+    monkeypatch.delenv("GOS_LAUNCH_DATE", raising=False)
+    make_daily(data_dir, "d15", "2026-11-15")  # already approved: today's puzzle, No. 1
+    make_daily(data_dir, "d18", "2026-11-18", status="awaiting_approval")
+    make_daily(data_dir, "d20", "2026-11-20", status="awaiting_approval")
+    set_today(client, date(2026, 11, 15))
+    assert client.post("/api/editor/cases/d20/approve").status_code == 200  # approved first -> next open day
+    assert client.post("/api/editor/cases/d18/approve").status_code == 200
+    q = {i["id"]: i for i in client.get("/api/editor/queue").json()}
+    assert (q["d15"]["meta"]["daily_date"], q["d15"]["daily_number"]) == ("2026-11-15", 1)
+    assert (q["d20"]["meta"]["daily_date"], q["d20"]["daily_number"]) == ("2026-11-16", 2)
+    assert (q["d18"]["meta"]["daily_date"], q["d18"]["daily_number"]) == ("2026-11-17", 3)
+    assert q["d20"]["meta"]["planned_date"] == "2026-11-20"  # the date the agents built it for is kept
+    assert client.post("/api/editor/cases/d20/approve").json()["daily_date"] == "2026-11-16"  # re-approving keeps its day

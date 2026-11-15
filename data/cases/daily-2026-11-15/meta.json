@@ -1,0 +1,20 @@
+{
+  "status": "rejected",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T05:25:25Z",
+  "tricks": [
+    "misleading-chart"
+  ],
+  "sources": [
+    "https://www.eia.gov/electricity/data/browser/",
+    "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+    "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+    "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate"
+  ],
+  "rejection_reason": "Editor pre-review: the blind solver failed it twice, both fakes are electricity charts, and one copies an existing post word for word. Rebuilding on fun topics with no chart data.",
+  "mode": "daily",
+  "daily_date": "2026-11-15",
+  "theme": "HackPrinceton Special"
+}

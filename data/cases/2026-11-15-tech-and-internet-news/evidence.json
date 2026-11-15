@@ -1,0 +1,84 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-14",
+      "url": "https://www.npr.org/2026/11/14/nx-s1-6040188/asia-societys-lizzi-c-lee-on-big-tech-restrictions-after-nvidia-espionage-claims",
+      "before": "",
+      "highlight": "NPR's Scott Simon asks Lizzi C. Lee of the Asia Society about restrictions on big tech in the wake of allegations of espionage against Nvidia.",
+      "after": ""
+    },
+    "account": {
+      "name": "Jersey Bill Watch",
+      "handle": "@jerseybills",
+      "created": "October 2026",
+      "followers": 1840,
+      "verified": false,
+      "bio": "Exposing what they don't want you to know about your bills.",
+      "recent_posts": [
+        "Your utility bill is a SCAM. Thread 🧵",
+        "Share before they delete this!"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-13",
+      "url": "https://www.npr.org/2026/11/13/nx-s1-6040004/microsoft-outage-disrupts-work-and-gives-some-a-chance-to-unplug",
+      "before": "",
+      "highlight": "Millions of individuals, organizations and businesses were left without access to Microsoft's Outlook email on Thursday.",
+      "after": "Some people celebrated a day without email, while others work around obstacles."
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-14",
+      "url": "https://www.npr.org/2026/11/14/nx-s1-6037416/hello-james-gleicks-new-book-compares-the-history-of-the-telephone-to-the-modern-era",
+      "before": "",
+      "highlight": "Have you ever wondered where phone etiquette or the idea for the first social network came from?",
+      "after": "Author James Gleick talks about his new book, The Telephone."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-13",
+      "url": "https://www.npr.org/2026/11/13/nx-s1-6039350/microsoft-investigating-widespread-outage-that-took-email-and-other-apps-offline",
+      "before": "",
+      "highlight": "NPR's A Martinez speaks with Andrew Couts of WIRED about a widespread outage of Microsoft products that has disrupted the life and work of thousands of people.",
+      "after": ""
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

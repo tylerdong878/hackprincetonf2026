@@ -1,0 +1,46 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": true,
+      "trick": "out-of-context-quote",
+      "tell": "The original says \"retiring after 69 years in radio and television\" — a career span, not an age.",
+      "explanation": "The source describes someone stepping down after a 69-year career in broadcasting. The crop removes \"in radio and television,\" making it read like the person is retiring at age 69.",
+      "con_line_fooled": "I didn't change a single word. I just stopped quoting early.",
+      "con_line_caught": "You read the whole sentence. How thorough. How annoying.",
+      "diff": {
+        "type": "quote",
+        "shown": "Retiring after 69 years.",
+        "original": "retiring after 69 years in radio and television.",
+        "removed": [
+          "in radio and television"
+        ]
+      }
+    },
+    "p2": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real. A random account shared it, but the words are exactly New Jersey 101.5's (Nov 14, 2026), as the source label says.",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey 101.5 (Nov 12, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey 101.5 (Nov 13, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p5": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real. A random account shared it, but the words are exactly New Jersey 101.5's (Nov 14, 2026), as the source label says.",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    }
+  },
+  "con_line_clean": null
+}

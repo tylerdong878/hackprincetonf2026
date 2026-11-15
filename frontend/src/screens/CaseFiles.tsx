@@ -3,7 +3,7 @@ import { ConMascot } from '../components/Art'
 import { SiteHeader } from '../components/Header'
 import { IconArrow, IconFolder, IconLens } from '../components/Icon'
 import { Button, ErrorState, LinkButton, Loading } from '../components/ui'
-import { api, caseCache } from '../lib/api'
+import { api, ApiError, caseCache } from '../lib/api'
 import { caseNo } from '../lib/format'
 import { useAsync } from '../lib/hooks'
 import { href, navigate } from '../lib/router'
@@ -14,6 +14,10 @@ export function CaseFiles() {
   const featured = useAsync(() => api.todayCase(), [])
   const list = useAsync(() => api.listCases(), [])
   const next = useNextCase()
+  // No approved Case Files yet (every one waits for a human editor): say so instead of an error.
+  const noCases =
+    (list.status === 'ok' && list.data.length === 0) ||
+    (featured.status === 'error' && featured.error instanceof ApiError && featured.error.status === 404)
 
   useEffect(() => {
     if (featured.status === 'ok') caseCache.set(featured.data.id, featured.data)
@@ -41,7 +45,18 @@ export function CaseFiles() {
           </div>
         </div>
 
+        {noCases && (
+          <div className="mt-8 max-w-[860px] border-2 border-dashed border-ink bg-sheet px-6 py-6">
+            <p className="font-display text-2xl font-bold">No Case Files on the shelf yet.</p>
+            <p className="mt-2 text-[16px] leading-relaxed">
+              The Con’s agents build every case, and a human editor approves each one before it goes live. The next one is
+              waiting on the Editor’s Desk.
+            </p>
+          </div>
+        )}
         <div className="mt-8 flex flex-wrap items-center gap-4">
+          {!noCases && (
+          <>
           <Button
             variant="primary"
             size="lg"
@@ -61,13 +76,16 @@ export function CaseFiles() {
             <IconLens size={18} />
             {next.loading ? 'Finding…' : 'A case picked for me'}
           </Button>
+          </>
+          )}
           <LinkButton to="/editor" size="lg" variant="ghost">
             Editor’s Desk <IconArrow size={18} />
           </LinkButton>
         </div>
-        {featured.status === 'error' && <ErrorState error={featured.error} onRetry={featured.reload} className="mt-6" />}
+        {featured.status === 'error' && !noCases && <ErrorState error={featured.error} onRetry={featured.reload} className="mt-6" />}
         <NextCaseError error={next.error} onRetry={next.open} />
 
+        {!noCases && (
         <section className="mt-12" aria-labelledby="all-h">
           <div className="mb-6">
             <h2 id="all-h" className="font-display text-3xl font-bold sm:text-[34px]">
@@ -99,6 +117,7 @@ export function CaseFiles() {
             </ul>
           )}
         </section>
+        )}
       </main>
     </>
   )

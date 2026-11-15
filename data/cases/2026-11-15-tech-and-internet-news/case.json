@@ -1,0 +1,91 @@
+{
+  "id": "2026-11-15-tech-and-internet-news",
+  "number": 18,
+  "title": "Thursday's Outage, Nvidia Questions, and a History of Phone Etiquette",
+  "topic": "tech and internet news",
+  "briefing": "A quiet Thursday until the inbox went dark, the chip giant got awkward, and someone wrote a whole book about why we say \"hello.\"",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Jersey Bill Watch",
+        "handle": "@jerseybills",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#E3A42B"
+      },
+      "posted_at": "2026-11-15T03:00:00Z",
+      "body": "Restrictions on big tech in the wake of allegations of espionage against Nvidia.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Turnpike Tea",
+        "handle": "@turnpiketea",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-15T01:00:00Z",
+      "body": "Millions. On a Thursday. No email. No warning. “Millions of individuals, organizations and businesses were left without access to Microsoft's Outlook email on Thursday.”",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-14T22:48:35Z",
+      "body": "Have you ever wondered where phone etiquette or the idea for the first social network came from?",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-13T09:43:44Z",
+      "body": "NPR's A Martinez speaks with Andrew Couts of WIRED about a widespread outage of Microsoft products that has disrupted the life and work of thousands of people.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}

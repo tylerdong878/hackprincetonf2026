@@ -1,0 +1,116 @@
+{
+  "id": "daily-2026-11-16",
+  "number": 19,
+  "title": "Jersey Weird: Diners, Scams & 69-Year Careers",
+  "topic": "new jersey weird news",
+  "briefing": "0–3 doctored today. The Garden State serves up time-capsule diners, Thanksgiving dessert surprises, and a career length that might make you do a double-take.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Jersey Bill Watch",
+        "handle": "@jerseybills",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#E3A42B"
+      },
+      "posted_at": "2026-11-16T08:15:00Z",
+      "body": "Retiring after 69 years. That's not a career, that's a lifestyle.",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Turnpike Tea",
+        "handle": "@turnpiketea",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-16T09:30:00Z",
+      "body": "Wait, THIS is NJ's #1 Thanksgiving dessert? Not pumpkin pie?! “The most popular dessert in New Jersey on Thanksgiving”",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-16T10:00:00Z",
+      "body": "This beloved Diner in Middletown, NJ is stuck in the 1950's",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 12, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-16T11:15:00Z",
+      "body": "Wildwood Police Officer Steps In Just In Time to Stop Scam",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "Scroll Patrol",
+        "handle": "@scrollpatrol",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#DB2777"
+      },
+      "posted_at": "2026-11-16T12:45:00Z",
+      "body": "Bald eagles in the backyard? Jersey delivers. “My Fav Birds Here In The Garden State I Photographed”",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    }
+  ]
+}

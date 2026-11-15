@@ -1,5 +1,5 @@
 {
-  "status": "awaiting_approval",
+  "status": "rejected",
   "origin": "pipeline",
   "daily": false,
   "difficulty": "hard",
@@ -14,7 +14,7 @@
     "https://newjerseymonitor.com/2026/11/12/nj-virtual-power-plant-battery-storage/",
     "https://nj.gov/bpu/newsroom/2026/approved/20260813.html"
   ],
-  "rejection_reason": null,
+  "rejection_reason": "Editor: an older electricity puzzle built before the guardrails; replaced by new agent builds.",
   "mode": "daily",
   "daily_date": "2026-11-18",
   "theme": "Your Bills",

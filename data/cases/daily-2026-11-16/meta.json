@@ -1,0 +1,21 @@
+{
+  "status": "rejected",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T05:47:55Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://nj1015.com/ixp/564/p/larry-kane-retires-philadelphia-tv/",
+    "https://nj1015.com/favorite-thanksgiving-desserts-ranked/",
+    "https://nj1015.com/new-monmouth-diner-new-jersey/",
+    "https://nj1015.com/ixp/564/p/wildwood-police-stop-phone-scam/",
+    "https://nj1015.com/ixp/394/p/jersey-birds-photographs/"
+  ],
+  "rejection_reason": "Editor: the blind solver failed it, and the crop does not change the meaning (no motive). Rebuild.",
+  "mode": "daily",
+  "daily_date": "2026-11-16",
+  "theme": "Jersey Weird"
+}

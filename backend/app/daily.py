@@ -1,6 +1,7 @@
 """The Daily Grain (CONTRACT §7.2): which daily is today's, numbering, streaks, crowd stats."""
 from __future__ import annotations
 
+import os
 from datetime import date, datetime, timedelta, timezone
 
 from .store import CaseRecord
@@ -44,14 +45,33 @@ def dailies(approved: list[CaseRecord]) -> list[tuple[date, CaseRecord]]:
     return sorted([(d, r) for d, r in out if d], key=lambda x: (x[0], x[1].number, x[1].id))
 
 
+def launch_date(all_dailies: list[tuple[date, CaseRecord]]) -> date | None:
+    """Day #1 of the Daily Grain: GOS_LAUNCH_DATE if set (YYYY-MM-DD), else the earliest approved daily."""
+    pinned = parse_date(os.environ.get("GOS_LAUNCH_DATE", "").strip() or None)
+    if pinned:
+        return pinned
+    return all_dailies[0][0] if all_dailies else None
+
+
+def next_open_day(taken: set[date], start: date) -> date:
+    """The first day from `start` on that no approved daily holds: approving fills the schedule in order."""
+    day = start
+    while day in taken:
+        day += timedelta(days=1)
+    return day
+
+
 def daily_number(rec: CaseRecord, all_dailies: list[tuple[date, CaseRecord]]) -> int | None:
-    """meta.daily_number if set, else the case's 1-based position among approved dailies by date."""
+    """meta.daily_number if set, else Wordle-style: days since launch + 1, so a day's number never changes
+    when an earlier gap is filled in (Nov 15 = #1, Nov 16 = #2, Nov 18 = #4)."""
     if not is_daily(rec):
         return None
     if isinstance(rec.meta.get("daily_number"), int):
         return rec.meta["daily_number"]
-    ids = [r.id for _, r in all_dailies]
-    return ids.index(rec.id) + 1 if rec.id in ids else None
+    day, launch = parse_date(rec.meta.get("daily_date")), launch_date(all_dailies)
+    if day is None or launch is None or day < launch:
+        return None
+    return (day - launch).days + 1
 
 
 def current_daily(all_dailies: list[tuple[date, CaseRecord]], today: date) -> CaseRecord | None:

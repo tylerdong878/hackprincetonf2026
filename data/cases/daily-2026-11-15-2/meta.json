@@ -1,0 +1,27 @@
+{
+  "status": "approved",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T05:40:26Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+    "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+    "https://nj1015.com/new-jersey-worst-drivers-2/",
+    "https://nj1015.com/new-monmouth-diner-new-jersey/",
+    "https://www.npr.org/2026/09/24/nx-s1-5977047/south-africa-braai-bbq"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-15",
+  "theme": "Strange But True",
+  "editor_edits": [
+    "title: dropped \"HackPrinceton Special\"",
+    "briefing: removed a hint that gave away the number of fakes",
+    "theme: Strange But True",
+    "topic: a readable label instead of the pipeline topic id"
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "daily-2026-11-15",
+  "number": 16,
+  "title": "Daily Grain: HackPrinceton Special",
+  "topic": "hackprinceton special",
+  "briefing": "0–3 doctored today. Some charts show the numbers; the question is which numbers they show.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Jersey Bill Watch",
+        "handle": "@jerseybills",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#E3A42B"
+      },
+      "posted_at": "2026-11-15T03:00:00Z",
+      "body": "NJ power prices are up 26% since Mar 2025!",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "NJ Residential Electricity Prices",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Mar 2025",
+            "value": 19.65
+          },
+          {
+            "label": "Aug 2026",
+            "value": 24.61
+          }
+        ],
+        "y_min": 19.0,
+        "y_max": 25.0
+      },
+      "source_label": "Data: U.S. EIA",
+      "tools": [
+        "data",
+        "account"
+      ],
+      "card_style": "chart"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Turnpike Tea",
+        "handle": "@turnpiketea",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-15T00:00:00Z",
+      "body": "NJ power prices are up 27% in ONE YEAR. Share before your next bill hits.",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "NJ Residential Electricity Prices",
+        "unit": "¢/kWh",
+        "points": [
+          {
+            "label": "Apr 2025",
+            "value": 19.91
+          },
+          {
+            "label": "Jul 2026",
+            "value": 25.19
+          }
+        ],
+        "y_min": 19.5,
+        "y_max": 26.0
+      },
+      "source_label": "Data: U.S. EIA",
+      "tools": [
+        "data",
+        "account"
+      ],
+      "card_style": "chart"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-09T21:39:35Z",
+      "body": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "Scroll Patrol",
+        "handle": "@scrollpatrol",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#DB2777"
+      },
+      "posted_at": "2026-11-14T19:00:00Z",
+      "body": "Scientists think they've found ancient remnants of dinosaur blood",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 9, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-10-30T09:00:00Z",
+      "body": "Candy prices got you scared stiff? What to know about the cost of Halloween this year",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 30, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    }
+  ]
+}

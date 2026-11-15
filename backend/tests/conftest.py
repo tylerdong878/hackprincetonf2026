@@ -8,6 +8,8 @@ from fastapi.testclient import TestClient
 from backend.app.main import create_app
 
 REPO = Path(__file__).resolve().parents[2]
+# Test cases live with the tests, not in data/cases, so the live game content can change freely.
+FIXTURE_CASES = Path(__file__).resolve().parent / "fixtures" / "cases"
 DEMO = "2026-11-14-power-bills"
 CLEAN = "2026-11-14-power-bills-clean"
 SEED_CASES = (DEMO, CLEAN)
@@ -15,7 +17,7 @@ SEED_CASES = (DEMO, CLEAN)
 
 # Server settings a developer's .env might set (main.py loads .env on import). Tests start from the defaults.
 # TEACHER_TOKEN is the old name of EDITOR_TOKEN, still read as a fallback, so it is cleared too.
-SERVER_ENV = ("GOS_PUBLIC", "EDITOR_TOKEN", "TEACHER_TOKEN", "DEMO_TOKEN", "CON_LIVE_DAILY_CAP",
+SERVER_ENV = ("GOS_PUBLIC", "GOS_LAUNCH_DATE", "EDITOR_TOKEN", "TEACHER_TOKEN", "DEMO_TOKEN", "CON_LIVE_DAILY_CAP",
               "CON_LIVE_PER_PLAYER", "ANSWER_RATE_PER_MIN", "CROWD_MIN", "GOS_DATA_DIR")
 
 
@@ -30,7 +32,7 @@ def data_dir(tmp_path):
     """A private copy of the two seed cases, so tests never touch the real data/."""
     d = tmp_path / "data"
     for case_id in SEED_CASES:
-        shutil.copytree(REPO / "data" / "cases" / case_id, d / "cases" / case_id)
+        shutil.copytree(FIXTURE_CASES / case_id, d / "cases" / case_id)
     return d
 
 

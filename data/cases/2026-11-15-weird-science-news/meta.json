@@ -1,5 +1,5 @@
 {
-  "status": "awaiting_approval",
+  "status": "rejected",
   "origin": "pipeline",
   "daily": false,
   "difficulty": "hard",
@@ -12,5 +12,5 @@
     "https://www.npr.org/2026/11/13/nx-s1-6039312/spacex-nasa-starship-iss-dragon-falcon-musk",
     "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds"
   ],
-  "rejection_reason": null
+  "rejection_reason": "Editor: duplicates the dino-blood crop in today's Daily; Case File #0018 replaces it."
 }
