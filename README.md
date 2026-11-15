@@ -2,7 +2,7 @@
 
 **Don't believe everything. Don't doubt everything.**
 
-A 2-minute daily game, laid out like a newspaper front page. An AI con artist called **the Con** doctors real news posts. You catch the fakes without doubting the true ones. Then you turn the tables and try to fool the Con.
+A 2-minute daily game, laid out like a newspaper front page. An AI con artist called **the Con** slips stories he made up in among real news posts. You catch the fakes without doubting the true ones. Then you turn the tables and try to fool the Con.
 
 *Built at HackPrinceton Fall 2026 · Entertainment & Media*
 
@@ -10,9 +10,11 @@ A 2-minute daily game, laid out like a newspaper front page. An AI con artist ca
 
 ## How to play
 
-**🧂 Daily Grain.** Five real news posts a day, the same five for everyone. The Con has secretly doctored some of them: a quote cropped mid-sentence, a chart axis that doesn't start at zero, a statistic missing its time frame. Some days nothing is fake.
+**🧂 Daily Grain.** Five news posts a day, the same five for everyone. Most are real and word for word from their source, and some of the real ones are wild ("LendingTree says New Jersey drivers are the worst in America"). Somewhere among them the Con has slipped in 0 to 3 stories he made up himself, like a robot octopus that "slips through a keyhole in exactly 7 seconds" sitting next to a real NPR story about octopuses squeezing through tiny holes. Some days nothing is fake.
+- Every made-up story has a clue you can spot on the card: a number that's too exact, a claim one step too far, nobody named who could back it up, or bait like "share before it's deleted". Some days are easy, some are brain-teasers.
+- You get three magnifiers a day to open a post's source if you're not sure.
 - Mark each card **Real** or **Doctored**, and name the trick for bonus points.
-- Every card flips over right away to show the original next to what you saw.
+- Every card flips over right away. A made-up card shows the tell, what the closest real story actually said, and a link to it.
 - **Getting fooled costs you.** So does **crying wolf on a true post.**
 - Few people spotted it? You get a rarity bonus: *Rare catch* +50, *One in a shaker* +100.
 - Share your grid without spoilers: 🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled.
@@ -55,26 +57,27 @@ flowchart LR
     D[(Con the Con deck)] --> J[Live judge<br/>levels 1-3] --> C[Con the Con]
 ```
 
-- **Researcher:** reads only the topic's listed news feeds. It can only save text that appears word for word on a page it fetched during that run, with the link.
-- **Forger:** doctors real material in code (crop, axis, window, drop, detail swap) and never writes quotes freehand. Fakes come only from invented personas, never a real outlet or a realistic-sounding name.
-- **Blind solver:** gets the same evidence tools as the player and none of the answers. If it can't solve a puzzle, the puzzle is rejected as unfair and rebuilt.
+- **Researcher:** reads only the topic's listed news feeds. It can only save text that appears word for word on a page it fetched during that run, with the link, and it never sees a story another puzzle already uses.
+- **Forger:** reads the skill file for each trick (one `SKILL.md` per trick, loaded only when needed). Dailies use **made-up stories**: its `make_tall_tale` tool refuses names of people, bands or brands, quote marks, credit to a real outlet, health claims and near-copies of a real story. For Case Files it can also doctor real material in code (crop, axis, window, detail swap) and never writes quotes freehand. Fakes come only from invented personas, never a real outlet or a realistic-sounding name.
+- **Blind solver:** a sealed sub-agent with the same evidence tools as the player and none of the answers or files. If it can't solve a puzzle, the forger gets its notes and one more try.
 - **Guardrails in code:**
   - A blocklist keeps out tragedies, deaths, minors and elections.
-  - Every daily includes real posts from unknown accounts, so metadata never gives the answer away.
+  - Fakes land at random card positions, and every daily has at least one weird-but-true real post, so "weird" never means "fake".
+  - Every daily includes real posts from unknown accounts, and on made-up days those drop their source label too, so metadata never gives the answer away.
   - Two model calls are always held back, so a run reaches the editor.
-- **Editor's Desk:** a human-in-the-loop interrupt holds every puzzle until the editor approves it, rejects it with a reason, or holds it. The AI's first fun-topic puzzles got real things wrong, and those rejections stay on the desk with their reasons.
+- **Editor's Desk:** a human-in-the-loop interrupt holds every puzzle until the editor approves it, rejects it with a reason, or holds it. The AI got real things wrong along the way (one made-up story was about a real celebrity), and those rejections stay on the desk with their reasons.
 - **Tracing:** every build and every live judgment is traced in LangSmith.
 
 ![The Editor's Desk: player preview next to the answer key](docs/img/editors-desk.png)
 
 ## Design
 
-The look comes from our designer's Figma file: one light newsprint theme, press red and ink, hard ink shadows, and a noir silhouette of the Con as the cover photo. Type is Gloock for the logotype, Bodoni Moda for titles, Oswald for headlines, buttons and stamps, and Old Standard TT for body text. Inter is kept inside the post cards, so the posts still look like a social app. The full design system is in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+The look comes from our designer's Figma file: a torn black-and-white newspaper front page with a blackletter masthead, a newspaper collage behind every screen, press red and ink, and a noir silhouette of the Con. Type is Iosevka Charon throughout; Inter is kept inside the post cards, so the posts still look like a social app. On laptops the Daily follows the Figma's desktop frames: card tabs, the Evidence Kit in its own column, and the Con on an ink bar along the bottom. The design system is in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## Ground rules
 
 - **Real posts are real.** Every real card is verbatim from a page the researcher fetched, and links to it. The Con the Con deck's sources are listed in [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), and `--verify` re-checks every excerpt against the live page.
-- **Doctored posts only come from made-up accounts** with invented handles. We never invent quotes from real people, and only ever cut or reframe real material.
+- **Doctored posts only come from made-up accounts** with invented handles. We never invent quotes from real people. The Con's made-up stories stay on light topics (animals, food, odd science, places), never name real people, bands or brands, never credit a real outlet, and every one is labeled "the Con made this up" at the reveal.
 - **Every doctored post is stamped at the reveal.** Share grids contain no post content.
 - **Off-limits topics:** tragedies, minors, private individuals, elections and active emergencies.
 - **Privacy:** no accounts and no personal data. A random player id lives in your browser, and the server stores only the answers made under that id, plus anonymous crowd counts.
@@ -95,7 +98,7 @@ The Daily Grain and Case Files play from the saved case bank and need no API key
 - **The iMessage bot** needs a [Photon](https://photon.codes) project.
 
 ```bash
-uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20 --hold-for-editor   # build a puzzle
+uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20 --style made-up --hold-for-editor   # build a puzzle
 uv run python -m pipeline.build_case --dry-run                                                # no model calls
 uv run --env-file .env.build python scripts/nightly_build.py                                  # fill the next empty day
 uv run python -m backend.imessage                                                             # the iMessage bot
@@ -106,7 +109,7 @@ For a public link, set `GOS_PUBLIC=1`. That hides the API docs, puts a password 
 ## Tests
 
 ```bash
-uv run python -m pytest -q              # 405 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
+uv run python -m pytest -q              # 429 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
 cd frontend && npm run build  # typecheck + production build
 ```
 

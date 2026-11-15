@@ -673,6 +673,12 @@ kbd {
 .torn-hero {
   position: relative;
   padding-bottom: 110px;
+  /* The page content below is pulled up into this padding (negative top margins), and this positioned
+     section paints over it: let clicks through the empty space, keep the hero's own content clickable. */
+  pointer-events: none;
+}
+.torn-hero > * {
+  pointer-events: auto;
 }
 .torn-hero::before {
   content: "";

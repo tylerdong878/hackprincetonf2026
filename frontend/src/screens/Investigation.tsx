@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BottomSheet } from '../components/BottomSheet'
-import { ConBubble } from '../components/ConBubble'
 import { ClueTokens, EvidenceKit, type KitNotice } from '../components/EvidenceKit'
 import { PostCard } from '../components/PostCard'
 import { ErrorState, SectionLabel } from '../components/ui'
