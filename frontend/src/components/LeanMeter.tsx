@@ -42,7 +42,7 @@ export function LeanMeter({
         {/* five bands: press red, pink, paper (the sweet spot), tan, ochre */}
         <span className="h-full flex-1 bg-press" aria-hidden="true" />
         <span className="h-full flex-1 bg-[#D98A84]" aria-hidden="true" />
-        <span className="h-full flex-1 bg-sheet outline-[1.5px] outline-offset-[-3px] outline-ink outline-dashed" aria-hidden="true" />
+        <span className="h-full flex-1 bg-sheet outline-[1.5px] outline-offset-[-3px] outline-ink outline-solid" aria-hidden="true" />
         <span className="h-full flex-1 bg-[#D9B77A]" aria-hidden="true" />
         <span className="h-full flex-1 bg-ochre" aria-hidden="true" />
         {has && (

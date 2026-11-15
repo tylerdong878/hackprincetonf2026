@@ -225,7 +225,7 @@ export function SaltCrystal({ size = 20, className = '', title }: IconProps) {
     >
       <g stroke="currentColor" strokeWidth="1.56" strokeLinecap="round" strokeLinejoin="round">
         <path d="M85.9053 18.2927L98.319 22.6714L88.6298 31.1103L76.2161 26.7316L85.9053 18.2927Z" fill="#FFFFFF" />
-        <path d="M76.2161 26.7316L88.6298 31.1103L91.0948 42.7073L78.6811 38.3285L76.2161 26.7316Z" fill="#E9E2D3" />
+        <path d="M76.2161 26.7316L88.6298 31.1103L91.0948 42.7073L78.6811 38.3285L76.2161 26.7316Z" fill="#e6e6e6" />
         <path d="M98.319 22.6714L88.6298 31.1103L91.0948 42.7073L100.784 34.2684L98.319 22.6714Z" fill="#CFC6B4" />
       </g>
     </svg>
@@ -261,8 +261,8 @@ export function ClueToken({ spent = false, size = 22, className = '' }: { spent?
   if (spent) {
     return (
       <svg viewBox="0 0 23.4 23.4" width={size} height={size} fill="none" className={`inline-block shrink-0 ${className}`} aria-hidden="true">
-        <path opacity="0.6" d="M22.7 11.7C22.7 17.7751 17.7751 22.7 11.7 22.7C5.62487 22.7 0.7 17.7751 0.7 11.7C0.7 5.62487 5.62487 0.7 11.7 0.7C17.7751 0.7 22.7 5.62487 22.7 11.7Z" strokeWidth="1.4" stroke="#5A544B" />
-        <path opacity="0.6" d="M5.09996 18.2999L18.3 5.0999" strokeWidth="1.4" stroke="#5A544B" />
+        <path opacity="0.6" d="M22.7 11.7C22.7 17.7751 17.7751 22.7 11.7 22.7C5.62487 22.7 0.7 17.7751 0.7 11.7C0.7 5.62487 5.62487 0.7 11.7 0.7C17.7751 0.7 22.7 5.62487 22.7 11.7Z" strokeWidth="1.4" stroke="#555555" />
+        <path opacity="0.6" d="M5.09996 18.2999L18.3 5.0999" strokeWidth="1.4" stroke="#555555" />
       </svg>
     )
   }
@@ -306,7 +306,7 @@ export function OutcomeSquare({
   const c = outcome ? SQUARE[outcome] : undefined
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center border-[1.5px] ${c ? 'border-ink' : 'border-dashed border-line-soft'} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center border-[1.5px] ${c ? 'border-ink' : 'border-line-soft'} ${className}`}
       style={{ width: size, height: size, background: c?.bg ?? 'transparent', color: c?.fg }}
       role={title ? 'img' : undefined}
       aria-label={title}

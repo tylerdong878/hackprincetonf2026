@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { AccountView, DataView, normalizeEvidence, SourceView, ToolRow, TOOLS } from '../components/EvidenceKit'
-import { Brand, SoundToggle } from '../components/Header'
+import { BarHeader, SiteHeader, SoundToggle } from '../components/Header'
 import {
   ClueToken,
   IconArrow,
@@ -21,7 +20,7 @@ import { MiniDiff, OutcomeBadge } from '../components/Reveal'
 import { TrickPicker } from '../components/TrickPicker'
 import { btnClass, Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, BACKEND_START_CMD } from '../lib/api'
-import { CON_LINES, CON_QUIPS, pick } from '../lib/content'
+import { CON_QUIPS, pick } from '../lib/content'
 import { outcomeStyle, shortDate, trickLabel } from '../lib/format'
 import { useAsync, useElementHeight, useReducedMotion, useTween } from '../lib/hooks'
 import { withPlayer } from '../lib/player'
@@ -41,6 +40,7 @@ import type {
 } from '../lib/types'
 import { loadJSON, saveJSON } from './common'
 import { DailyEnd } from './DailyEnd'
+import tornV from '../assets/figma/torn-v.webp'
 
 export const DAILY_RANGE = '0–3 doctored today'
 
@@ -117,10 +117,10 @@ export function ProgressDots({ posts, cards, current }: { posts: Post[]; cards: 
                 className={`num flex h-8 w-8 items-center justify-center text-[14px] font-semibold ${
                   here
                     ? 'border-2 border-ink bg-sheet text-ink outline-2 outline-offset-2 outline-press'
-                    : 'border-[1.5px] border-dashed border-[#B9AE99] text-muted'
+                    : 'border-[1.5px] border-[#cfcfcf] text-muted'
                 }`}
               >
-                {rec?.skipped ? '·' : i + 1}
+                {rec?.skipped ? '–' : i + 1}
               </span>
             )}
           </li>
@@ -145,7 +145,7 @@ function CardTabs({ posts, cards, current, className = '' }: { posts: Post[]; ca
             key={p.id}
             aria-current={on ? 'step' : undefined}
             className={`caps flex flex-col items-center border-2 px-2 py-1.5 leading-tight ${
-              on ? 'border-ink bg-ink text-sheet' : outcome ? 'border-ink bg-sheet text-ink' : 'border-[#CFC6B4] bg-sheet text-ink'
+              on ? 'border-ink bg-ink text-sheet' : outcome ? 'border-ink bg-sheet text-ink' : 'border-[#a8a8a8] bg-sheet text-ink'
             }`}
           >
             <span className="text-[15px] font-bold">Card {i + 1}</span>
@@ -194,7 +194,7 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
   const bonus = rarityBonusOf(reveal)
   if (!crowd) {
     return (
-      <p className="flex items-start gap-2 border-[1.5px] border-dashed border-[#B9AE99] px-3 py-2 text-sm text-muted">
+      <p className="flex items-start gap-2 border-[1.5px] border-[#cfcfcf] px-3 py-2 text-sm text-muted">
         <IconGlasses size={18} className="mt-0.5 text-ink" />
         <span>Be one of the first 10 detectives to answer this one. Crowd stats unlock at 10.</span>
       </p>
@@ -211,10 +211,10 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
         <span className="h-full bg-press" style={{ width: `${doctoredPct}%` }} />
       </div>
       <p className="text-[15px] font-bold">
-        <b className="num">{realPct}%</b> said Real · <b className="num">{doctoredPct}%</b> said Doctored
+        <b className="num">{realPct}%</b> said Real, <b className="num">{doctoredPct}%</b> said Doctored
         <span className="font-normal text-muted">
           {' '}
-          · <span className="num">{crowd.n}</span> detectives
+          (<span className="num">{crowd.n}</span> detectives)
         </span>
       </p>
       <div className="flex flex-wrap items-center gap-2">
@@ -293,15 +293,15 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
         <Points value={pts} />
       </div>
       <p className="mt-3 font-head text-2xl leading-tight font-bold">
-        {r.doctored ? <>Doctored · {trickLabel(r.trick)}</> : r.suspicious_real ? <>Real · sounds fake, isn’t</> : <>Real</>}
+        {r.doctored ? <>Doctored: {trickLabel(r.trick)}</> : r.suspicious_real ? <>Real, just sounds fake</> : <>Real</>}
       </p>
       <p className="text-[15px] text-muted">
         You said <span className="font-bold text-ink">{you}</span>
-        {r.trick_named_correctly && <span className="font-bold text-ink"> · named the trick (+50)</span>}
+        {r.trick_named_correctly && <span className="font-bold text-ink">, named the trick (+50)</span>}
       </p>
 
       {(r.tell || r.explanation) && (
-        <p className={`mt-3 border-l-4 pl-3 text-[16px] leading-snug font-bold ${r.doctored ? 'border-press' : 'border-ink'}`}>
+        <p className={`mt-3 text-[16px] leading-snug font-bold`}>
           {r.doctored ? (
             <b>The tell: </b>
           ) : (
@@ -320,12 +320,11 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
       )}
 
       <div className="mt-5 flex items-start gap-3">
-        <ConMascot size={48} shape="circle" className="mt-1 shrink-0" />
         <ConBubble text={quip} size="md" speed={14} className="min-w-0 flex-1" />
       </div>
 
       {!rec.restored && (
-        <div className="mt-5 border-t border-[#CFC6B4] pt-4">
+        <div className="mt-5 border-t border-[#a8a8a8] pt-4">
           <CrowdLine reveal={reveal} />
         </div>
       )}
@@ -351,65 +350,77 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
   const c = daily.case
   const startRef = useRef<HTMLButtonElement>(null)
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 lg:grid lg:max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:items-center lg:gap-14 lg:px-6 lg:py-12">
-      {/* Laptop: the Con and his line on the left, the Grain on the right (Figma "Case — Briefing"). */}
-      <div className="flex items-end gap-4 lg:flex-col-reverse lg:items-start lg:gap-6">
-        <ConMascot size={150} shape="door" className="shrink-0 lg:h-[420px] lg:w-auto" />
-        <ConBubble
-          text={c.briefing}
-          size="md"
-          className="mb-2 min-w-0 flex-1 lg:mb-0 lg:w-full lg:flex-none"
-          onDone={() => startRef.current?.focus({ preventScroll: true })}
-        />
-      </div>
-      <section className="folder-open panel p-5 sm:p-6" aria-labelledby="grain-h">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="dateline font-bold !text-ink">{shortDate(`${daily.date}T12:00:00`)}</p>
+    <>
+      <SiteHeader active="daily" />
+      <main className="flex-1 pb-16">
+        {/* Masthead on the black paper: red kicker, Iosevka caps title over the double rule (as on every page). */}
+        <section className="torn-hero">
+          <div className="page-wrap pt-8 md:pt-[30px]">
+            <div className="on-night max-w-[830px]">
+              <p className="kicker">{shortDate(`${daily.date}T12:00:00`)}</p>
+              <h1 id="grain-h" className="hero-title mt-1">
+                Grain #{daily.daily_number}
+              </h1>
+              <div className="double-rule mt-1 max-w-[780px]" aria-hidden="true" />
+              <p className="mt-3 text-[20px] leading-snug font-bold">{c.title}</p>
+              {daily.theme && <p className="mt-1 text-[17px] leading-[1.5] italic">{daily.theme}</p>}
+            </div>
+          </div>
+        </section>
+
+        {/* Below the tear: the Con’s line on the left, the rules card on the right (Figma "Case — Briefing"). */}
+        <div className="page-wrap -mt-10 grid gap-8 md:-mt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)] lg:items-start lg:gap-14">
+          <div className="lg:pt-20">
+            <ConBubble
+              text={c.briefing}
+              size="lg"
+              className="w-full"
+              onDone={() => startRef.current?.focus({ preventScroll: true })}
+            />
+          </div>
+          <section className="folder-open paper-card relative bg-white/90 p-5 sm:p-7" aria-labelledby="grain-h">
+            <p className="caps text-[13px] font-bold tracking-[0.06em]">Today’s rules</p>
+            <div className="double-rule-thin mt-1.5" aria-hidden="true" />
+            <ul className="mt-5 grid grid-cols-3 gap-2 border-y border-[#cfcfcf] py-4 text-center">
+              <li className="flex flex-col items-center gap-1">
+                <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">cards</span>
+                <span className="num block text-4xl leading-none font-bold">{c.posts.length}</span>
+              </li>
+              <li className="flex flex-col items-center gap-1">
+                <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">{c.clue_budget} checks</span>
+                <span className="flex items-center gap-0.5" aria-hidden="true">
+                  {Array.from({ length: Math.min(5, c.clue_budget) }, (_, i) => (
+                    <ClueToken key={i} size={26} />
+                  ))}
+                </span>
+              </li>
+              <li className="flex flex-col items-center gap-1">
+                <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">doctored</span>
+                <span className="num block text-4xl leading-none font-bold">0–3</span>
+              </li>
+            </ul>
+            <p className="mt-5 border-2 border-press bg-press-wash px-4 py-3 text-center text-[18px] text-press italic">{DAILY_RANGE}. Maybe none.</p>
+            <ul className="mt-4 flex flex-col gap-1.5 text-[15px]" aria-label="Scoring">
+              <li className="flex items-baseline gap-3">
+                <span className="num w-12 text-lg font-bold">+100</span> per right call
+              </li>
+              <li className="flex items-baseline gap-3">
+                <span className="num w-12 text-lg font-bold text-press">−50</span> for accusing the truth
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex w-12 justify-start">
+                  <SaltCrystal size={20} />
+                </span>{' '}
+                bonus for rare catches
+              </li>
+            </ul>
+            <button ref={startRef} type="button" onClick={onStart} className={`${btnClass('primary', 'lg')} mt-6 min-h-16 w-full py-4 text-[22px]`}>
+              <IconArrow size={22} /> Start
+            </button>
+          </section>
         </div>
-        <div className="double-rule mt-2" aria-hidden="true" />
-        <h1 id="grain-h" className="logotype mt-4 text-[44px] text-ink sm:text-5xl">
-          Grain of Salt #{daily.daily_number}
-        </h1>
-        {daily.theme && <p className="caps mt-3 inline-flex bg-ink px-3 py-1 text-[13px] font-semibold text-sheet">{daily.theme}</p>}
-        <p className="mt-3 font-head text-[26px] leading-tight font-bold">{c.title}</p>
-        <ul className="mt-5 grid grid-cols-3 gap-2 border-y-2 border-dotted border-[#8C8270] py-4 text-center">
-          <li className="flex flex-col items-center gap-1">
-            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">cards</span>
-            <span className="num block text-4xl leading-none font-bold">{c.posts.length}</span>
-          </li>
-          <li className="flex flex-col items-center gap-1">
-            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">{c.clue_budget} checks</span>
-            <span className="flex items-center gap-0.5" aria-hidden="true">
-              {Array.from({ length: Math.min(5, c.clue_budget) }, (_, i) => (
-                <ClueToken key={i} size={26} />
-              ))}
-            </span>
-          </li>
-          <li className="flex flex-col items-center gap-1">
-            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">doctored</span>
-            <span className="num block text-4xl leading-none font-bold">0–3</span>
-          </li>
-        </ul>
-        <p className="mt-5 border-2 border-press bg-[#F8E2DC] px-4 py-3 text-center text-[18px] text-press italic">{DAILY_RANGE}. Maybe none.</p>
-        <ul className="mt-4 flex flex-col gap-1.5 text-[15px]" aria-label="+100 per right call · −50 for accusing the truth · bonus for rare catches">
-          <li className="flex items-baseline gap-3">
-            <span className="num w-12 text-lg font-bold">+100</span> per right call
-          </li>
-          <li className="flex items-baseline gap-3">
-            <span className="num w-12 text-lg font-bold text-press">−50</span> for accusing the truth
-          </li>
-          <li className="flex items-center gap-3">
-            <span className="flex w-12 justify-start">
-              <SaltCrystal size={20} />
-            </span>{' '}
-            bonus for rare catches
-          </li>
-        </ul>
-        <button ref={startRef} type="button" onClick={onStart} className={`${btnClass('ink', 'lg')} mt-6 w-full py-4 text-xl`}>
-          <IconArrow size={22} /> Start
-        </button>
-      </section>
-    </main>
+      </main>
+    </>
   )
 }
 
@@ -608,24 +619,11 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
 
   const flipClass = flip === 'out' ? 'flip-out' : flip === 'in' ? 'flip-in' : ''
 
-  const answeredCount = posts.filter((p) => prog.cards[p.id]).length
-  const anyOpened = TOOLS.some((t) => opened[t.id])
-  // The Con's line on the laptop dock follows what you're doing (Figma "Case — Investigation").
-  const conLine = answered
-    ? isLast
-      ? CON_LINES.submitting[0]
-      : CON_LINES.idle[idx % CON_LINES.idle.length]
-    : picker
-      ? CON_LINES.markDoctored[0]
-      : prog.cluesLeft <= 0
-        ? CON_LINES.outOfClues[0]
-        : anyOpened
-          ? CON_LINES.evidence[idx % CON_LINES.evidence.length]
-          : CON_LINES.idle[idx % CON_LINES.idle.length]
-
   const nextLabel = finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'
 
   return (
+    <>
+    <DailyBar daily={daily} cluesLeft={prog.cluesLeft} />
     <main
       className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3 lg:grid lg:max-w-[1360px] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-8 lg:px-6 lg:pt-6"
       style={{ paddingBottom: Math.max(barH, 96) + 20 }}
@@ -637,11 +635,11 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
           <div className="lg:hidden">
             <ProgressDots posts={posts} cards={prog.cards} current={idx} />
             <p className="dateline mt-2 text-center">
-              Card {idx + 1} of {posts.length} · {DAILY_RANGE}
+              Card {idx + 1} of {posts.length}
             </p>
           </div>
           <CardTabs posts={posts} cards={prog.cards} current={idx} className="hidden lg:grid" />
-          <p className="mt-3 hidden border-[1.5px] border-dashed border-press px-3 py-2.5 text-center text-[17px] text-press italic lg:block">
+          <p className="mt-3 hidden bg-press-wash px-3 py-2.5 text-center text-[17px] text-press italic lg:block">
             {DAILY_RANGE}. Maybe none.
           </p>
 
@@ -653,8 +651,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
               <div className="flex items-start justify-between gap-3">
                 <p>
                   <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
-                  who posted it? · does a real outlet back it up? · does it sound too perfect, or just weird? Real news can be strange;
-                  the Con’s stories are usually too neat. <i>Not sure? Check the source.</i>
+                  who posted it? Does a real outlet back it up? Does it sound too neat?
                 </p>
                 <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
                   ×
@@ -712,7 +709,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                       </div>
                     )}
                     {notice && (
-                      <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+                      <p role="alert" className="border-2 border-ochre bg-press-wash px-3 py-2 text-sm">
                         {notice}
                       </p>
                     )}
@@ -740,7 +737,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                   type="button"
                   onClick={next}
                   disabled={finishing}
-                  className={`${btnClass('primary', 'lg')} w-full scroll-mb-[132px] py-4 text-xl`}
+                  className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
                 >
                   {!finishing && <IconArrow size={22} />}
                   {nextLabel}
@@ -781,16 +778,24 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                 )}
               </>
             )}
-            <p className="dateline mt-3 text-center !text-[11px]" aria-live="polite">
-              {pending ? 'Checking with the case file…' : `Keys: R real · D doctored · 1–${choices.length} trick · C check · Enter next`}
-            </p>
+            {pending && (
+              <p className="dateline mt-3 text-center !text-[11px]" aria-live="polite">
+                Checking…
+              </p>
+            )}
           </div>
           {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
         </div>
       </section>
 
-      <aside className="hidden min-w-0 border-l border-ink pl-6 lg:block" aria-label="Evidence Kit">
-        <div className="panel thin-scroll sticky top-[88px] flex max-h-[calc(100vh-88px-112px)] flex-col gap-4 overflow-y-auto p-5">
+      <aside className="hidden min-w-0 pl-6 lg:block" aria-label="Evidence Kit">
+        {/* The rip: the kit's column sits on torn black paper, the tear running down the gap between the columns.
+            Fixed, but left at its static spot (the kit's edge). Only the near-vertical top half of the tear is used. */}
+        <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 -z-[5] -ml-[80px] hidden w-[100vw] overflow-hidden lg:flex">
+          <img src={tornV} alt="" draggable={false} className="h-[200vh] w-[400px] max-w-none shrink-0 -scale-x-100 select-none" />
+          <div className="-ml-px flex-1 bg-night" />
+        </div>
+        <div className="panel thin-scroll sticky top-[88px] flex max-h-[calc(100vh-88px-24px)] flex-col gap-4 overflow-y-auto p-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-head text-[30px] leading-none font-bold">Evidence Kit</h2>
             <span className="flex items-center gap-2">
@@ -799,10 +804,10 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
             </span>
           </div>
           <p className="caps -mt-1 text-[12.5px] font-semibold tracking-[0.06em] text-press">
-            Card {idx + 1} {answered ? '· answered' : 'selected'}
+            Card {idx + 1} {answered ? 'answered' : 'selected'}
           </p>
           {answered ? (
-            <p className="text-[14px] leading-snug text-muted">This card is answered. Anything you opened stays below.</p>
+            <p className="text-[14px] leading-snug text-muted">Answered.</p>
           ) : (
             <div className="flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
               {TOOLS.map((t) => {
@@ -826,16 +831,13 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
             </div>
           )}
           {notice && (
-            <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+            <p role="alert" className="border-2 border-ochre bg-press-wash px-3 py-2 text-sm">
               {notice}
             </p>
           )}
           {TOOLS.filter((t) => opened[t.id]).map((t) => (
             <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
           ))}
-          <p className="text-[13px] leading-snug text-muted italic">
-            Opened evidence stays here for this card, free to re-read. Checks you don’t use earn a bonus at the end.
-          </p>
         </div>
       </aside>
 
@@ -867,7 +869,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
           ) : picker ? (
             <div className="sheet-up">
               <div className="flex justify-center pb-2" aria-hidden="true">
-                <span className="h-1.5 w-12 bg-[#B9AE99]" />
+                <span className="h-1.5 w-12 bg-[#a8a8a8]" />
               </div>
               <button type="button" className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline" onClick={() => setPicker(false)}>
                 <IconArrowLeft size={15} /> Back
@@ -893,60 +895,43 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                 <IconX size={24} strokeWidth={2.6} /> Doctored
               </button>
               <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
-                {pending ? 'Checking with the case file…' : <span className="hidden md:inline">Keys: R real · D doctored · C check</span>}
+                {pending ? 'Checking…' : null}
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Laptop dock: the Con on an ink bar (Figma) */}
-      <div className="fixed inset-x-0 bottom-0 z-20 hidden border-t-4 border-press bg-ink text-sheet lg:block">
-        <div className="mx-auto flex max-w-[1360px] items-center gap-4 px-6 py-3">
-          <ConMascot size={56} className="shrink-0 border-sheet" />
-          <ConBubble key={conLine} text={conLine} size="md" speed={18} className="min-w-0 flex-1 !border-l-0 !px-0 !shadow-none md:max-w-2xl" />
-          <div className="ml-auto flex shrink-0 flex-col items-start gap-1.5" aria-live="polite">
-            <p className="caps text-[12.5px] font-semibold tracking-[0.06em]">
-              <span className="num">{answeredCount}</span> of {posts.length} answered
-            </p>
-            <span className="flex gap-1" aria-hidden="true">
-              {posts.map((p) => (
-                <span key={p.id} className={`h-2 w-5 border border-sheet ${prog.cards[p.id] ? 'bg-sheet' : ''}`} />
-              ))}
-            </span>
-          </div>
-        </div>
-      </div>
     </main>
+    </>
   )
 }
 
-function DailyTopBar({ daily }: { daily: DailyResponse | null }) {
+/** In play: the slim case bar (logo | Grain No. and title | checks, Home, sound), same as a Case File. */
+function DailyBar({ daily, cluesLeft }: { daily: DailyResponse; cluesLeft: number }) {
   return (
-    <header className="sticky top-0 z-30 bg-sheet">
-      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2 lg:max-w-[1360px] lg:px-6">
-        <div className="min-w-0 flex-1 lg:flex lg:flex-none lg:items-center lg:gap-4">
-          <Brand size={27} />
-          <p className="dateline mt-0.5 truncate !text-[12px] lg:hidden">
-            {daily ? <>No. {daily.daily_number}</> : 'The Daily Grain'}
-            {daily?.theme && <> · {daily.theme}</>}
-          </p>
-          <div className="hidden min-w-0 border-l-2 border-ink pl-4 lg:block">
-            <p className="dateline !text-[12px]">
-              {daily ? <>No. {daily.daily_number}</> : 'The Daily Grain'}
-              {daily?.theme && <> · {daily.theme}</>}
-            </p>
-            {daily && <p className="truncate font-head text-[17px] leading-tight font-bold italic">{daily.case.title}</p>}
-          </div>
-        </div>
-        <span className="hidden flex-1 lg:block" />
-        <a href="#/" className="caps px-1.5 py-1 text-[13px] font-bold text-ink hover:underline">
-          Home
-        </a>
-        <SoundToggle className="-mr-1.5" />
+    <BarHeader
+      right={
+        <>
+          <span className="hidden flex-col items-start gap-0.5 md:flex">
+            <span className="caps text-[11px] font-semibold tracking-[0.1em] text-muted">Checks</span>
+            <Magnifiers left={cluesLeft} total={daily.case.clue_budget} />
+          </span>
+          <a href="#/" className="caps ml-2 px-1.5 py-1 text-[13px] font-bold text-ink hover:underline">
+            Home
+          </a>
+          <SoundToggle className="-mr-1.5" />
+        </>
+      }
+    >
+      <div className="min-w-0 leading-tight">
+        <p className="caps truncate text-[11.5px] font-semibold tracking-[0.08em] text-muted">
+          Grain #{daily.daily_number}
+          {daily.theme && <>, {daily.theme}</>}
+        </p>
+        <p className="truncate text-[17px] italic sm:text-[19px]">{daily.case.title}</p>
       </div>
-      <div className="double-rule" aria-hidden="true" />
-    </header>
+    </BarHeader>
   )
 }
 
@@ -963,12 +948,13 @@ export function DailyScreen() {
 
   return (
     <>
-      <DailyTopBar daily={daily} />
+      {/* The site header everywhere but mid-game (the briefing and the play view bring their own). */}
+      {!(data.status === 'ok' && daily && !finalResult && !daily.already_played) && <SiteHeader active="daily" />}
       {data.status === 'loading' && <Loading label="Shaking out today’s Grain…" className="flex-1" />}
       {data.status === 'error' && (
         <main className="flex flex-1 items-center px-4 py-16">
           {data.error instanceof ApiError && data.error.status === 404 ? (
-            <div className="panel mx-auto max-w-md p-6 text-center">
+            <div className="paper-card mx-auto max-w-md bg-white/90 p-6 text-center">
               <h1 className="font-display text-3xl font-bold">No Grain today yet.</h1>
               <p className="mt-2 text-sm text-muted">The Con is still preparing today’s puzzle. Try a Case File or Con the Con meanwhile.</p>
               <div className="mt-5 flex justify-center gap-3">
@@ -990,7 +976,7 @@ export function DailyScreen() {
         (finalResult ? (
           <DailyEnd daily={daily} result={finalResult} alreadyPlayed={!result} />
         ) : daily.already_played ? (
-          <main className="mx-auto max-w-md px-4 py-10 text-center">
+          <main className="mx-auto max-w-md px-4 py-16 text-center">
             <p className="font-display text-2xl font-bold">You’ve already played today’s Grain.</p>
             <p className="mt-1 text-muted">Come back tomorrow for #{daily.daily_number + 1}.</p>
             <Button className="mt-4" variant="primary" onClick={() => navigate('/con')}>

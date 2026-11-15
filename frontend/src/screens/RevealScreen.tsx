@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { IconArrow, IconBook, IconCheck, IconShare, OutcomeSquare } from '../components/Icon'
 import { FeedCard } from '../components/PostCard'
@@ -45,9 +44,9 @@ function PostReveal({
         <OutcomeBadge outcome={result.outcome} size="lg" />
         <span className="font-head text-[22px] leading-tight sm:text-[26px]">
           {result.doctored ? (
-            <>Doctored · {trickLabel(result.trick)}</>
+            <>Doctored: {trickLabel(result.trick)}</>
           ) : result.suspicious_real ? (
-            <>Real · built to look fake</>
+            <>Real, built to look fake</>
           ) : (
             <>Real</>
           )}
@@ -61,7 +60,7 @@ function PostReveal({
       </header>
       <p className="mt-2 text-[15.5px]">
         {s.blurb} You said: <span className="font-bold">{you}</span>
-        {result.trick_named_correctly && <span className="font-bold"> · named the trick (+50)</span>}
+        {result.trick_named_correctly && <span className="font-bold">, named the trick (+50)</span>}
       </p>
 
       {result.doctored && result.diff ? (
@@ -90,7 +89,7 @@ function PostReveal({
       {result.doctored && (tell || result.con_line) && (
         <div className="mt-6 grid items-start gap-6 md:grid-cols-2">
           {tell ? (
-            <div className="border-l-[6px] border-press py-1 pl-5 text-[16.5px] leading-snug">
+            <div className="py-1 text-[16.5px] leading-snug">
               {result.tell && (
                 <p className="font-bold">
                   <span className="font-head font-semibold tracking-wide">The tell:</span> {result.tell}
@@ -126,7 +125,7 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
   }, [shown, total])
 
   const grid = ordered.map((p) => outcomeStyle(byId.get(p.id)!.outcome).emoji).join('')
-  const shareText = `Grain of Salt · Case ${caseNo(game.number)}\n${grid}\nDetective rating ${result.rating} (${result.rank})`
+  const shareText = `Grain of Salt, Case ${caseNo(game.number)}\n${grid}\nDetective rating ${result.rating} (${result.rank})`
   const learnTrick =
     result.results.find((r) => r.doctored && r.outcome === 'fooled')?.trick ?? result.results.find((r) => r.doctored)?.trick ?? null
   const counts = result.results.reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.outcome]: (acc[r.outcome] ?? 0) + 1 }), {})
@@ -148,7 +147,7 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
               {(['caught', 'trusted', 'fooled', 'false_alarm'] as const)
                 .filter((o) => counts[o])
                 .map((o) => `${counts[o]} ${outcomeStyle(o).word.toLowerCase()}`)
-                .join(' · ')}
+                .join(', ')}
               <span className="sr-only">. Share grid: {grid}</span>
             </p>
           </div>
@@ -158,12 +157,12 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
               <dd className="num mt-2 text-[44px] leading-none font-bold sm:text-[52px]">{score}</dd>
             </div>
             {result.clue_bonus != null && (
-              <div className="flex flex-col items-center border-l-[1.5px] border-ink px-5 py-5">
+              <div className="flex flex-col items-center px-5 py-5">
                 <dt className={LABEL}>Clue bonus</dt>
                 <dd className="num mt-2 text-[44px] leading-none font-bold sm:text-[52px]">+{result.clue_bonus}</dd>
               </div>
             )}
-            <div className="flex flex-col items-center border-l-[1.5px] border-ink px-5 py-5">
+            <div className="flex flex-col items-center px-5 py-5">
               <dt className={LABEL}>Detective rating</dt>
               <dd className="mt-2 flex flex-col items-center">
                 <span className="num text-[44px] leading-none font-bold text-press sm:text-[52px]">{result.rating}</span>
@@ -178,7 +177,6 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
       {result.clean_case && (
         <section className="rise-in mt-8 border-2 border-press bg-sheet p-5 shadow-[var(--hard)] sm:p-6" aria-label="Clean case">
           <div className="flex flex-col items-center gap-5 sm:flex-row">
-            <ConMascot size={120} shape="circle" className="shrink-0" />
             <div className="min-w-0 flex-1 text-center sm:text-left">
               <p className="caps text-2xl font-bold tracking-[0.04em] text-press sm:text-3xl">A clean case</p>
               <p className="mt-1 text-[15px] text-muted italic">Every post in this case was real. Nothing was doctored.</p>
@@ -197,8 +195,8 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
             {i < shown ? (
               <PostReveal post={p} index={i} result={byId.get(p.id)!} verdict={verdicts[p.id]} caseNumber={game.number} />
             ) : (
-              <div className="mb-6 border-[1.5px] border-dashed border-ink px-5 py-5 text-[15px] text-muted italic" aria-hidden="true">
-                Post {i + 1} · opening the file…
+              <div className="mb-6 border-[1.5px] border-[#cfcfcf] px-5 py-5 text-[15px] text-muted italic" aria-hidden="true">
+                Post {i + 1}…
               </div>
             )}
           </li>
@@ -210,7 +208,6 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
           <div className="double-rule" aria-hidden="true" />
           {result.adaptation_message && (
             <div className="flex items-center gap-5 bg-press px-5 py-5 text-white sm:px-6">
-              <ConMascot size={92} shape="circle" className="hidden shrink-0 sm:inline-block" />
               <div className="min-w-0 flex-1">
                 <ConBubble
                   text={result.adaptation_message}
@@ -258,7 +255,7 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
             {copied === 'ok'
               ? 'Copied! Only the grid, case number and rating, never the doctored posts.'
               : copied === 'fail'
-                ? 'Couldn’t reach the clipboard. Copy this instead: ' + shareText.replace(/\n/g, ' · ')
+                ? 'Couldn’t reach the clipboard. Copy this instead: ' + shareText.replace(/\n/g, ' ')
                 : 'Sharing copies only the emoji grid, case number and rating, never the doctored posts.'}
           </p>
           <NextCaseError error={next.error} onRetry={next.open} />

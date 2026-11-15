@@ -1,49 +1,52 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------
-   Newsprint tokens (Figma redesign). One light theme: the dark theme is gone.
-   The old semantic names (--bg, --surface, --real, --con, ...) are kept and
-   mapped onto the newsprint palette so every screen shares one source.
+   Newsprint tokens (Figma v2: grey newsprint, torn black paper, press red).
+   One light theme. The old semantic names (--bg, --surface, --real, --con, ...) are kept and mapped
+   onto the palette so every screen shares one source.
    ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
   /* palette */
   --ink: #141414;
-  --newsprint: #f2e8d5;
-  --sheet: #fbf7ee; /* "paper" in the Figma: sheets and panels */
-  --manila: #e6d3a8;
+  --night: #0a0a0a; /* the torn black paper */
+  --newsprint: #e7e7e7; /* the page */
+  --sheet: #ffffff; /* panels and cards */
+  --paper-white: #fbf7ee; /* type and rules on the black paper */
+  --manila: #dedbd4;
   --press: #c8231b;
   --press-dark: #9e1a14;
   --press-soft: #f07a72; /* the Con's label on ink */
+  --press-tint: #f6d3cf; /* cut words, alerts */
+  --press-wash: #f6e1dc; /* notes */
   --ochre: #b9822a;
   --chart-blue: #2a78d6;
-  --highlight: #ffe58a;
+  --highlight: #e9d7a8; /* "the words the post cut" */
   --rule-soft: #cfc6b4;
 
   /* semantic (kept names) */
   --bg: var(--newsprint);
   --surface: var(--sheet);
-  --surface-2: #f6efe0;
+  --surface-2: #f2f2f0;
   --line: var(--ink);
   --paper: var(--manila);
   --paper-ink: var(--ink);
   --feed-card: #ffffff;
   --text: var(--ink);
-  --muted: #5a544b;
+  --muted: #55524c;
   --real: var(--ink);
   --doctored: var(--press);
   --alarm: var(--ochre);
   --con: var(--press);
   --focus: #1f5fd1;
   --on-accent: #ffffff;
-  /* "caught" is salt: a paper square with an ink crystal */
   --salt: var(--sheet);
   --salt-ink: var(--ink);
   --salt-edge: var(--ink);
 
-  /* one hard shadow everywhere */
-  --hard: 4px 4px 0 var(--ink);
-  --hard-sm: 2px 2px 0 var(--ink);
+  /* Flat print: the v2 design has no offset shadows. The names stay so old call sites keep working. */
+  --hard: 0 0 0 0 transparent;
+  --hard-sm: 0 0 0 0 transparent;
 }
 
 @theme inline {
@@ -76,17 +79,20 @@
   --color-ochre: var(--ochre);
   --color-chart-blue: var(--chart-blue);
   --color-highlight: var(--highlight);
+  --color-night: var(--night);
+  --color-paper-white: var(--paper-white);
+  --color-press-tint: var(--press-tint);
+  --color-press-wash: var(--press-wash);
+  --color-rule-soft: var(--rule-soft);
 
-  /* Bodoni Moda: nameplates and titles. Oswald: condensed caps, buttons, stamps.
-     Old Standard TT: copy, datelines, tables (the Con speaks in its italic).
-     Gloock: the "Grain of Salt" logotype. Inter: only inside feed / post cards. */
-  --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
-  --font-head: "Oswald", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
-  --font-sans: "Old Standard TT", Georgia, "Times New Roman", serif;
-  --font-serif: "Old Standard TT", Georgia, "Times New Roman", serif;
-  --font-con: "Old Standard TT", Georgia, "Times New Roman", serif;
-  --font-mono: "Old Standard TT", Georgia, "Times New Roman", serif;
-  --font-logo: "Gloock", "Bodoni Moda", Georgia, serif;
+  /* Iosevka Charon for everything (titles, buttons, copy, numbers). Inter only inside feed / post cards. */
+  --font-display: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-head: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-sans: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-serif: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-con: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-mono: "Iosevka Charon", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-logo: "Iosevka Charon", ui-monospace, monospace;
   --font-feed: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-code: ui-monospace, "SFMono-Regular", Consolas, monospace;
 
@@ -100,15 +106,15 @@
   --radius-3xl: 0px;
   --radius-4xl: 0px;
 
-  /* One hard shadow (no blur) instead of soft drop shadows. */
-  --shadow-2xs: 2px 2px 0 var(--ink);
-  --shadow-xs: 2px 2px 0 var(--ink);
-  --shadow-sm: 2px 2px 0 var(--ink);
-  --shadow: 4px 4px 0 var(--ink);
-  --shadow-md: 4px 4px 0 var(--ink);
-  --shadow-lg: 4px 4px 0 var(--ink);
-  --shadow-xl: 4px 4px 0 var(--ink);
-  --shadow-2xl: 4px 4px 0 var(--ink);
+  /* Flat print: no shadows. */
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 0 #0000;
+  --shadow-xl: 0 0 #0000;
+  --shadow-2xl: 0 0 #0000;
 }
 
 /* ------------------------------------------------------------------
@@ -138,6 +144,12 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* The page backdrops (collage, torn paper) sit at negative z-index inside this context. */
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  /* The page colour lives inside the isolated group so blend modes (the Home masthead) see it. */
+  background-color: var(--bg);
 }
 
 :focus-visible {
@@ -534,7 +546,6 @@ kbd {
 .panel {
   background: var(--sheet);
   border: 2px solid var(--ink);
-  box-shadow: var(--hard);
 }
 .hard-shadow {
   box-shadow: var(--hard);
@@ -543,17 +554,17 @@ kbd {
 /* The double rule under nameplates and headers. */
 .double-rule {
   border: 0;
-  height: 7px;
+  height: 6px;
   background:
-    linear-gradient(var(--ink), var(--ink)) top / 100% 4px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) bottom / 100% 1px no-repeat;
+    linear-gradient(var(--rule, var(--ink)), var(--rule, var(--ink))) top / 100% 3px no-repeat,
+    linear-gradient(var(--rule, var(--ink)), var(--rule, var(--ink))) bottom / 100% 1px no-repeat;
 }
 .double-rule-thin {
   border: 0;
   height: 5px;
   background:
-    linear-gradient(var(--ink), var(--ink)) top / 100% 1px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) bottom / 100% 1px no-repeat;
+    linear-gradient(var(--rule, var(--ink)), var(--rule, var(--ink))) top / 100% 2px no-repeat,
+    linear-gradient(var(--rule, var(--ink)), var(--rule, var(--ink))) bottom / 100% 1px no-repeat;
 }
 
 /* Press-able chrome: the hard shadow shrinks when pressed. */
@@ -561,31 +572,33 @@ kbd {
   transition: transform 80ms ease-out, box-shadow 80ms ease-out, background-color 120ms;
 }
 .press:not(:disabled):active {
-  transform: translate(2px, 2px);
-  box-shadow: var(--hard-sm);
+  transform: translate(1px, 2px);
 }
 
+/* The verdict stamp (Figma "REAL"): heavy caps in a double-ruled box. */
 .stamp {
   font-family: var(--font-head);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border: 3px solid currentColor;
-  outline: 1.5px solid currentColor;
-  outline-offset: 2px;
-  padding: 0.02em 0.4em;
-  line-height: 1.15;
+  letter-spacing: 0.01em;
+  border: 2px solid currentColor;
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+  padding: 0.04em 0.3em;
+  line-height: 1.1;
   white-space: nowrap;
 }
 
 /* The Con's speech bubble: ink sheet, press-red left rule, Old Standard italic. */
+/* The Con's lines (Figma): a black slip, ink edge with a fine paper rule inside, italic. */
 .con-bubble {
-  background: var(--ink);
-  color: var(--sheet);
-  border-left: 6px solid var(--press);
+  background: var(--night);
+  color: var(--paper-white);
+  border: 2px solid var(--ink);
+  outline: 1.5px solid var(--paper-white);
+  outline-offset: -5px;
   font-family: var(--font-con);
   font-style: italic;
-  box-shadow: var(--hard);
 }
 
 /* Case-file manila (no grain: flat manila with an ink rule). */
@@ -596,7 +609,7 @@ kbd {
 
 /* Halftone dots, for the newspaper photo frame. */
 .halftone {
-  background-image: radial-gradient(circle, #b9ae99 32%, transparent 36%);
+  background-image: radial-gradient(circle, #b3b3b3 32%, transparent 36%);
   background-size: 7px 7px;
 }
 
@@ -619,5 +632,117 @@ kbd {
 .thin-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--muted) transparent;
+}
+
+/* ---- v2 print pieces ---- */
+
+/* The red kicker tag above a page title ("ROLE REVERSAL", "LEARN MORE"). */
+.kicker {
+  display: inline-block;
+  background: var(--press);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 30px;
+}
+
+/* Page title on the black paper: huge Iosevka caps. */
+.hero-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-size: clamp(48px, 8.4vw, 86px);
+}
+
+/* Anything set on the black paper: paper-white type and rules. */
+.on-night {
+  color: var(--paper-white);
+  --rule: var(--paper-white);
+}
+
+/*
+ * The torn hero: a band of black paper whose bottom edge is the torn texture, running low on the
+ * left and high on the right (Figma "Texturelabs_Paper_133L" under every page header). It is drawn
+ * full-bleed behind the hero; the newspaper collage sits on top of it (see .collage-layer).
+ */
+.torn-hero {
+  position: relative;
+  padding-bottom: 110px;
+}
+.torn-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -20;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  pointer-events: none;
+  --tw: max(100vw, 1200px);
+  /* The tear's height is capped (not tied to the width) so its rising edge never climbs past the
+     hero's bottom padding into the white type above it. */
+  --th: min(calc(var(--tw) * 0.443), 260px);
+  background:
+    url('./assets/figma/torn-h.webp') right bottom / var(--tw) var(--th) no-repeat,
+    linear-gradient(var(--night), var(--night)) top / 100% calc(100% - var(--th) + 6px) no-repeat;
+  transform: scaleX(-1);
+}
+@media (min-width: 768px) {
+  .torn-hero {
+    padding-bottom: 150px;
+  }
+}
+
+/* A torn black patch (Figma: scraps of black paper) behind a centred card or message. */
+.torn-patch {
+  position: relative;
+  isolation: isolate;
+}
+.torn-patch::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -14% -9%;
+  background: url('./assets/figma/torn-patch.webp') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* The newspaper collage over the whole page at 15% (Figma "AdobeStock" layer). */
+.collage-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  opacity: 0.15;
+  background: url('./assets/figma/newspaper-collage.webp') center top / cover no-repeat;
+}
+
+/* Translucent paper card on the collage (Case Files rows, deck tiles). */
+.paper-card {
+  background: rgb(255 255 255 / 0.62);
+  border: 2px solid var(--ink);
+}
+
+/* The page column (Figma: 60px margins on a 1440 frame). */
+.page-wrap {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 16px;
+}
+@media (min-width: 640px) {
+  .page-wrap {
+    padding-inline: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .page-wrap {
+    padding-inline: 60px;
+  }
 }
 }

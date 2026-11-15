@@ -22,9 +22,9 @@ const GRID = '#E7E9EC'
 const AXIS = '#B8BEC6'
 const SERIES = '#2a78d6'
 const TRICK = '#C8231B' // the trick marker: press red (red on white: 5.6:1)
-const TRICK_BG = '#FBE4E1'
+const TRICK_BG = '#f6e1dc'
 const HONEST = '#141414' // honest = ink (the redesign drops green)
-const HONEST_BG = '#EFE9DC'
+const HONEST_BG = '#efefef'
 
 export function niceStep(range: number, target = 5): number {
   if (!(range > 0)) return 1

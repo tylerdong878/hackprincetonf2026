@@ -119,7 +119,7 @@ export function FeedCard({
         )}
       </div>
 
-      <div className="watermark-strip border-t border-dashed border-[#D9D2C2] bg-[#F7F4EE] px-4 py-1.5 text-[10px] font-medium text-[#7D776A]">
+      <div className="watermark-strip border-t border-[#e0e0e0] bg-[#f5f5f5] px-4 py-1.5 text-[10px] font-medium text-[#777777]">
         {watermarkText ?? watermark(caseNumber)}
       </div>
 
@@ -261,7 +261,7 @@ export function PostCard({
         style={{ borderColor: frameBorder, color: selected ? 'var(--focus)' : 'var(--ink)' }}
       >
         <span>Post {n}</span>
-        {selected && <span>· inspecting</span>}
+        {selected && <span>inspecting</span>}
       </div>
 
       {/* verdict stamp, top right */}

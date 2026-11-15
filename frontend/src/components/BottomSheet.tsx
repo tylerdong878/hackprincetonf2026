@@ -79,7 +79,7 @@ export function BottomSheet({
           onPointerUp={onUp}
           onPointerCancel={onUp}
         >
-          <span className="h-1.5 w-12 bg-[#B9AE99]" aria-hidden="true" />
+          <span className="h-1.5 w-12 bg-[#a8a8a8]" aria-hidden="true" />
           <span className="sr-only">Drag to resize</span>
         </div>
         <div className="flex shrink-0 justify-end gap-1 px-3">

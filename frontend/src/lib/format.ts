@@ -24,7 +24,7 @@ export const TRICK_FORMAT: Record<string, string> = {
 
 export const caseNo = (n: number | undefined | null) => `#${String(n ?? 0).padStart(4, '0')}`
 
-export const watermark = (n: number | undefined | null) => `CASE ${caseNo(n)} · TRAINING MATERIAL`
+export const watermark = (n: number | undefined | null) => `CASE ${caseNo(n)} TRAINING MATERIAL`
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -138,7 +138,7 @@ export const OUTCOMES: Record<Outcome, OutcomeStyle> = {
   },
 }
 
-export const GRID_LEGEND = '🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled'
+export const GRID_LEGEND = '🟩 trusted, 🧂 caught, 🟨 false alarm, 🟥 fooled'
 
 export function outcomeStyle(o: string): OutcomeStyle {
   return (
