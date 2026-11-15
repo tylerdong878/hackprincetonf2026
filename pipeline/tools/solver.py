@@ -28,7 +28,8 @@ from pipeline.context import RunContext, SolverSession
 from pipeline.textutil import clip
 
 AGENT = "blind-solver"
-TrickOrUnknown = Literal["out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail", "unknown"]
+TrickOrUnknown = Literal["out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail",
+                         "made-up-story", "unknown"]
 
 
 # --------------------------------------------------------------------------------------
@@ -160,6 +161,10 @@ TRICK_GUIDE = (
 )
 
 
+MADE_UP_GUIDE = (" made-up-story (a whole claim the Con invented, posted by a made-up account with no source; "
+                 "real news can be strange too, so check the source before calling it).")
+
+
 def post_lines(p: dict, *, with_time: bool = True) -> list[str]:
     """A post as plain text, using only player-visible fields (shared by the case solver and the Con judge)."""
     a = p["author"]
@@ -192,7 +197,8 @@ def sealed_briefing(ctx: RunContext, *, attach_images: bool) -> HumanMessage:
         f"Case {case['id']}: \"{case['title']}\". The Con says: \"{case['briefing']}\"",
         f"You have {case['clue_budget']} clue tokens. open_evidence(post_id, tool) spends one per new "
         "(post, tool) pair; view_chart is free.",
-        TRICK_GUIDE + " Some cases have NO doctored post at all, and real posts can look dramatic.",
+        TRICK_GUIDE + (MADE_UP_GUIDE if "made-up-story" in (case.get("trick_options") or []) else "")
+        + " Some cases have NO doctored post at all, and real posts can look dramatic.",
         "",
         "Feed:",
     ]

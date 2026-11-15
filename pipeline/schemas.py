@@ -7,7 +7,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 
-TrickId = Literal["out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail"]
+TrickId = Literal["out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail", "made-up-story"]
 ToolId = Literal["source", "data", "account"]
 Status = Literal["draft", "awaiting_approval", "approved", "rejected"]
 Difficulty = Literal["easy", "medium", "hard"]
@@ -180,7 +180,18 @@ class DetailDiff(_Strict):
     changed: list[DetailChange] = Field(min_length=1)
 
 
-Diff = Annotated[ChartDiff | QuoteDiff | StatDiff | DetailDiff, Field(discriminator="type")]
+class MadeUpDiff(_Strict):
+    """made-up-story: a claim the Con invented, beside the closest real story it borrows its feel from."""
+
+    type: Literal["made_up"]
+    shown: str
+    real: str
+    outlet: str
+    date: str | None = None
+    url: str | None = None
+
+
+Diff = Annotated[ChartDiff | QuoteDiff | StatDiff | DetailDiff | MadeUpDiff, Field(discriminator="type")]
 
 
 class DoctoredAnswer(_Strict):
@@ -224,13 +235,15 @@ class Meta(_Strict):
     mode: Literal["daily", "casefile"] | None = None  # §7.1 (absent = "casefile")
     daily_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     theme: str | None = None
+    # Set by the server when approving moves a daily to the next open day: the date it was built for.
+    planned_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
 
 
 # ---------------------------------------------------------------- cross-file checks
 
 
 _DIFF_FOR_TRICK = {"out-of-context-quote": "quote", "misleading-chart": "chart", "cherry-picked-stat": "stat",
-                   "edited-detail": "detail"}
+                   "edited-detail": "detail", "made-up-story": "made_up"}
 _RANGE_RE = re.compile(r"\b0\s*[–-]\s*3\b")
 _COUNT_RE = re.compile(r"\b(?:\d+|no|zero|one|two|three|four|five|a single|only one)\s+(?:of\s+(?:them|these)\s+)?"
                        r"(?:is\s+|are\s+)?(?:doctored|fakes?|forg\w*|lies?)\b", re.IGNORECASE)
@@ -282,8 +295,8 @@ def validate_bundle(case: dict, evidence: dict, answer_key: dict, meta: dict) ->
         problems.append("trick_options is empty")
     for pid, ans in doctored.items():
         post = next((p for p in c.posts if p.id == pid), None)
-        if post is not None and ans.trick == "edited-detail" and post.author.kind != "person":
-            problems.append(f"{pid}: edited-detail is only allowed on made-up-account posts")
+        if post is not None and ans.trick in ("edited-detail", "made-up-story") and post.author.kind != "person":
+            problems.append(f"{pid}: {ans.trick} is only allowed on made-up-account posts")
     if m.mode == "daily":
         if len(c.posts) != 5:
             problems.append(f"a daily case has 5 posts (got {len(c.posts)})")

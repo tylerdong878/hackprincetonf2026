@@ -118,6 +118,7 @@ class RunContext:
     articles: list[str] | None = None
     has_data: bool | None = None
     doctored_at: list[str] | None = None  # override the random doctored positions (tests)
+    fake_style: str = "twist"  # daily: "twist" (edit real posts) or "made-up" (invent whole stories)
     used_urls: frozenset[str] | None = None  # stories other approved/pending puzzles use (loaded on first check)
     _counters: dict[str, int] = field(default_factory=dict)
     # Parallel tool calls in one model turn run in threads: guard ids, lists and file writes.
@@ -165,6 +166,13 @@ class RunContext:
         rng = random.Random(f"doctored-slots-{self.case_id}")
         return [f"p{i}" for i in sorted(rng.sample(range(1, self.post_count_range[0] + 1), k=n))]
 
+    def _made_up_text(self) -> str:
+        if "made-up-story" not in self.tricks:
+            return ""
+        return (" Each made-up-story is a whole claim the Con invents with make_tall_tale, modeled on (but different "
+                "from) a real saved story; read /skills/made-up-story/SKILL.md. Real posts stay word for word; make "
+                "at least one of them startling but true, so weird never means fake.")
+
     def _slots_text(self) -> str:
         s = self.doctored_slots
         return (f" Put the doctored post{'s' if len(s) > 1 else ''} at {', '.join(s)} (this case's random "
@@ -191,7 +199,7 @@ class RunContext:
             return (f"Daily Grain for {self.daily_date} (theme: {self.theme}). Exactly {DAILY_POSTS} posts: "
                     f"{len(self.tricks)} doctored (tricks: {tricks}), at least one real post that sounds absurd but "
                     f"is true (real_suspicious), the rest plainly real. The briefing states the range "
-                    f"'{DAILY_RANGE_TEXT}', never the count." + self._slots_text())
+                    f"'{DAILY_RANGE_TEXT}', never the count." + self._slots_text() + self._made_up_text())
         if self.clean:
             return "Case file: 4 posts, NO doctored post (all real), at least one real post that looks suspicious."
         return (f"Case file: 4 posts: exactly one doctored post (trick: {self.trick or 'your choice'}), at least one "

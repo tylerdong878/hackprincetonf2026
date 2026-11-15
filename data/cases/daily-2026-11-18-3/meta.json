@@ -1,0 +1,22 @@
+{
+  "status": "approved",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T09:11:39Z",
+  "tricks": [
+    "made-up-story"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/14/nx-s1-6032604/organ-transplant-donor-dead-ethics",
+    "https://www.npr.org/2026/11/13/nx-s1-6039312/spacex-nasa-starship-iss-dragon-falcon-musk",
+    "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus",
+    "https://nj1015.com/ixp/564/p/larry-kane-retires-philadelphia-tv/",
+    "https://nj1015.com/ixp/394/p/jersey-birds-photographs/"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-15",
+  "theme": "Too Good To Be True",
+  "planned_date": "2026-11-18"
+}

@@ -1,6 +1,6 @@
 // Shapes from CONTRACT.md §2.1, §3, §5, §6. Fields the server may omit are optional.
 
-export type TrickId = 'out-of-context-quote' | 'misleading-chart' | 'cherry-picked-stat' | 'edited-detail' | (string & {})
+export type TrickId = 'out-of-context-quote' | 'misleading-chart' | 'cherry-picked-stat' | 'edited-detail' | 'made-up-story' | (string & {})
 export type ToolId = 'source' | 'data' | 'account'
 
 export interface ChartPoint {
@@ -134,7 +134,16 @@ export interface DetailDiff {
   original: string
   changed?: { from: string; to: string }[]
 }
-export type Diff = ChartDiff | QuoteDiff | StatDiff | DetailDiff
+/** A whole story the Con made up, next to the closest real story it was modeled on. */
+export interface MadeUpDiff {
+  type: 'made_up'
+  shown: string
+  real: string
+  outlet?: string | null
+  date?: string | null
+  url?: string | null
+}
+export type Diff = ChartDiff | QuoteDiff | StatDiff | DetailDiff | MadeUpDiff
 
 export interface PostResult {
   post_id: string

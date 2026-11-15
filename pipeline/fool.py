@@ -32,7 +32,8 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from pydantic import Field, create_model
 
 from pipeline.charts import render_chart_png
-from pipeline.config import EVIDENCE_TOOLS, TRICKS
+from pipeline.config import EVIDENCE_TOOLS
+from pipeline.config import TWIST_TRICKS as TRICKS  # players only edit real posts here
 from pipeline.safety import RealEntity, fictional_author_problems, known_entities, person_name_part
 from pipeline.textutil import clip, month_label, normalize, sentence_spans
 from pipeline.tools.forging import MIN_KEPT_WORDS, crop_tokens

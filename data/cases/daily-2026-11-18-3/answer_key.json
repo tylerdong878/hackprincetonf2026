@@ -1,0 +1,56 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real. A random account shared it, but the words are exactly NPR's (Nov 14, 2026), as the source label says.",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p2": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from NPR (Nov 13, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p3": {
+      "doctored": true,
+      "trick": "made-up-story",
+      "tell": "A fifteen-foot pastry given away free weekly is too neat; no bakery name or location to verify.",
+      "explanation": "The Con invented this claim modeled on the real story of Carnegie Deli reopening after a decade. No boardwalk bakery has announced a 15-foot cinnamon roll giveaway. The tell is the suspiciously round 'fifteen-foot' measure and the perfect 'free if you finish it' hook with no verifiable source.",
+      "con_line_fooled": "Smelled like warm cinnamon and a headline, didn't it?",
+      "con_line_caught": "Too tidy? Fine. Real news is messier.",
+      "diff": {
+        "type": "made_up",
+        "shown": "Boardwalk bakery debuts fifteen-foot cinnamon roll weekly, free for anyone eating entire pastry",
+        "real": "Iconic Carnegie Deli reopens in Midtown Manhattan after 10-year hiatus",
+        "outlet": "NPR",
+        "date": "2026-09-19",
+        "url": "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus"
+      }
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from New Jersey 101.5 (Nov 14, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    },
+    "p5": {
+      "doctored": true,
+      "trick": "made-up-story",
+      "tell": "A bird spelling 'food' in code at the exact same time each dawn is too perfect; no study or location named.",
+      "explanation": "The Con made this up, borrowing the backyard-bird feel from a real NJ 101.5 piece about a photographer's garden visitors. No goldfinch has been documented tapping Morse-like code for food at precise sunrise. The tell is the impossibly neat 'perfectly each dawn' rhythm with no researcher, institution, or town attached.",
+      "con_line_fooled": "It chirped like a viral nature clip, didn't it?",
+      "con_line_caught": "Too tidy? Fine. Real nature is messier.",
+      "diff": {
+        "type": "made_up",
+        "shown": "Backyard goldfinch taps out code on feeder spelling food perfectly each dawn",
+        "real": "My Fav Birds Here In The Garden State I Photographed",
+        "outlet": "New Jersey 101.5",
+        "date": "2026-11-14",
+        "url": "https://nj1015.com/ixp/394/p/jersey-birds-photographs/"
+      }
+    }
+  },
+  "con_line_clean": null
+}

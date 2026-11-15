@@ -101,14 +101,14 @@ export function Investigation({
     [isMobile],
   )
 
-  // Keyboard play (SPEC §3.12): Tab through posts, R / D to mark, 1–4 to name the trick, E for evidence.
+  // Keyboard play (SPEC §3.12): Tab through posts, R / D to mark, 1–9 to name the trick, E for evidence.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || locked) return
       const target = e.target as HTMLElement | null
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return
       const k = e.key.toLowerCase()
-      if (!['r', 'd', 'e', '1', '2', '3', '4'].includes(k)) return
+      if (!['r', 'd', 'e'].includes(k) && !/^[1-9]$/.test(k)) return
       const id = selectedId ?? posts[0]?.id
       if (!id) return
       e.preventDefault()
@@ -152,7 +152,7 @@ export function Investigation({
     />
   )
 
-  const trickKeys = `1–${Math.max(1, Math.min(4, game.trick_options.length))}`
+  const trickKeys = `1–${Math.max(1, Math.min(9, game.trick_options.length))}`
 
   const submitBtn = (
     <button

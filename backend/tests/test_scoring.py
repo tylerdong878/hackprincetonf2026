@@ -2,7 +2,8 @@
 import pytest
 
 from backend.app.con_lines import adaptation_message
-from backend.app.scoring import empty_counters, mastery, post_format, rank, rating
+from backend.app.scoring import (TRICKS, empty_counters, mastery, per_trick, post_format, rank, rating, record_verdict,
+                                 score_post)
 from backend.app.selection import Candidate, pick_next
 from backend.app.store import new_profile
 
@@ -133,3 +134,27 @@ def test_adaptation_messages():
     profile["history"] = [{"case_id": "a", "tools_used": ["source"]}]
     assert "craftier" in adaptation_message(scored(ok), profile)
     assert "clean feed" in adaptation_message(scored(ok, clean=True), profile)
+
+
+# ---- made-up-story: a whole story the Con invented ---------------------------------------------
+
+MADE_UP_DIFF = {"type": "made_up", "shown": "Octopuses now open childproof jars in exactly 9 seconds.",
+                "real": "Octopuses can learn to open jars.", "outlet": "NPR", "date": "2026-11-10", "url": None}
+
+
+def test_made_up_story_scores_like_the_other_tricks():
+    assert "made-up-story" in TRICKS and "made-up-story" in new_profile("p")["tricks"]
+    post = {"id": "p2", "body": MADE_UP_DIFF["shown"], "chart": None, "quote": None}
+    key = {"doctored": True, "trick": "made-up-story", "tell": "No outlet ran it.", "diff": MADE_UP_DIFF}
+    caught, rec = score_post(post, key, True, "made-up-story")
+    assert (caught["outcome"], caught["points"], caught["trick_named_correctly"]) == ("caught", 150, True)
+    assert caught["diff"] == MADE_UP_DIFF
+    fooled, fooled_rec = score_post(post, key, False, None)
+    assert (fooled["outcome"], fooled["points"], fooled["trick"]) == ("fooled", 0, "made-up-story")
+
+    profile = new_profile("p")
+    record_verdict(profile, "c1", {"score": 150, "records": [rec, fooled_rec]}, ["source"], "2026-11-15T00:00:00Z")
+    assert profile["tricks"]["made-up-story"] == dict(empty_counters(), shown=2, caught=1, missed=1, named=1)
+    assert per_trick(profile["tricks"])["made-up-story"] == {"miss_rate": 0.5, "false_alarm_rate": 0.0, "mastery": 1}
+    msg = adaptation_message(scored(dict(fooled_rec)), profile)
+    assert msg == "The Con has noticed: you believe a story just because it sounds like news."

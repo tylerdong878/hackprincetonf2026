@@ -1,9 +1,10 @@
 """Verdict scoring, profile updates, Detective rating and ranks (CONTRACT §3-§4)."""
 from __future__ import annotations
 
-TRICKS = ("out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail")
+TRICKS = ("out-of-context-quote", "misleading-chart", "cherry-picked-stat", "edited-detail", "made-up-story")
 
-# A real post's format counts toward honest_shown / false_alarms of the matching trick.
+# A real post's format counts toward honest_shown / false_alarms of the matching trick. Formats, not tricks: a real
+# headline counts as "text" (edited-detail and made-up-story have no format of their own).
 FORMAT_TRICK = {
     "chart": "misleading-chart",
     "quote": "out-of-context-quote",
