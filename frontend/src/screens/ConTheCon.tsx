@@ -166,7 +166,7 @@ function editLabel(item: FoolDeckItem | undefined, e: FoolEdit): string {
     case 'window':
       return `${formatMonth(e.window[0])} vs ${formatMonth(e.window[1])}`
     case 'crop': {
-      const words = item?.editable.quote_words ?? []
+      const words = cropWords(item)
       const cut = words.filter((_, i) => !e.keep_word_indices.includes(i))
       return `Cut “${cut.slice(0, 4).join(' ')}${cut.length > 4 ? '…' : ''}”`
     }
@@ -180,6 +180,13 @@ function editLabel(item: FoolDeckItem | undefined, e: FoolEdit): string {
 }
 
 // ---- edit helpers -----------------------------------------------------------------------------
+/** The words a crop cuts from: the quote if the post has one, otherwise the post's own text (mirrors apply_edit). */
+function cropWords(item: FoolDeckItem | undefined): string[] {
+  if (!item) return []
+  if (item.post.quote) return item.editable.quote_words ?? item.post.quote.text.split(/\s+/)
+  return (item.post.body ?? '').trim().split(/\s+/).filter(Boolean)
+}
+
 function seriesOf(item: FoolDeckItem) {
   return item.editable.chart_series ?? item.post.chart?.points ?? []
 }
@@ -237,7 +244,7 @@ function initialState(item: FoolDeckItem): EditorState {
 
 function stateFromEdit(item: FoolDeckItem, e: FoolEdit): EditorState {
   const st = initialState(item)
-  const words = item.editable.quote_words ?? []
+  const words = cropWords(item)
   switch (e.type) {
     case 'crop':
       return { ...st, tool: 'crop', removed: words.map((_, i) => i).filter((i) => !e.keep_word_indices.includes(i)) }
@@ -253,7 +260,7 @@ function stateFromEdit(item: FoolDeckItem, e: FoolEdit): EditorState {
 }
 
 function buildEdit(item: FoolDeckItem, st: EditorState): FoolEdit {
-  const words = item.editable.quote_words ?? []
+  const words = cropWords(item)
   switch (st.tool) {
     case 'crop':
       return st.removed.length ? { type: 'crop', keep_word_indices: words.map((_, i) => i).filter((i) => !st.removed.includes(i)) } : { type: 'none' }
@@ -277,7 +284,7 @@ function previewPost(item: FoolDeckItem, edit: FoolEdit, author: Author): Post {
   const p: Post = { ...item.post, quote: item.post.quote ? { ...item.post.quote } : item.post.quote }
   if (edit.type === 'none') return p
   if (edit.type === 'crop') {
-    const words = item.editable.quote_words ?? []
+    const words = cropWords(item)
     let shown = edit.keep_word_indices
       .map((i) => words[i])
       .join(' ')
@@ -285,8 +292,12 @@ function previewPost(item: FoolDeckItem, edit: FoolEdit, author: Author): Post {
       .replace(/[,;:]+$/, '')
     if (shown && shown[0] !== shown[0].toUpperCase()) shown = shown[0].toUpperCase() + shown.slice(1)
     shown = `${shown.replace(/[.!?…]+$/, '')}.`
-    if (p.quote) p.quote = { ...p.quote, text: shown }
-    p.body = ''
+    if (p.quote) {
+      p.quote = { ...p.quote, text: shown }
+      p.body = ''
+    } else {
+      p.body = shown
+    }
   } else if (edit.type === 'axis' && p.chart) {
     const values = p.chart.points.map((x) => x.value)
     p.chart = { ...p.chart, y_min: edit.y_min, y_max: axisTop(values, edit.y_min) }
@@ -1184,7 +1195,7 @@ export function ConTheCon() {
               <div role="tabpanel" className="border-2 border-ink bg-white/70 px-6 pt-6 pb-8">
                 <p className="mb-2 text-[16px] font-bold">{TOOL_META[st.tool].hint}</p>
                 {st.tool === 'crop' && (
-                  <CropTool words={item.editable.quote_words ?? []} removed={st.removed} onChange={(removed) => setSt({ ...st, removed })} />
+                  <CropTool words={cropWords(item)} removed={st.removed} onChange={(removed) => setSt({ ...st, removed })} />
                 )}
                 {st.tool === 'axis' && <AxisTool item={item} yMin={st.yMin} onChange={(yMin) => setSt({ ...st, yMin })} />}
                 {st.tool === 'window' && <WindowTool item={item} value={st.window} onChange={(window) => setSt({ ...st, window })} />}

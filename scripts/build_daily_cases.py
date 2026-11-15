@@ -951,12 +951,12 @@ def build_deck(prices: dict, eggs: dict, coffee: dict) -> list[dict]:
                    t("ROBINSON_WRECK"), t("ROBINSON_AFTER"), body=t("SCHOONER_HEADLINE")),
     ]
     ace = outlet_post("p1", "njm_0924", "stat", t("ACE_BEFORE"), t("ACE_PASSAGE"), "", body=t("ACE_PASSAGE"))
-    deck.append(deck_item("ace-offset", "stat", ace, ["drop"], stat={
+    deck.append(deck_item("ace-offset", "stat", ace, ["crop", "drop"], stat={
         "full": t("ACE_PASSAGE"),
         "droppable": [{"id": "offset", "text": t("ACE_FALL"), "shown_without": t("ACE_RISE")}]}))
     candy = outlet_post("p1", "npr_candy", "stat", t("CANDY_BEFORE"), t("CANDY_STAT"), t("CANDY_AFTER"),
                         body=t("CANDY_STAT"))
-    deck.append(deck_item("candy-two-years", "stat", candy, ["drop"], stat={
+    deck.append(deck_item("candy-two-years", "stat", candy, ["crop", "drop"], stat={
         "full": t("CANDY_STAT"),
         "droppable": [
             {"id": "window", "text": "have risen 7.7% in one year and … in two years",
@@ -1155,7 +1155,7 @@ def check_deck(deck: list[dict]) -> None:
             assert d["tools"] == ["axis", "window"] and ed["chart_series"] == ev["data"]["table"], where
             assert [x["value"] for x in ed["chart_series"]] == [x["value"] for x in p["chart"]["points"]], where
         else:
-            assert d["tools"] == ["drop"] and ed["stat"]["full"] == p["body"], where
+            assert d["tools"] == ["crop", "drop"] and ed["stat"]["full"] == p["body"], where
             for dr in ed["stat"]["droppable"]:
                 assert is_deletion(dr["shown_without"], ed["stat"]["full"]), f"{where}/{dr['id']}: drop must delete"
 

@@ -104,22 +104,31 @@ def _display_label(label: str) -> str:
 
 
 def _edit_crop(post: dict, editable: dict, edit: dict) -> tuple[dict, bool, dict | None]:
+    """Deletion-only word cuts: on the quote if the post has one, otherwise on the post's own text."""
     quote = post.get("quote")
-    if not quote:
-        raise ValueError("crop needs a quote post")
-    words = list(editable.get("quote_words") or quote["text"].split())
+    if quote:
+        words = list(editable.get("quote_words") or quote["text"].split())
+    else:
+        words = (post.get("body") or "").split()
+        if not words:
+            raise ValueError("crop needs a quote or some post text")
     keep = edit.get("keep_word_indices")
     if not isinstance(keep, list) or not all(isinstance(i, int) and not isinstance(i, bool) for i in keep):
         raise ValueError("keep_word_indices must be a list of word indices")
     if len(keep) < MIN_KEPT_WORDS:
         raise ValueError(f"a crop keeps at least {MIN_KEPT_WORDS} words")
     if any(i < 0 or i >= len(words) for i in keep):
-        raise ValueError("keep_word_indices has an index outside the quote")
+        raise ValueError("keep_word_indices has an index outside the text")
     if any(b <= a for a, b in zip(keep, keep[1:], strict=False)):
         raise ValueError("keep_word_indices must be in order, each word once (deletion only)")
     if len(keep) == len(words):
         return post, False, None
     shown, removed = crop_tokens(words, keep)
+    if not quote:  # a stat or headline post: the cut text is the post itself (cherry-picking the numbers)
+        original = post.get("body") or ""
+        post["body"] = shown
+        return post, True, {"type": "stat", "shown": shown, "original": original,
+                            "missing": removed[0] if removed else "", "removed": removed}
     original = quote["text"]
     post["quote"] = {"text": shown, "speaker": quote["speaker"]}
     post["body"] = ""  # the outlet's lead line could contradict the crop; the made-up account just posts the quote
@@ -240,7 +249,8 @@ def apply_edit(deck_item: dict, edit: dict) -> dict:
         return {"edited_post": copy.deepcopy(deck_item["post"]), "changed": False, "trick": None, "diff": None}
     post["author"] = edited_author(deck_item)  # §8.3: a doctored post never appears as the real outlet
     post["source_label"] = None
-    return {"edited_post": post, "changed": True, "trick": EDIT_TRICK[etype], "diff": diff}
+    trick = "cherry-picked-stat" if etype == "crop" and diff and diff.get("type") == "stat" else EDIT_TRICK[etype]
+    return {"edited_post": post, "changed": True, "trick": trick, "diff": diff}
 
 
 # ======================================================================================

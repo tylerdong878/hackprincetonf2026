@@ -282,7 +282,8 @@ export function DiffView({
       </OriginalPanel>
     )
   } else if (diff.type === 'stat') {
-    const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
+    const cut = diff.removed?.length ? diff.removed : diff.missing ? [diff.missing] : []
+    const runs = cut.length ? highlightRuns(diff.original, cut) : [{ s: diff.original, hit: false }]
     const found = runs.some((r) => r.hit)
     right = (
       <OriginalPanel note={diff.missing && !found ? <>Left out: <b>{diff.missing}</b></> : <>Highlighted: what the post left out.</>}>
@@ -430,7 +431,8 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     )
   }
   if (diff.type === 'stat') {
-    const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
+    const cut = diff.removed?.length ? diff.removed : diff.missing ? [diff.missing] : []
+    const runs = cut.length ? highlightRuns(diff.original, cut) : [{ s: diff.original, hit: false }]
     return (
       <div className={box}>
         <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#555555]">The full numbers</p>

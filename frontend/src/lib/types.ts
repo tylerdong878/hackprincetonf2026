@@ -127,6 +127,8 @@ export interface StatDiff {
   shown: string
   original: string
   missing?: string
+  /** Con the Con word cuts on a stat post: every phrase the player removed. */
+  removed?: string[]
 }
 export interface DetailDiff {
   type: 'detail'

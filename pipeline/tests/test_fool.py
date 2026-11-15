@@ -470,3 +470,23 @@ def test_trace_keeps_its_name_and_is_tagged_with_the_level(monkeypatch):
     judge_post(quote_item()["post"], quote_item()["evidence"], level=1)
     assert got["extra"]["metadata"] == {"con_level": 1, "con_level_name": "Rookie Con"}
     assert "con-level-1" in got["extra"]["tags"] and got["kwargs"]["level"] == 1
+
+
+def test_crop_cuts_words_from_a_stat_post_too():
+    item = stat_item()
+    item["tools"] = ["crop", "drop"]
+    words = ACE_FULL.split()
+    cut_from = next(i for i, w in enumerate(words) if w.lower().startswith("but"))
+    out = apply_edit(item, {"type": "crop", "keep_word_indices": list(range(cut_from))})
+    assert out["changed"] and out["trick"] == "cherry-picked-stat"
+    post = out["edited_post"]
+    assert post["quote"] is None and post["body"].rstrip(".,") == " ".join(words[:cut_from]).rstrip(".,")
+    assert out["diff"]["type"] == "stat" and out["diff"]["original"] == ACE_FULL and out["diff"]["removed"]
+    assert_made_up(post)
+    # deletion only: out of order or too short is refused
+    with pytest.raises(ValueError):
+        apply_edit(item, {"type": "crop", "keep_word_indices": [3, 1, 2, 4]})
+    with pytest.raises(ValueError):
+        apply_edit(item, {"type": "crop", "keep_word_indices": [0, 1]})
+    # keeping every word is no change
+    assert apply_edit(item, {"type": "crop", "keep_word_indices": list(range(len(words)))})["changed"] is False
