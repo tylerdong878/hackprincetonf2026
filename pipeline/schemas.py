@@ -235,6 +235,8 @@ class Meta(_Strict):
     mode: Literal["daily", "casefile"] | None = None  # §7.1 (absent = "casefile")
     daily_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     theme: str | None = None
+    # Set by the server when approving moves a daily to the next open day: the date it was built for.
+    planned_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
 
 
 # ---------------------------------------------------------------- cross-file checks

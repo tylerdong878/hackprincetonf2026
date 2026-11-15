@@ -1,5 +1,5 @@
 {
-  "status": "approved",
+  "status": "rejected",
   "origin": "pipeline",
   "daily": false,
   "difficulty": "hard",
@@ -14,7 +14,7 @@
     "https://nj1015.com/new-monmouth-diner-new-jersey/",
     "https://www.npr.org/2026/09/24/nx-s1-5977047/south-africa-braai-bbq"
   ],
-  "rejection_reason": null,
+  "rejection_reason": "Replaced as today's Daily by the made-up-story style (#24): its fake was a one-word crop a player couldn't catch from the card. Its agent run (fail, revise, pass) stays here to show.",
   "mode": "daily",
   "daily_date": "2026-11-15",
   "theme": "Strange But True",

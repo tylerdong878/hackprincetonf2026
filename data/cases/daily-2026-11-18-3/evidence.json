@@ -1,0 +1,106 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-14",
+      "url": "https://www.npr.org/2026/11/14/nx-s1-6032604/organ-transplant-donor-dead-ethics",
+      "before": "",
+      "highlight": "A new policy could help solve the U.S. organ shortage. Critics say it's unethical",
+      "after": "New guidelines are supposed to protect organ donors in a retrieval procedure that keeps blood flowing through livers, kidneys, lungs and hearts. But bioethicists have troubling questions."
+    },
+    "account": {
+      "name": "Jersey Bill Watch",
+      "handle": "@jerseybills",
+      "created": "October 2026",
+      "followers": 1840,
+      "verified": false,
+      "bio": "Exposing what they don't want you to know about your bills.",
+      "recent_posts": [
+        "Your utility bill is a SCAM. Thread 🧵",
+        "Share before they delete this!"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-13",
+      "url": "https://www.npr.org/2026/11/13/nx-s1-6039312/spacex-nasa-starship-iss-dragon-falcon-musk",
+      "before": "",
+      "highlight": "SpaceX's giant rocket may leave NASA in the dust",
+      "after": "As it races to develop its new massive rocket, the space launch company is preparing to retire NASA's main ride to the International Space Station. (Image credit: Eric Gay)"
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-19",
+      "url": "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus",
+      "before": "",
+      "highlight": "Iconic Carnegie Deli reopens in Midtown Manhattan after 10-year hiatus",
+      "after": "Carnegie Deli, famous for its sandwiches piled high with meat, has reopened as a sit-down restaurant in New York City after a 10-year hiatus."
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-14",
+      "url": "https://nj1015.com/ixp/564/p/larry-kane-retires-philadelphia-tv/",
+      "before": "",
+      "highlight": "A Philadelphia Broadcasting Legend is Signing Off After 69 Years",
+      "after": "Larry Kane, a familiar face and voice to generations of Philadelphia and South Jersey audiences, is retiring after 69 years in radio and television. Continue reading…"
+    },
+    "account": {
+      "name": "New Jersey 101.5",
+      "handle": "@nj1015",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "Radio news · nj1015.com",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "New Jersey 101.5",
+      "date": "2026-11-14",
+      "url": "https://nj1015.com/ixp/394/p/jersey-birds-photographs/",
+      "before": "",
+      "highlight": "My Fav Birds Here In The Garden State I Photographed",
+      "after": "One Jersey photographer shares his backyard and shoreline finds, from bald eagles to a summer goldfinch. Continue reading…"
+    },
+    "account": {
+      "name": "Scroll Patrol",
+      "handle": "@scrollpatrol",
+      "created": "June 2019",
+      "followers": 22400,
+      "verified": false,
+      "bio": "I read the whole feed so you don't have to. 📱",
+      "recent_posts": [
+        "Today's feed, ranked.",
+        "Not a bot. Probably."
+      ]
+    }
+  }
+}
