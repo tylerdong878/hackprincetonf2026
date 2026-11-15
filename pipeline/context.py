@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import random
 import threading
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -116,6 +117,7 @@ class RunContext:
     feeds: list[str] | None = None
     articles: list[str] | None = None
     has_data: bool | None = None
+    doctored_at: list[str] | None = None  # override the random doctored positions (tests)
     used_urls: frozenset[str] | None = None  # stories other approved/pending puzzles use (loaded on first check)
     _counters: dict[str, int] = field(default_factory=dict)
     # Parallel tool calls in one model turn run in threads: guard ids, lists and file writes.
@@ -152,6 +154,23 @@ class RunContext:
         return 0 if self.clean else 1
 
     @property
+    def doctored_slots(self) -> list[str]:
+        """Post ids that must hold the doctored posts: random per case (seeded by its id), so the fake isn't
+        always card 1. Picked from the first N ids, N = the smallest allowed post count."""
+        n = self.expected_doctored
+        if self.doctored_at is not None:
+            return list(self.doctored_at)
+        if n == 0:
+            return []
+        rng = random.Random(f"doctored-slots-{self.case_id}")
+        return [f"p{i}" for i in sorted(rng.sample(range(1, self.post_count_range[0] + 1), k=n))]
+
+    def _slots_text(self) -> str:
+        s = self.doctored_slots
+        return (f" Put the doctored post{'s' if len(s) > 1 else ''} at {', '.join(s)} (this case's random "
+                "positions); every other id is real.") if s else ""
+
+    @property
     def allowed_tricks(self) -> set[str] | None:
         if self.is_daily:
             return set(self.tricks)
@@ -172,11 +191,11 @@ class RunContext:
             return (f"Daily Grain for {self.daily_date} (theme: {self.theme}). Exactly {DAILY_POSTS} posts: "
                     f"{len(self.tricks)} doctored (tricks: {tricks}), at least one real post that sounds absurd but "
                     f"is true (real_suspicious), the rest plainly real. The briefing states the range "
-                    f"'{DAILY_RANGE_TEXT}', never the count.")
+                    f"'{DAILY_RANGE_TEXT}', never the count." + self._slots_text())
         if self.clean:
             return "Case file: 4 posts, NO doctored post (all real), at least one real post that looks suspicious."
         return (f"Case file: 4 posts: exactly one doctored post (trick: {self.trick or 'your choice'}), at least one "
-                "real post that looks suspicious, the rest real.")
+                "real post that looks suspicious, the rest real." + self._slots_text())
 
     # -- paths
     @property

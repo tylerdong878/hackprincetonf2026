@@ -207,3 +207,36 @@ def test_case_number_follows_existing_cases(tmp_path):
     ids = research(ctx)
     case, *_ = build_case_bundle(ctx, "T", "B", chart_case(ctx, ids))
     assert case["number"] == 8
+
+
+# ---------------------------------------------------------------- doctored positions
+
+
+def test_doctored_positions_are_random_per_case_and_stable():
+    from pipeline.context import RunContext
+    from pipeline.events import EventLog
+
+    def slots(case_id: str, tricks: list[str]) -> list[str]:
+        return RunContext(case_id=case_id, topic="weird science news", mode="daily", tricks=tricks,
+                          persist=False, events=EventLog(None)).doctored_slots
+
+    one = [slots(f"daily-2026-12-{d:02d}", ["edited-detail"]) for d in range(1, 29)]
+    assert all(len(s) == 1 and s[0] in {"p1", "p2", "p3", "p4", "p5"} for s in one)
+    assert len({s[0] for s in one}) >= 4  # spread over the cards, not always card 1
+    assert slots("daily-2026-12-01", ["edited-detail"]) == one[0]  # a rebuild plans the same positions
+    two = slots("daily-2026-12-05", ["edited-detail", "cherry-picked-stat"])
+    assert len(two) == 2 and two == sorted(two)
+    assert slots("daily-2026-12-05", []) == []  # an all-real day has no slots
+    case = RunContext(case_id="2026-12-01-x", topic="weird science news", trick="edited-detail",
+                      persist=False, events=EventLog(None))
+    assert len(case.doctored_slots) == 1 and int(case.doctored_slots[0][1]) <= 3  # Case Files may have 3 posts
+    assert f"at {case.doctored_slots[0]} " in case.case_shape()
+
+
+def test_write_case_rejects_a_fake_outside_its_planned_position(researched):
+    ctx, ids = researched
+    ctx.doctored_at = ["p3"]
+    with pytest.raises(CaseBuildError, match="must be p3"):
+        build_case_bundle(ctx, "Title", "Four posts. I may have touched one.", chart_case(ctx, ids))
+    ctx.doctored_at = ["p2"]
+    build_case_bundle(ctx, "Title", "Four posts. I may have touched one.", chart_case(ctx, ids))
