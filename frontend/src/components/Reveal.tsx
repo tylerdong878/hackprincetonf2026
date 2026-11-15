@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
-import { formatNumber, outcomeStyle, withUnit } from '../lib/format'
+import { formatNumber, outcomeStyle, shortDate, withUnit } from '../lib/format'
 import { useReducedMotion, useTween } from '../lib/hooks'
-import type { ChartDiff, ChartSpec, Diff, Post } from '../lib/types'
+import type { ChartDiff, ChartSpec, Diff, MadeUpDiff, Post } from '../lib/types'
 import { IconPlay, IconReplay, OutcomeGlyph } from './Icon'
 import { FeedCard } from './PostCard'
 import { chartDomain, PostChart } from './PostChart'
@@ -217,6 +217,21 @@ export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
   )
 }
 
+/** "NPR · Nov 14, 2026": where the real story a made-up post was modeled on ran. */
+function storyByline(diff: MadeUpDiff): string {
+  const date = diff.date ? shortDate(/^\d{4}-\d{2}-\d{2}$/.test(diff.date) ? `${diff.date}T12:00:00` : diff.date) : ''
+  return [diff.outlet, date].filter(Boolean).join(' · ')
+}
+
+function StoryLink({ url }: { url?: string | null }) {
+  if (!url) return null
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="break-all text-[#1F5FD1] underline underline-offset-2 hover:no-underline">
+      Read the real story ↗
+    </a>
+  )
+}
+
 function OriginalPanel({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
     <div className="flex h-full flex-col overflow-hidden border-2 border-ink bg-white text-[#1B1B1F]">
@@ -282,6 +297,14 @@ export function DiffView({
         </p>
       </OriginalPanel>
     )
+  } else if (diff.type === 'made_up') {
+    const byline = storyByline(diff)
+    right = (
+      <OriginalPanel note={diff.url ? <StoryLink url={diff.url} /> : undefined}>
+        {byline && <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">{byline}</p>}
+        <p className="text-[15px] leading-relaxed">{diff.real}</p>
+      </OriginalPanel>
+    )
   }
 
   return (
@@ -318,11 +341,12 @@ export function DiffView({
             {pair.from > 0 && <DropButton dropped={axis.dropped} onClick={axis.drop} />}
           </div>
         )}
+        {diff.type === 'made_up' && <p className="text-[13px] leading-snug text-muted">The Con made this up, account and all.</p>}
       </div>
       <div className="flex min-w-0 flex-col gap-2">
         <SectionLabel>
           {dot('var(--real)')}
-          {pair ? 'The honest view' : 'The original'}
+          {pair ? 'The honest view' : diff.type === 'made_up' ? 'The closest real story' : 'The original'}
         </SectionLabel>
         {right}
       </div>
@@ -346,7 +370,8 @@ export function DetailChanges({ changed }: { changed: { from: string; to: string
 
 /**
  * The compact before-and-after on a Daily card's back (PLAN_V2 §1A): the chart's axis animates
- * to its honest start, cut words come back highlighted, a missing number reappears, a swapped detail is shown.
+ * to its honest start, cut words come back highlighted, a missing number reappears, a swapped detail is shown,
+ * a made-up story sits above the closest real one.
  */
 export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
   const pair = diff.type === 'chart' ? chartPair(diff, post) : null
@@ -432,6 +457,23 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
         <p className="mt-1.5 text-[13px] text-[#4A4A55]">
           <DetailChanges changed={changed} />
         </p>
+      </div>
+    )
+  }
+  if (diff.type === 'made_up') {
+    const byline = storyByline(diff)
+    return (
+      <div className={box}>
+        <p className="mb-1.5 font-bold">The Con made this up, account and all.</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">
+          The closest real story{byline && ` · ${byline}`}
+        </p>
+        <p>{diff.real}</p>
+        {diff.url && (
+          <p className="mt-1.5 text-[13px] text-[#4A4A55]">
+            <StoryLink url={diff.url} />
+          </p>
+        )}
       </div>
     )
   }

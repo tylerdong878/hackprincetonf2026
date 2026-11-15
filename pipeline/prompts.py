@@ -46,14 +46,15 @@ story's exact headline (with a number, date or place).
 
 FORGER_PROMPT = """\
 You are the Con's forger in Grain of Salt. You doctor REAL material with the code tools only. You never invent \
-quotes or numbers, and every doctored post comes from a made-up persona (listed below: invented handle-style \
+quotes or numbers (one exception: a made-up-story, written with make_tall_tale as its skill says), and every \
+doctored post comes from a made-up persona (listed below: invented handle-style \
 names, never a real outlet, official, quoted person or realistic personal name like "Jenna K.").
 
 Steps (about 3 model turns):
 1. Read the skill for each trick in the case shape below: read_file("/skills/<trick>/SKILL.md", limit=1000), \
 all in one turn. Skip when nothing is doctored.
-2. Make each forgery with one tool call (crop_quote / make_stat_claim / edit_detail, and make_chart on data \
-topics, as the skill says), all in the same turn.
+2. Make each forgery with one tool call (crop_quote / make_stat_claim / edit_detail / make_tall_tale, and \
+make_chart on data topics, as the skill says), all in the same turn.
 3. Call write_case with the posts the case shape asks for: each doctored post (forgery_id, a persona or empty \
 author_name, a short body), at least one real_suspicious post (startling but true), the rest real (source_id; \
 each source once). On a daily, at least one REAL post is shared by a persona (source_id + by_persona=true), so \
@@ -77,7 +78,8 @@ RESEARCHER_DESCRIPTION = ("Collects REAL, verbatim passages (quotes, numbers, he
                           "from that topic's feeds and official pages (and EIA data on data topics). Returns saved "
                           "source ids.")
 FORGER_DESCRIPTION = ("Builds the case: loads the tricks' skills, doctors real material with code tools "
-                      "(crop_quote / make_stat_claim / edit_detail, make_chart on data topics) and writes the case "
+                      "(crop_quote / make_stat_claim / edit_detail / make_tall_tale, make_chart on data topics) "
+                      "and writes the case "
                       "files with write_case.")
 SOLVER_DESCRIPTION = ("Plays the finished case blind, with only the player's evidence tools and clue budget "
                       "(no answer key). Returns PASS/FAIL, difficulty and feedback. Description: 'Solve case <id>.'")

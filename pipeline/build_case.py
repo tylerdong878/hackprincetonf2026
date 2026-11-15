@@ -93,12 +93,13 @@ def run_settings(args: argparse.Namespace, now: datetime, cases_dir: Path = CASE
         except ValueError as exc:
             raise SystemExit(f"--daily-date must be YYYY-MM-DD (got {daily_date!r})") from exc
         n = 0 if args.clean else args.doctored
-        tricks, reason = plan_daily(daily_date, n, hints_for(args.topic).get("tricks"))
+        tricks, reason = plan_daily(daily_date, n, hints_for(args.topic).get("tricks"), style=args.style)
         if args.trick and tricks:
             tricks[0] = args.trick
         case_id = args.case_id or _unique(f"daily-{daily_date}", cases_dir)
         return {"case_id": case_id, "mode": "daily", "daily_date": daily_date, "tricks": tricks,
-                "theme": args.theme or theme_for(args.topic), "clean": not tricks, "trick": None, "reason": reason}
+                "theme": args.theme or theme_for(args.topic), "clean": not tricks, "trick": None, "reason": reason,
+                "fake_style": args.style}
     case_id = args.case_id or make_case_id(args.topic, cases_dir, clean=args.clean, now=now)
     if args.clean:
         trick, reason = None, "clean case"
@@ -370,6 +371,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                     help="daily mode: number of doctored posts (default: planned from the weekday)")
     ap.add_argument("--clean", action="store_true", help="build a clean case (no doctored post)")
     ap.add_argument("--trick", choices=TRICKS, help="force a trick (default: from --player profile, else random)")
+    ap.add_argument("--style", choices=("twist", "made-up"), default="twist",
+                    help="daily mode: twist = the Con edits real posts; made-up = every fake is a story he invents")
     ap.add_argument("--player", help="player id: pick the trick from data/players/<id>/profile.json (SPEC §7.3)")
     ap.add_argument("--case-id", help="override the case id (default <date>-<topic-slug>)")
     g = ap.add_mutually_exclusive_group()

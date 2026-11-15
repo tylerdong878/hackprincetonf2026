@@ -199,3 +199,13 @@ def test_rejected_puzzles_and_the_runs_own_folder_do_not_block_a_story(ctx):
     _case_using(ctx.cases_dir, ctx.case_id, fx.PRESS_URL, "draft")
     fetch_article_impl(ctx, fx.PRESS_URL)
     assert save_source_impl(ctx, fx.PRESS_URL, fx.BPU_20).startswith("Saved s1")
+
+
+def test_fetch_rss_hides_stories_another_puzzle_uses(ctx):
+    first = fetch_rss_impl(ctx, fx.FEED_URL, "electricity rates bills")
+    used_url = next(iter(ctx.docs.values())).url
+    _case_using(ctx.cases_dir, "daily-2026-11-01", used_url, "approved")
+    ctx.used_urls = None  # reload the used list
+    again = fetch_rss_impl(ctx, fx.FEED_URL, "electricity rates bills")
+    assert "already used by other puzzles (not listed)" in again and used_url not in again.split("\n\n", 1)[1]
+    assert used_url in first

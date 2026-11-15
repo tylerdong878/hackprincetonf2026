@@ -73,6 +73,8 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
   for (const id of Object.keys(TRICK_LABELS)) perTrick[id] ??= { miss_rate: 0, false_alarm_rate: 0, mastery: 0 }
   // edited-detail only shows once the player has met it
   if (!profile.per_trick?.['edited-detail'] && !profile.tricks?.['edited-detail']) delete perTrick['edited-detail']
+  // made-up-story too (the server keeps empty counters for every trick, so "met" means shown at least once)
+  if (!profile.tricks?.['made-up-story']?.shown) delete perTrick['made-up-story']
   const caseById = new Map(cases.map((c) => [c.id, c]))
   const rating = Math.max(0, Math.min(100, profile.rating ?? 0))
   const extras = profileExtras(profile)
@@ -130,7 +132,7 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
 
       <section className="mt-12" aria-labelledby="tricks-h">
         <SectionTitle id="tricks-h">By trick</SectionTitle>
-        <div className={`grid gap-5 sm:grid-cols-2 ${trickCount >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+        <div className={`grid gap-5 sm:grid-cols-2 ${trickCount === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           {Object.entries(perTrick).map(([id, t]) => {
             const counts = profile.tricks?.[id]
             return (

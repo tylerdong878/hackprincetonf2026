@@ -653,8 +653,8 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
               <div className="flex items-start justify-between gap-3">
                 <p>
                   <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
-                  big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
-                  short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
+                  who posted it? · does a real outlet back it up? · does it sound too perfect, or just weird? Real news can be strange;
+                  the Con’s stories are usually too neat. <i>Not sure? Check the source.</i>
                 </p>
                 <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
                   ×
@@ -782,7 +782,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
               </>
             )}
             <p className="dateline mt-3 text-center !text-[11px]" aria-live="polite">
-              {pending ? 'Checking with the case file…' : 'Keys: R real · D doctored · 1–4 trick · C check · Enter next'}
+              {pending ? 'Checking with the case file…' : `Keys: R real · D doctored · 1–${choices.length} trick · C check · Enter next`}
             </p>
           </div>
           {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}

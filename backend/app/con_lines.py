@@ -35,6 +35,7 @@ TRUSTS = {
     "out-of-context-quote": "take a quote at its word without reading the rest",
     "cherry-picked-stat": "believe a big number without asking \"out of what?\"",
     "edited-detail": "trust a headline's details without checking the original",
+    "made-up-story": "believe a story just because it sounds like news",
 }
 # What the player wrongly doubts, per post format (on a false alarm).
 DOUBTS = {

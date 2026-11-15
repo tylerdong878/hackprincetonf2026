@@ -1,18 +1,19 @@
 import type { ReactNode, Ref } from 'react'
 import { trickLabel } from '../lib/format'
-import { IconData, IconHash, IconPen, IconSource } from './Icon'
+import { IconData, IconHash, IconPen, IconSource, IconSparkles } from './Icon'
 
-/** The icon for each of the Con's four tricks. */
+/** The icon for each of the Con's tricks. */
 export function TrickIcon({ trick, size = 18, className = '' }: { trick: string | null | undefined; size?: number; className?: string }) {
   if (trick === 'misleading-chart') return <IconData size={size} className={className} />
   if (trick === 'out-of-context-quote') return <IconSource size={size} className={className} />
   if (trick === 'cherry-picked-stat') return <IconHash size={size} className={className} />
   if (trick === 'edited-detail') return <IconPen size={size} className={className} />
+  if (trick === 'made-up-story') return <IconSparkles size={size} className={className} />
   return null
 }
 
 /**
- * One trick picker (Figma "Trick picker"): four tricks plus "Not sure", keys 1-4.
+ * One trick picker (Figma "Trick picker"): the case's tricks plus "Not sure", keys 1-9.
  * Used as the Daily's bottom-sheet body and the Case Files popover. Selected = press-red row.
  */
 export function TrickPicker({
@@ -68,7 +69,7 @@ export function TrickPicker({
                 on ? 'border-press bg-press text-white' : 'border-press bg-white text-ink hover:bg-press/[0.06]'
               }`}
             >
-              {i < 4 && (
+              {i < 9 && (
                 <kbd
                   className={`flex h-6 w-6 shrink-0 items-center justify-center border-[1.5px] text-[11px] font-semibold not-italic ${
                     on ? 'border-white text-white' : 'border-press text-press'

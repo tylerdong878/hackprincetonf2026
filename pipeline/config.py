@@ -12,7 +12,9 @@ SOURCES_DIR = DATA_DIR / "sources"
 EIA_FILE = SOURCES_DIR / "eia_nj_res_price_monthly.raw.json"
 
 V1_TRICKS = ("out-of-context-quote", "misleading-chart", "cherry-picked-stat")
-TRICKS = (*V1_TRICKS, "edited-detail")  # CONTRACT §7.1 adds edited-detail
+TWIST_TRICKS = (*V1_TRICKS, "edited-detail")  # CONTRACT §7.1 adds edited-detail: edits of REAL material
+# made-up-story: a whole claim the Con invents (a "tall tale"), modeled on a real saved story.
+TRICKS = (*TWIST_TRICKS, "made-up-story")
 EVIDENCE_TOOLS = ("source", "data", "account")
 
 # Which reveal diff each trick produces (CONTRACT §2.3).
@@ -21,6 +23,7 @@ TRICK_DIFF_TYPE = {
     "misleading-chart": "chart",
     "cherry-picked-stat": "stat",
     "edited-detail": "detail",
+    "made-up-story": "made_up",
 }
 
 EIA_URL = "https://www.eia.gov/electricity/data/browser/"

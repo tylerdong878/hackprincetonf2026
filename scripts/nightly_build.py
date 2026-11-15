@@ -80,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     # 40 calls: noisy feeds plus the safety blocklist can take the researcher alone to ~18, and a solver retry adds ~10.
     cmd = [sys.executable, "-m", "pipeline.build_case", "--mode", "daily", "--daily-date", d.isoformat(),
-           "--topic", topic, "--hold-for-editor", "--max-calls", "40"]
+           "--topic", topic, "--style", "made-up", "--hold-for-editor", "--max-calls", "40"]
     return subprocess.run(cmd, cwd=ROOT).returncode
 
 

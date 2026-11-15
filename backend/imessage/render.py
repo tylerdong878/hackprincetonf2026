@@ -8,6 +8,7 @@ TRICK_LABELS = {
     "misleading-chart": "Misleading chart",
     "cherry-picked-stat": "Cherry-picked stat",
     "edited-detail": "Edited detail",
+    "made-up-story": "Made up",
 }
 TOOL_LABELS = {"source": "📄 source", "data": "📊 data", "account": "👤 account"}
 OUTCOME_HEAD = {
@@ -139,6 +140,10 @@ def reveal(result: dict, guessed_trick: str | None) -> list[Out]:
     if diff.get("type") == "chart" and isinstance(diff.get("original"), dict):
         png = chart_png(diff["original"])
         out.append(Out(image=png) if png else Out.t("Honest version: " + chart_text(diff["original"])))
+    elif diff.get("type") == "made_up" and isinstance(diff.get("real"), str):
+        head = " · ".join(x for x in (diff.get("outlet"), diff.get("date")) if x)
+        text = f"The Con made this up.\n\nThe closest real story{f' ({head})' if head else ''}: {diff['real']}"
+        out.append(Out.t(f"{text}\n\n{diff['url']}" if diff.get("url") else text))
     elif isinstance(diff.get("original"), str) and isinstance(diff.get("shown"), str):
         out.append(Out.t(f"What they showed: {diff['shown']}\n\nThe original: {diff['original']}"))
     return out

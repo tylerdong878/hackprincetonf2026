@@ -75,7 +75,7 @@ def test_cli_dry_run(capsys):
     out = capsys.readouterr().out
     assert "Blind-solver isolation: OK" in out
     assert "researcher" in out and "forger" in out and "blind-solver" in out
-    assert "skills: ['/skills/'] -> cherry-picked-stat, edited-detail, misleading-chart, out-of-context-quote" in out
+    assert "skills: ['/skills/'] -> cherry-picked-stat, edited-detail, made-up-story, misleading-chart, out-of-context-quote" in out
 
 
 def test_cli_refuses_blocklisted_topic(capsys):

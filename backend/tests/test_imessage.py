@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from backend.app.main import create_app
 from backend.imessage.engine import Engine, GameAPI, Sessions
 from backend.imessage.parse import parse
+from backend.imessage.render import reveal, trick_question
 
 from .conftest import FIXTURE_CASES, REPO  # noqa: F401
 
@@ -38,6 +39,28 @@ def test_parse_not_sure_and_tool():
     assert parse("not sure", OPTS).not_sure
     assert parse("check source", OPTS).tool == "source"
     assert parse("c data", OPTS).tool == "data"
+
+
+@pytest.mark.parametrize("text,kind", [
+    ("made up", "trick"), ("Made-up", "trick"), ("5", "trick"), ("invented", "trick"),
+    ("fake made up", "fake"), ("FAKE 5", "fake"), ("fake, totally made up", "fake"), ("d5", "fake"),
+])
+def test_parse_made_up_story(text, kind):
+    i = parse(text, OPTS + ["made-up-story"])
+    assert (i.kind, i.trick) == (kind, "made-up-story")
+    assert parse("made up", OPTS).trick is None        # only when the case offers it
+    assert parse("i made it", OPTS + ["made-up-story"]).trick is None
+
+
+def test_render_made_up_story():
+    assert "5. Made up" in trick_question(OPTS + ["made-up-story"]).text
+    diff = {"type": "made_up", "shown": "Octopuses now open jars in exactly 9 seconds.",
+            "real": "Octopuses can learn to open jars.", "outlet": "NPR", "date": "2026-11-10", "url": "https://example.org/a"}
+    out = reveal({"outcome": "caught", "doctored": True, "trick": "made-up-story", "trick_named_correctly": True,
+                  "points": 150, "tell": "No outlet ran it.", "diff": diff}, "made-up-story")
+    assert "And you named the trick: Made up." in out[0].text
+    assert out[1].text == ("The Con made this up.\n\nThe closest real story (NPR · 2026-11-10): "
+                           "Octopuses can learn to open jars.\n\nhttps://example.org/a")
 
 
 @pytest.fixture

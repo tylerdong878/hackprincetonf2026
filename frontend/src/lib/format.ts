@@ -5,6 +5,7 @@ export const TRICK_LABELS: Record<string, string> = {
   'misleading-chart': 'Misleading chart',
   'cherry-picked-stat': 'Cherry-picked stat',
   'edited-detail': 'Edited detail',
+  'made-up-story': 'Made up',
 }
 
 export function trickLabel(id: TrickId | null | undefined): string {
@@ -18,6 +19,7 @@ export const TRICK_FORMAT: Record<string, string> = {
   'misleading-chart': 'charts',
   'cherry-picked-stat': 'statistics',
   'edited-detail': 'headlines',
+  'made-up-story': 'stories',
 }
 
 export const caseNo = (n: number | undefined | null) => `#${String(n ?? 0).padStart(4, '0')}`

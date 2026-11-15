@@ -233,10 +233,16 @@ def fetch_rss_impl(ctx: RunContext, feed_url: str, query: str = "", pages: int =
     if not fetched:
         return f"Error: could not read feed {feed_url} ({'; '.join(errors) or 'no items'})."
     terms = _terms(query)
-    ranked = sorted(fetched, key=lambda d: _score(d, terms), reverse=True)
+    # Stories other puzzles already use are never listed, so the researcher doesn't spend calls on them
+    # (save_source would refuse them anyway).
+    fresh = [d for d in fetched if not ctx.already_used(d.url)]
+    hidden = len(fetched) - len(fresh)
+    ranked = sorted(fresh, key=lambda d: _score(d, terms), reverse=True)
     shown = [d for d in ranked if _score(d, terms) > 0][:max_items]
     head = (f"Read {len(fetched)} items from {feed_url} ({pages} page(s)); "
             f"{len(shown)} match '{query}'. Full text is cached for save_source.")
+    if hidden:
+        head += f" {hidden} already used by other puzzles (not listed)."
     if errors:
         head += f" Stopped early: {'; '.join(errors)}."
     parts = [head] + [f"[{i}] " + _show_doc(d, MAX_ITEM_CHARS) for i, d in enumerate(shown, 1)]

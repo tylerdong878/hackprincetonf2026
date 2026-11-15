@@ -162,7 +162,7 @@ class PostIn(BaseModel):
         description="real | real_suspicious (real but looks fake) | doctored")
     source_id: str = Field("", description="real posts: a saved source id (s#). Text is copied verbatim for you.")
     forgery_id: str = Field("", description="doctored posts: the f# from crop_quote / make_chart / make_stat_claim / "
-                                            "edit_detail")
+                                            "edit_detail / make_tall_tale")
     chart_id: str = Field("", description="real posts by a made-up persona: an honest chart c# from make_chart")
     by_persona: bool = Field(False, description="real source_id posts: true = shared by a made-up persona (verbatim, "
                                                 "source label cites the outlet) instead of by the outlet itself")
@@ -420,7 +420,8 @@ def build_case_bundle(ctx: RunContext, title: str, briefing: str, posts: list[Po
                 assert src is not None
                 ev["source"] = _source_evidence(src)
                 urls.append(src.url)
-                post["source_label"] = None if no_derivatives(src.url) else label_for(src)
+                # A made-up story never cites a real outlet: no outlet ran it.
+                post["source_label"] = None if trick == "made-up-story" or no_derivatives(src.url) else label_for(src)
             ev["account"] = persona.account()
             fooled, caught = CON_LINES[trick]
             answers[p.id] = {
@@ -483,8 +484,13 @@ def build_case_bundle(ctx: RunContext, title: str, briefing: str, posts: list[Po
                     posted = stamp or default_time
                     default_expl = (f"Real and word for word, from {src.outlet}"
                                     + (f" ({label_date})." if label_date else "."))
+                label = label_for(src)
+                if ctx.fake_style == "made-up" and author.get("kind") == "person":
+                    # Made-up stories carry no label, so reposts by made-up accounts drop it too (people share
+                    # real news without links): "no source" stays a reason to check, never the answer.
+                    label = None
                 post = {"id": p.id, "author": author, "posted_at": posted, "body": body, "quote": quote,
-                        "chart": None, "source_label": label_for(src)}
+                        "chart": None, "source_label": label}
                 urls.append(src.url)
             else:
                 art = ctx.artifacts.get(p.chart_id)

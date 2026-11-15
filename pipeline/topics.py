@@ -8,7 +8,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from pipeline.config import TRICKS
+from pipeline.config import TRICKS, TWIST_TRICKS
 from pipeline.textutil import slugify
 
 TOPIC_HINTS: dict[str, dict[str, list[str]]] = {
@@ -85,7 +85,7 @@ DAILY_DOCTORED_BY_WEEKDAY = {0: (0, 1), 1: (1, 1), 2: (1, 2), 3: (1, 2), 4: (2, 
 
 
 def plan_daily(daily_date: str, n_doctored: int | None = None,
-               allowed: list[str] | None = None) -> tuple[list[str], str]:
+               allowed: list[str] | None = None, style: str = "twist") -> tuple[list[str], str]:
     """(tricks, reason) for a Daily Grain: 0-3 doctored posts, seeded by the date so a re-run plans the same day.
 
     `allowed` limits the tricks (e.g. no misleading-chart for a topic with no chart data)."""
@@ -95,7 +95,10 @@ def plan_daily(daily_date: str, n_doctored: int | None = None,
     n = rng.randint(lo, hi) if n_doctored is None else n_doctored
     if not 0 <= n <= 3:
         raise ValueError("a daily has 0-3 doctored posts")
-    pool = [t for t in TRICKS if allowed is None or t in allowed]
+    if style == "made-up":  # every fake is a whole story the Con invents
+        return ["made-up-story"] * n, f"{day:%A}: {n} doctored, all made-up stories" + (
+            " (set by the operator)" if n_doctored is not None else "")
+    pool = [t for t in TWIST_TRICKS if allowed is None or t in allowed]
     tricks = rng.sample(pool, k=min(n, len(pool)))
     reason = f"{day:%A}: {n} doctored" + (" (set by the operator)" if n_doctored is not None else "")
     return tricks, reason
@@ -178,12 +181,12 @@ def choose_trick(profile_path: Path | None = None, rng: random.Random | None = N
     """(trick, reason). With a player profile: 70% weakest trick, 20% a mastered one, 10% new (SPEC §7.3)."""
     rng = rng or random.Random()
     if profile_path is None or not profile_path.exists():
-        t = rng.choice(TRICKS)
+        t = rng.choice(TWIST_TRICKS)
         return t, "no player profile: random trick"
     prof = json.loads(profile_path.read_text(encoding="utf-8"))
     stats = prof.get("tricks", {})
-    seen = [t for t in TRICKS if stats.get(t, {}).get("shown", 0) > 0]
-    unseen = [t for t in TRICKS if t not in seen]
+    seen = [t for t in TWIST_TRICKS if stats.get(t, {}).get("shown", 0) > 0]
+    unseen = [t for t in TWIST_TRICKS if t not in seen]
 
     def miss_rate(t: str) -> float:
         s = stats.get(t, {})
@@ -196,5 +199,5 @@ def choose_trick(profile_path: Path | None = None, rng: random.Random | None = N
     if seen and roll < 0.9:
         t = min(seen, key=miss_rate)
         return t, "retention check on a mastered trick"
-    t = rng.choice(unseen or list(TRICKS))
+    t = rng.choice(unseen or list(TWIST_TRICKS))
     return t, "a trick this player hasn't seen yet" if unseen else "random trick"

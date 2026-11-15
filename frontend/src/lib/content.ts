@@ -98,4 +98,15 @@ export const CASEBOOK: TrickPage[] = [
     tool: '📄 Open source: compare the exact figures, dates and places against the original article.',
     realWorld: 'Search the headline’s key phrase and compare the numbers in the first few results from reputable outlets.',
   },
+  {
+    id: 'made-up-story',
+    name: 'Made up',
+    icon: '✨',
+    what: 'A whole story the Con invented: a plausible claim from a made-up account, loosely modeled on something real. No outlet ever ran it.',
+    example:
+      'A made-up account posts “Scientists just taught octopuses to open childproof jars in exactly 9 seconds.” It borrows the feel of real octopus stories, but no outlet ran it, no study is named, and “exactly 9 seconds” is too neat.',
+    tell: 'Nothing behind it: no outlet, study or place you could look up, and it sounds a little too perfect. Real news can be strange; the Con’s stories are usually too neat.',
+    tool: '📄 Open source: the closest real story, which says something different.',
+    realWorld: 'Search the claim and look for who reported it. If no reputable outlet ran it, treat it as made up.',
+  },
 ]

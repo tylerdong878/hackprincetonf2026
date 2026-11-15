@@ -9,6 +9,7 @@ TRICK_WORDS = {
     "misleading-chart": ("chart", "axis", "graph", "scale"),
     "cherry-picked-stat": ("stat", "cherry", "number", "numbers", "statistic", "cherrypicked", "cherry-picked"),
     "edited-detail": ("edit", "edited", "detail", "headline", "photoshop", "altered"),
+    "made-up-story": ("madeup", "invented", "fabricated", "fiction", "fictional", "story", "tale", "hoax"),
 }
 
 REAL = {"real", "r", "legit", "true", "trust", "trusted", "genuine", "honest", "fine", "👍", "✅", "🟩"}
@@ -45,7 +46,9 @@ def words(text: str) -> list[str]:
 
 def trick_from(tokens: list[str], options: list[str]) -> tuple[str | None, int | None, bool]:
     """(trick id, bare number, not sure) from the words after 'fake' (or a reply to 'which trick?')."""
-    for w in tokens:
+    for i, w in enumerate(tokens):
+        if w == "made" and tokens[i + 1:i + 2] == ["up"]:  # "made up" / "made-up" -> one word
+            w = "madeup"
         if w.isdigit():
             n = int(w)
             if n == 0:

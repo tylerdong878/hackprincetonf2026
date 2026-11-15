@@ -43,6 +43,8 @@ CON_LINES = {
                            "You went looking for the other half of the story. Rude."),
     "edited-detail": ("One little number. Nobody ever checks the little number.",
                       "You compared it word for word. Who does that?"),
+    "made-up-story": ("I made the whole thing up. It sounded just like the news, didn't it?",
+                      "Too tidy? Fine. Real news is messier than my stories."),
 }
 CON_FALSE_ALARM = "That one was real. I didn't even have to lie. You did the work for me."
 CON_FALSE_ALARM_SUSPICIOUS = "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
@@ -535,12 +537,136 @@ def edit_detail_impl(ctx: RunContext, source_id: str, find: str, replace: str) -
             f"Use forgery_id {fid} in write_case; the edited text is the post body (made-up account only).")
 
 
+TALL_TALE_WORDS = (8, 45)
+_TT_HEALTH = re.compile(r"\b(cures?|cured|vaccin\w*|cancer|diabet\w*|dose|dosage|medic\w*|treatments?|detox|"
+                        r"weight[- ]loss|supplements?|pills?|prescri\w*|symptoms?|disease|virus|covid)\b", re.IGNORECASE)
+_TT_TITLE_NAME = re.compile(r"\b(?:Gov|Governor|Sen|Senator|Rep|President|Mayor|Dr|Prof|Professor|Mr|Mrs|Ms|CEO|"
+                            r"Coach|Judge|Officer|Chief)\.?\s+[A-Z][a-z]+")
+_TT_QUOTES = re.compile(r"[\u201c\u201d\"\u2018]|(?<![A-Za-z])'(?=[A-Za-z])")  # double or opening single quotes
+# The only capitalized words a made-up story may use: places, days, months (and NJ shorthand). Anything else
+# capitalized mid-sentence is a name: a person, band, brand or group, and the Con never invents claims about them.
+_TT_OK_CAPS = {
+    "new", "jersey", "nj", "garden", "state", "shore", "jersey shore", "pine", "barrens", "turnpike", "parkway",
+    "atlantic", "city", "ocean", "county", "cape", "may", "wildwood", "asbury", "park", "hoboken", "newark", "trenton",
+    "princeton", "camden", "paterson", "jersey city", "seaside", "heights", "point", "pleasant", "long", "beach",
+    "island", "delaware", "river", "hudson", "passaic", "raritan", "bay", "north", "south", "east", "west",
+    "central", "america", "american", "us", "u.s.", "usa", "earth", "moon", "mars", "pacific", "arctic", "antarctica",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+    "mondays", "tuesdays", "wednesdays", "thursdays", "fridays", "saturdays", "sundays",
+    "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
+    "december", "thanksgiving", "halloween", "christmas", "i",
+}
+_TT_CAP = re.compile(r"(?<![.!?]\s)(?<!^)\b([A-Z][\w'\u2019.-]*)")
+
+
+_TT_COMMON = {"the", "and", "for", "with", "from", "this", "that", "these", "those", "into", "onto", "over", "under",
+              "after", "before", "about", "here", "there", "what", "when", "where", "why", "how", "who", "his", "her",
+              "its", "our", "your", "their", "she", "they", "you", "but", "not", "now", "new", "one", "two", "all"}
+
+
+def _title_case(text: str) -> bool:
+    """A headline written In Title Case: its capitals say nothing about names."""
+    words = [w for w in re.findall(r"[A-Za-z][\w'\u2019-]*", text) if len(w) > 3]
+    return len(words) >= 3 and sum(w[0].isupper() for w in words) >= 0.7 * len(words)
+
+
+def _tt_names(text: str) -> list[str]:
+    """Capitalized words mid-sentence that aren't places, days or months (likely names of people or brands)."""
+    out = []
+    for m in _TT_CAP.finditer(text):
+        word = m.group(1).rstrip(".'\u2019").lower()
+        word = word[:-2] if word.endswith(("'s", "\u2019s")) else word
+        if word and word not in _TT_OK_CAPS:
+            out.append(m.group(1))
+    return out
+_TT_WORD = re.compile(r"[a-z0-9]+")
+
+
+def _content_words(text: str) -> set[str]:
+    stop = {"the", "a", "an", "of", "to", "in", "on", "for", "and", "or", "is", "are", "was", "were", "it", "its",
+            "that", "this", "with", "as", "at", "by", "from", "be", "has", "have", "had", "new", "just", "their"}
+    return {w for w in _TT_WORD.findall(normalize(text).lower()) if w not in stop and len(w) > 2}
+
+
+def make_tall_tale_impl(ctx: RunContext, source_id: str, claim: str) -> str:
+    """made-up-story: the Con's own invented claim, modeled on a saved real story (its "closest real story")."""
+    from pipeline.safety import blocklist_hits, story_level_hits
+    from pipeline.textutil import word_count
+
+    src = ctx.source(source_id)
+    if src is None:
+        return f"Rejected: no saved source '{source_id}'. Saved: {', '.join(s.id for s in ctx.sources) or 'none'}."
+    text = " ".join((claim or "").split()).strip()
+    lo, hi = TALL_TALE_WORDS
+    if not lo <= word_count(text) <= hi:
+        return f"Rejected: a made-up story is one or two sentences, {lo}-{hi} words (got {word_count(text)})."
+    if _TT_QUOTES.search(text):
+        return "Rejected: no quote marks. A made-up story never puts words in anyone's mouth."
+    if m := _TT_TITLE_NAME.search(text):
+        return f"Rejected: '{m.group(0)}' names a person. Made-up stories never name real or realistic people."
+    # Names the day's real stories mention (people, bands, brands), wherever they appear in the claim, even as its
+    # first word, where capitalization proves nothing ("Springsteen reveals ...").
+    in_sources = {w.lower() for s in ctx.sources if not _title_case(s.text)
+                  for w in re.findall(r"\b[A-Z][a-z]{2,}\b", s.text)
+                  if w.lower() not in _TT_OK_CAPS and w.lower() not in _TT_COMMON and not s.text.startswith(w)}
+    if said := [w for w in re.findall(r"[A-Za-z][\w\u2019'-]*", text)
+                if re.sub(r"['\u2019]s$", "", w).lower() in in_sources]:
+        return (f"Rejected: {', '.join(repr(w) for w in said)} is a name from the real stories. The Con never "
+                "invents claims about real people, bands or companies: use a generic subject instead.")
+    if names := _tt_names(text):
+        return (f"Rejected: {', '.join(repr(n) for n in names)} looks like a name (a person, band, brand or group). "
+                "The Con never invents claims about real people or companies: use a generic subject instead "
+                "('a Shore diner', 'a local band', 'researchers'). Places, days and months are fine.")
+    for s in ctx.sources:
+        surname = (s.speaker or "").split(",")[0].split()[-1:] or []
+        if surname and len(surname[0]) > 2 and re.search(rf"\b{re.escape(surname[0])}\b", text):
+            return f"Rejected: '{surname[0]}' is a real person in the saved sources. Leave people out."
+        if s.outlet and re.search(rf"\b{re.escape(s.outlet)}\b", text, re.IGNORECASE):
+            return f"Rejected: never credit a made-up story to a real outlet ('{s.outlet}')."
+    if _TT_HEALTH.search(text):
+        return "Rejected: no health or medical claims, even made-up ones (they can hurt people if shared)."
+    if blocklist_hits([text]) or story_level_hits([text]):
+        return "Rejected: the story touches a blocked topic (SPEC §8). Keep it light: animals, food, odd science, places."
+    mine = _content_words(text)
+    for s in ctx.sources:
+        theirs = _content_words(s.text)
+        if mine and theirs and len(mine & theirs) / len(mine) >= 0.7:
+            return (f"Rejected: too close to the real {s.id} ({s.outlet}). Don't copy or tweak a real story: invent a "
+                    "different claim that only borrows its subject.")
+    original = ("…" + src.text) if src.starts_mid_sentence and not src.text.startswith("…") else src.text
+    date = f", {src.date}" if src.date else ""
+    art = {
+        "kind": "forgery", "trick": "made-up-story", "source_id": src.id, "shown": text, "headline": False,
+        "diff": {"type": "made_up", "shown": text, "real": original, "outlet": src.outlet,
+                 "date": src.date or None, "url": src.url},
+        "evidence_tools": ["source"],
+        "allowed_numbers": sorted(set(numbers_in(text))),
+        "default_tell": f"No outlet reported this. The closest real story ({src.outlet}{date}) says something else.",
+        "default_explanation": ("The Con made this one up. It sounds like news, but no outlet ran it: it cites nothing, "
+                                f"and the real {src.outlet} story it borrows from tells a different story."),
+    }
+    fid = _store(ctx, "f", art)
+    return (f"Made {fid} (made-up-story), modeled on {src.id}: “{clip(text, 160)}”. Use forgery_id {fid} in write_case "
+            "with a made-up persona; the story is the post body. Don't also use that source as a real post.")
+
+
 # --------------------------------------------------------------------------------------
 # LangChain tools
 # --------------------------------------------------------------------------------------
 
 
 def forging_tools(ctx: RunContext) -> list[BaseTool]:
+    @tool
+    def make_tall_tale(source_id: str, claim: str) -> str:
+        """made-up-story: write a short made-up news claim the Con invents, modeled on a saved REAL story.
+
+        source_id = the real story it borrows its subject and feel from (shown as the closest real story when a
+        player checks). claim = one or two sentences, 8-45 words, in the voice of a viral post: plausible, a bit too
+        neat, and FALSE. No people's names, no quote marks, no real outlet credit, no health or medical claims, no
+        blocked topics, and not a copy or small tweak of any real saved story. Returns a forgery id for write_case.
+        """
+        return make_tall_tale_impl(ctx, source_id, claim)
+
     @tool
     def crop_quote(source_id: str, keep_text: str) -> str:
         """out-of-context-quote: cut a saved REAL quote (or sentence/headline) so it misleads.
@@ -593,4 +719,4 @@ def forging_tools(ctx: RunContext) -> list[BaseTool]:
         return edit_detail_impl(ctx, source_id, find, replace)
 
     # make_chart only charts the EIA electricity series, so it exists only on topics whose hints list data.
-    return [crop_quote, *([make_chart] if ctx.has_data else []), make_stat_claim, edit_detail]
+    return [crop_quote, *([make_chart] if ctx.has_data else []), make_stat_claim, edit_detail, make_tall_tale]
