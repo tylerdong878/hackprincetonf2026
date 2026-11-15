@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "data" / "cases"
 
-# Weekday -> topic (keys of pipeline.topics.TOPIC_HINTS). Mon=0. Fun first; see docs/PITCH.md.
+# Weekday -> topic (keys of pipeline.topics.TOPIC_HINTS). Mon=0. Fun topics first.
 THEMES = {
     0: "new jersey weird news",
     1: "tech and internet news",

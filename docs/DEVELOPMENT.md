@@ -54,15 +54,23 @@ npm run build      # typecheck + production build to frontend/dist/ (served by t
 - **Daily Grain** (`#/daily`): five cards one at a time, three magnifiers and an instant reveal per card. The end card has the Gullible ↔ Paranoid meter, a streak, the share grid and a countdown to midnight ET.
 - **Con the Con** (`#/con`): doctor a real deck post with crop, axis, window or drop, or bluff and leave it real. Then pick a boss: Rookie, Street or Master Con.
 - **Case Files** (`#/casefiles`): the longer four-post cases, with the Workshop replay of how the AI built each one.
-- **Also:** Dossier (lean meter, streak, per-trick rates), Casebook, and the Editor's Desk queue and case review.
+- **Also:** Stats (`#/dossier`: rating, lean meter, streak, per-trick rates), Tricks (`#/casebook`: a page per trick), and the Editor's Desk (`#/editor`: the approval queue and case review).
 
 **Keyboard:**
 - **Daily:** `R` Real, `D` Doctored then `1`–`4` for the trick, `C` Check, Enter for the next card.
-- **Case Files:** Tab moves between posts, `R` / `D`, `1`–`3`, `E` for evidence.
+- **Case Files:** Tab moves between posts, `R` / `D`, `1`–`4` for the trick, `E` for evidence.
+
+**Design system** (from the designer's Figma file; tokens in `src/index.css`):
+- One light newsprint theme: ink `#141414`, newsprint `#F2E8D5`, paper `#FBF7EE`, manila `#E6D3A8`, press red `#C8231B`, ochre `#B9822A`; focus blue `#1F5FD1` only for focus rings and the selected post.
+- One hard shadow (4px down-right, solid ink) and 2px ink rules.
+- Type: Gloock (the logotype), Bodoni Moda (titles), Oswald (caps headlines, buttons, stamps), Old Standard TT (copy; the Con speaks in its italic). Inter appears only inside post cards, so posts still look like a social app.
+- Line icons (`src/components/Icon.tsx`, the designer's SVGs plus `lucide-react`) replace emoji in the UI; the share text keeps emoji.
+- The noir Con silhouette and halftone frame are in `src/assets/figma/`.
 
 **Other:**
-- The player id lives in `localStorage` (`gos.player_id`). "Start as a new detective" on Home or the Dossier resets it, which is handy between demo players.
-- The theme follows `prefers-color-scheme` (dark by default), and sound has a mute toggle in the header.
+- The player id lives in `localStorage` (`gos.player_id`). "Start as a new detective" on Home or Stats resets it, which is handy between demo players.
+- Sound effects have a mute toggle in the header.
+- Shared links show a preview card (`public/og.png` and the `og:` tags in `index.html`).
 
 ## Pipeline
 
@@ -110,6 +118,35 @@ uv run pytest pipeline/tests -q                                   # no network, 
   - Level 2: one evidence check on the fast model.
   - Level 3: one check on the full models.
 - The judge sees every post from the same neutral reposter, so it can't tell edits apart by author.
+
+## Nightly builds
+
+`scripts/nightly_build.py` adds one AI-built Daily Grain to the backlog per run. It finds the earliest date in the next 14 days with no daily case, picks that weekday's theme, builds it, and holds it for the Editor's Desk.
+
+```
+uv run --env-file .env.build python scripts/nightly_build.py            # build one puzzle
+uv run --env-file .env.build python scripts/nightly_build.py --dry-run  # say what it would build
+```
+
+- Keep the build key in a separate `.env.build`, so builds never spend the game server's live-judging quota.
+- Weekday themes come from `TOPIC_HINTS` in `pipeline/topics.py`: food, sports, science, tech and Jersey Weird. Each topic reads only its listed feeds. Topics without chart data skip the misleading-chart trick.
+- Each run is capped at 30 model calls, with 2 held back so the run always reaches the editor instead of stopping as a draft.
+
+## iMessage bot
+
+`backend/imessage/` plays the Daily Grain over iMessage through Photon 2.0. It's a separate process that polls Photon for new texts and plays through the game server's API, so texts and taps share the same scoring and crowd stats.
+
+```
+uv run python -m backend.imessage
+uv run pytest backend/tests/test_imessage.py -q
+```
+
+- **Needs:** `PHOTON_API_KEY` and `PHOTON_PROJECT_ID` (a Photon 2.0 project), and `GOS_API_URL` pointing at the game server (default `http://127.0.0.1:8000`).
+- **Commands are loose on purpose:** "play"; REAL / FAKE ("sus", "cap", 👍 and 👎 work too); a trick name ("fake chart"); CHECK source, data or account; HINT; STATS; HELP; STOP to mute reminders.
+- **Reminders:** `GOS_NUDGE_HOUR` sets the daily reminder hour in ET (default 9; -1 turns them off).
+- **The detective partner** answers free-form texts. It tries Gemini first (`GOS_PARTNER_ORDER`, default `gemini,openrouter`), with `GOS_PARTNER_DAILY` replies per player per day (default 40).
+- **Shared Photon lines:** each player must be added to the line and text it first before the bot can reply.
+- **Run one copy only,** or every text gets two replies.
 
 ## Hand-built content
 
