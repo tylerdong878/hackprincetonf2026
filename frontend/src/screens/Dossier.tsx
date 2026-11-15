@@ -273,6 +273,8 @@ export function Dossier() {
             </LinkButton>
             <Button
               variant="ghost"
+              // On laptops this sits on the black hero: paper-white type and an outline so it stays visible.
+              className="md:border-2 md:border-paper-white md:text-paper-white md:hover:bg-white/10"
               disabled={resetting}
               onClick={async () => {
                 setResetting(true)

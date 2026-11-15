@@ -19,9 +19,9 @@ A 2-minute daily game, laid out like a newspaper front page. An AI con artist ca
 - Few people spotted it? You get a rarity bonus: *Rare catch* +50, *One in a shaker* +100.
 - Share your grid without spoilers: 🟩 trusted · 🧂 caught · 🟨 false alarm · 🟥 fooled.
 
-| The reveal | The end card |
+| A made-up card's reveal | The end card |
 |---|---|
-| ![Card reveal: what you saw next to the honest view](docs/img/daily-reveal.png) | ![End card with score, outcome tiles and the lean meter](docs/img/end-card.png) |
+| ![A made-up card's reveal: the tell, the Con's claim and the closest real story](docs/img/daily-reveal.png) | ![End card with score, outcome tiles and the lean meter](docs/img/end-card.png) |
 
 **🎭 Con the Con.** Now you're the con artist.
 - Take a real post and doctor it with one trick: crop the quote, move the axis, cherry-pick the months, drop the context. Or bluff and leave it untouched.
@@ -30,7 +30,7 @@ A 2-minute daily game, laid out like a newspaper front page. An AI con artist ca
   - **Street Con** gets one evidence check on a fast model.
   - **Master Con** gets one check on the full models.
 
-![Con the Con verdict: the edit got past the AI](docs/img/con-the-con.png)
+![Con the Con: cut words from a real quote, then send it to the AI](docs/img/con-the-con.png)
 
 **💬 Play over iMessage.** Text the Grain of Salt number "play" and today's puzzle arrives one card at a time. Reply REAL or FAKE ("sus", "cap" and 👎 work too), name the trick, text CHECK for a clue, or ask for a HINT. It's the same game: the same scoring and the same crowd stats. It also sends a 9am reminder, and a dry detective partner chats back.
 
