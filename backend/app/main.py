@@ -483,8 +483,9 @@ def reject_case(case_id: CaseId, store: StoreDep, body: RejectRequest | None = N
 
 # ---- app ---------------------------------------------------------------------
 
-# The page itself always revalidates (a cheap 304 via its ETag), so a new deploy shows up on the next load instead
-# of a browser reusing an old index.html that points at an old bundle. Hashed assets cache as usual.
+# The page itself is never reused from cache without asking, so a new deploy shows up on the next load instead of a
+# browser reusing an old index.html that points at an old bundle. FileResponse re-sends it in full (no 304), which
+# is fine for a ~2 KB page. Hashed assets cache as usual.
 INDEX_HEADERS = {"Cache-Control": "no-cache"}
 
 
