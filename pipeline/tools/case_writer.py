@@ -436,7 +436,11 @@ def build_case_bundle(ctx: RunContext, title: str, briefing: str, posts: list[Po
                 if src is None:
                     raise CaseBuildError(where + f"no saved source '{p.source_id}'")
                 if p.source_id in used_sources or p.source_id in forged_sources:
-                    raise CaseBuildError(where + f"source {p.source_id} is already used by another post")
+                    taken = used_sources | forged_sources
+                    free = [s.id for s in ctx.sources if s.id not in taken]
+                    hint = (f" Unused saved sources: {', '.join(free)}. Pick one of those for this post."
+                            if free else " Every saved source is taken: use fewer posts or ask for more sources.")
+                    raise CaseBuildError(where + f"source {p.source_id} is already used by another post." + hint)
                 used_sources.add(p.source_id)
                 o = outlet_for(src.url)
                 label_date = source_date_label(src.date)
