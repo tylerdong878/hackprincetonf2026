@@ -117,190 +117,196 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
   const bonusTotal = ordered.reduce((s, x) => s + (x.r?.rarity_bonus?.points ?? 0), 0)
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 pt-6 pb-16">
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 pt-6 pb-16 lg:grid lg:max-w-[1160px] lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:px-6 lg:pt-10">
       {alreadyPlayed && (
-        <p className="border-2 border-ink bg-sheet px-4 py-2.5 text-center text-sm">
+        <p className="border-2 border-ink bg-sheet px-4 py-2.5 text-center text-sm lg:col-span-2">
           You’ve played today’s Grain. <b>Come back tomorrow</b> for #{n + 1}.
         </p>
       )}
 
-      {/* Lead with the grid and the lean meter. */}
-      <section className="panel rise-in relative px-5 pt-5 pb-16 sm:px-6" aria-labelledby="end-h">
-        <p className="dateline font-bold">
-          {shortDate(`${daily.date}T12:00:00`)} {daily.theme ? `· ${daily.theme}` : ''}
-        </p>
-        <h1 id="end-h" className="logotype mt-2 text-[40px] text-ink sm:text-[44px]">
-          Grain of Salt #{n}
-        </h1>
-        <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-1" aria-label={`${correct} of ${outcomes.length} right, ${result.score} points`}>
-          <p className="flex items-baseline gap-1.5">
-            <b className="num text-[76px] leading-[0.85] font-bold text-ink">{score}</b>
-            <span className="caps text-sm font-semibold text-muted">pts</span>
+      {/* Laptop: the result on the left, what to do next on the right. Phones: one column, same order. */}
+      <div className="flex flex-col gap-5">
+        {/* Lead with the grid and the lean meter. */}
+        <section className="panel rise-in relative px-5 pt-5 pb-16 sm:px-6" aria-labelledby="end-h">
+          <p className="dateline font-bold">
+            {shortDate(`${daily.date}T12:00:00`)} {daily.theme ? `· ${daily.theme}` : ''}
           </p>
-          <div className="pb-1">
-            <p className="font-head text-xl font-bold">
-              <span className="num">
-                {correct}/{outcomes.length}
-              </span>{' '}
-              right
+          <h1 id="end-h" className="logotype mt-2 text-[40px] text-ink sm:text-[44px]">
+            Grain of Salt #{n}
+          </h1>
+          <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-1" aria-label={`${correct} of ${outcomes.length} right, ${result.score} points`}>
+            <p className="flex items-baseline gap-1.5">
+              <b className="num text-[76px] leading-[0.85] font-bold text-ink">{score}</b>
+              <span className="caps text-sm font-semibold text-muted">pts</span>
             </p>
-            {(result.clue_bonus || bonusTotal > 0) && (
-              <p className="text-[14px] text-muted">
-                {result.clue_bonus ? <>+{result.clue_bonus} unused checks</> : null}
-                {result.clue_bonus && bonusTotal ? ' · ' : null}
-                {bonusTotal ? <>+{bonusTotal} rarity bonus</> : null}
+            <div className="pb-1">
+              <p className="font-head text-xl font-bold">
+                <span className="num">
+                  {correct}/{outcomes.length}
+                </span>{' '}
+                right
               </p>
-            )}
-          </div>
-        </div>
-        <div className="mt-4">
-          <Tiles outcomes={outcomes} animate={animate} />
-        </div>
-        <ul className="mt-3 flex flex-wrap gap-x-3.5 gap-y-1 text-[13px] text-muted" aria-label={GRID_LEGEND}>
-          {LEGEND.map(([o, word]) => (
-            <li key={o} className="inline-flex items-center gap-1.5">
-              <OutcomeSquare outcome={o} size={15} />
-              {word}
-            </li>
-          ))}
-        </ul>
-        <span
-          className={`stamp ${animate ? 'stamp-thunk' : ''} absolute right-5 bottom-4 bg-sheet text-[18px] text-press`}
-          style={{ ['--stamp-rot' as string]: '-6deg', animationDelay: animate ? `${tilesDone}ms` : undefined }}
-          aria-hidden="true"
-        >
-          Closed
-        </span>
-      </section>
-
-      <section aria-label="Your lean">
-        <LeanMeter lean={lean} label={label} />
-      </section>
-
-      {/* Rating and streak. */}
-      <div className="grid grid-cols-2 gap-3">
-        <a href="#/dossier" className="panel press flex flex-col justify-center px-4 py-3 hover:bg-surface-2">
-          <span className="flex items-baseline gap-2">
-            <span className="num text-[40px] leading-none font-bold">{result.rating}</span>
-            <span className="truncate text-lg text-press italic">{result.rank}</span>
-          </span>
-        </a>
-        <div className="panel flex items-center gap-2 px-4 py-3">
-          <IconFlame size={30} className={streak > 0 ? 'flame text-press' : 'text-muted opacity-50'} />
-          <span className="num leading-none whitespace-nowrap">
-            <span className="text-[40px] font-bold">{streak}</span>
-            <span className="text-[18px] font-semibold text-muted">-day streak</span>
-          </span>
-        </div>
-      </div>
-
-      {rare && (
-        <section className="pop panel flex items-center gap-3 px-4 py-3" aria-label="Your rarest catch today">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-ink bg-highlight text-ink" aria-hidden="true">
-            {rare.r.rarity_bonus && rare.r.rarity_bonus.points >= 100 ? <SaltCrystal size={26} /> : <IconSparkles size={22} />}
-          </span>
-          <div className="min-w-0 flex-1 text-sm">
-            <p className="font-head text-lg font-bold">
-              Rarest catch: card {rare.index + 1}
-              {rare.r.rarity_bonus && (
-                <span className="ml-2 text-press">
-                  {rare.r.rarity_bonus.label} <span className="num">+{rare.r.rarity_bonus.points}</span>
-                </span>
+              {(result.clue_bonus || bonusTotal > 0) && (
+                <p className="text-[14px] text-muted">
+                  {result.clue_bonus ? <>+{result.clue_bonus} unused checks</> : null}
+                  {result.clue_bonus && bonusTotal ? ' · ' : null}
+                  {bonusTotal ? <>+{bonusTotal} rarity bonus</> : null}
+                </p>
               )}
-            </p>
-            <p className="truncate text-muted">
-              {rare.pct != null && (
-                <>
-                  Only <b className="num text-ink">{Math.round(rare.pct)}%</b> {rare.r.doctored ? 'caught' : 'trusted'} this ·{' '}
-                </>
-              )}
-              {rare.post.author.name}
-            </p>
+            </div>
           </div>
-        </section>
-      )}
-
-      {result.adaptation_message && (
-        <div className="flex items-start gap-3">
-          <ConMascot size={56} shape="circle" className="mt-1 shrink-0" />
-          <ConBubble text={result.adaptation_message} size="md" className="min-w-0 flex-1" />
-        </div>
-      )}
-
-      <section className="flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={async () => {
-            setCopied((await copyText(shareText)) ? 'ok' : 'fail')
-            window.setTimeout(() => setCopied('idle'), 2400)
-          }}
-          className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
-        >
-          {copied === 'ok' ? (
-            <>
-              <IconCheck size={22} strokeWidth={2.6} /> Copied!
-            </>
-          ) : (
-            <>
-              <IconShare size={22} /> Share
-            </>
-          )}
-        </button>
-        <p className="text-[13px] text-muted" role="status">
-          {copied === 'fail' ? `Copy this instead: ${shareText.replace(/\n/g, ' · ')}` : 'Shares the number, grid and lean. Never the doctored posts.'}
-        </p>
-        <Countdown className="mt-3" />
-      </section>
-
-      <a
-        href="#/con"
-        className="group press flex w-full items-center gap-3.5 border-2 border-press bg-sheet px-4 py-4 shadow-[var(--hard)] hover:bg-press/[0.04]"
-      >
-        <IconMask size={34} className="shrink-0 text-press" />
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-[21px] leading-tight font-bold">Bonus round: con the Con</span>
-          <span className="block text-[14px] text-muted">Doctor a real post. Our AI tries to bust you, live.</span>
-        </span>
-        <IconArrow size={24} className="shrink-0 text-press transition group-hover:translate-x-1" />
-      </a>
-
-      <section className="border-2 border-ink bg-sheet">
-        <button
-          type="button"
-          aria-expanded={showCards}
-          onClick={() => setShowCards((s) => !s)}
-          className="caps flex w-full items-center justify-between px-4 py-3.5 text-left text-[16px] font-bold"
-        >
-          Review today’s cards <IconChevron size={20} className={`transition ${showCards ? 'rotate-180' : ''}`} />
-        </button>
-        {showCards && (
-          <ol className="flex flex-col gap-3 border-t-2 border-ink px-4 py-4">
-            {ordered.map(({ post, r }, i) => (
-              <li key={post.id} className="flex gap-3 text-sm">
-                <OutcomeSquare outcome={r!.outcome} size={26} className="mt-0.5" />
-                <div className="min-w-0">
-                  <p className="font-bold">
-                    {i + 1}. {post.author.name} · {outcomeStyle(r!.outcome).word}
-                    {r!.doctored && <span className="text-muted"> · {trickLabel(r!.trick)}</span>}
-                  </p>
-                  <p className="text-muted">{r!.tell || r!.explanation}</p>
-                </div>
+          <div className="mt-4">
+            <Tiles outcomes={outcomes} animate={animate} />
+          </div>
+          <ul className="mt-3 flex flex-wrap gap-x-3.5 gap-y-1 text-[13px] text-muted" aria-label={GRID_LEGEND}>
+            {LEGEND.map(([o, word]) => (
+              <li key={o} className="inline-flex items-center gap-1.5">
+                <OutcomeSquare outcome={o} size={15} />
+                {word}
               </li>
             ))}
-          </ol>
-        )}
-      </section>
+          </ul>
+          <span
+            className={`stamp ${animate ? 'stamp-thunk' : ''} absolute right-5 bottom-4 bg-sheet text-[18px] text-press`}
+            style={{ ['--stamp-rot' as string]: '-6deg', animationDelay: animate ? `${tilesDone}ms` : undefined }}
+            aria-hidden="true"
+          >
+            Closed
+          </span>
+        </section>
 
-      <div className="flex flex-wrap justify-center gap-2">
-        <LinkButton to="/dossier" variant="ghost" size="sm">
-          Stats
-        </LinkButton>
-        <LinkButton to="/casefiles" variant="ghost" size="sm">
-          More cases
-        </LinkButton>
-        <LinkButton to="/" variant="ghost" size="sm">
-          Home
-        </LinkButton>
+        <section aria-label="Your lean">
+          <LeanMeter lean={lean} label={label} />
+        </section>
+
+        {/* Rating and streak. */}
+        <div className="grid grid-cols-2 gap-3">
+          <a href="#/dossier" className="panel press flex flex-col justify-center px-4 py-3 hover:bg-surface-2">
+            <span className="flex items-baseline gap-2">
+              <span className="num text-[40px] leading-none font-bold">{result.rating}</span>
+              <span className="truncate text-lg text-press italic">{result.rank}</span>
+            </span>
+          </a>
+          <div className="panel flex items-center gap-2 px-4 py-3">
+            <IconFlame size={30} className={streak > 0 ? 'flame text-press' : 'text-muted opacity-50'} />
+            <span className="num leading-none whitespace-nowrap">
+              <span className="text-[40px] font-bold">{streak}</span>
+              <span className="text-[18px] font-semibold text-muted">-day streak</span>
+            </span>
+          </div>
+        </div>
+
+        {rare && (
+          <section className="pop panel flex items-center gap-3 px-4 py-3" aria-label="Your rarest catch today">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-ink bg-highlight text-ink" aria-hidden="true">
+              {rare.r.rarity_bonus && rare.r.rarity_bonus.points >= 100 ? <SaltCrystal size={26} /> : <IconSparkles size={22} />}
+            </span>
+            <div className="min-w-0 flex-1 text-sm">
+              <p className="font-head text-lg font-bold">
+                Rarest catch: card {rare.index + 1}
+                {rare.r.rarity_bonus && (
+                  <span className="ml-2 text-press">
+                    {rare.r.rarity_bonus.label} <span className="num">+{rare.r.rarity_bonus.points}</span>
+                  </span>
+                )}
+              </p>
+              <p className="truncate text-muted">
+                {rare.pct != null && (
+                  <>
+                    Only <b className="num text-ink">{Math.round(rare.pct)}%</b> {rare.r.doctored ? 'caught' : 'trusted'} this ·{' '}
+                  </>
+                )}
+                {rare.post.author.name}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {result.adaptation_message && (
+          <div className="flex items-start gap-3">
+            <ConMascot size={56} shape="circle" className="mt-1 shrink-0" />
+            <ConBubble text={result.adaptation_message} size="md" className="min-w-0 flex-1" />
+          </div>
+        )}
+
+      </div>
+
+      <div className="flex flex-col gap-5">
+        <section className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={async () => {
+              setCopied((await copyText(shareText)) ? 'ok' : 'fail')
+              window.setTimeout(() => setCopied('idle'), 2400)
+            }}
+            className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
+          >
+            {copied === 'ok' ? (
+              <>
+                <IconCheck size={22} strokeWidth={2.6} /> Copied!
+              </>
+            ) : (
+              <>
+                <IconShare size={22} /> Share
+              </>
+            )}
+          </button>
+          <p className="text-[13px] text-muted" role="status">
+            {copied === 'fail' ? `Copy this instead: ${shareText.replace(/\n/g, ' · ')}` : 'Shares the number, grid and lean. Never the doctored posts.'}
+          </p>
+          <Countdown className="mt-3" />
+        </section>
+
+        <a
+          href="#/con"
+          className="group press flex w-full items-center gap-3.5 border-2 border-press bg-sheet px-4 py-4 shadow-[var(--hard)] hover:bg-press/[0.04]"
+        >
+          <IconMask size={34} className="shrink-0 text-press" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-[21px] leading-tight font-bold">Bonus round: con the Con</span>
+            <span className="block text-[14px] text-muted">Doctor a real post. Our AI tries to bust you, live.</span>
+          </span>
+          <IconArrow size={24} className="shrink-0 text-press transition group-hover:translate-x-1" />
+        </a>
+
+        <section className="border-2 border-ink bg-sheet">
+          <button
+            type="button"
+            aria-expanded={showCards}
+            onClick={() => setShowCards((s) => !s)}
+            className="caps flex w-full items-center justify-between px-4 py-3.5 text-left text-[16px] font-bold"
+          >
+            Review today’s cards <IconChevron size={20} className={`transition ${showCards ? 'rotate-180' : ''}`} />
+          </button>
+          {showCards && (
+            <ol className="flex flex-col gap-3 border-t-2 border-ink px-4 py-4">
+              {ordered.map(({ post, r }, i) => (
+                <li key={post.id} className="flex gap-3 text-sm">
+                  <OutcomeSquare outcome={r!.outcome} size={26} className="mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="font-bold">
+                      {i + 1}. {post.author.name} · {outcomeStyle(r!.outcome).word}
+                      {r!.doctored && <span className="text-muted"> · {trickLabel(r!.trick)}</span>}
+                    </p>
+                    <p className="text-muted">{r!.tell || r!.explanation}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+
+        <div className="flex flex-wrap justify-center gap-2">
+          <LinkButton to="/dossier" variant="ghost" size="sm">
+            Stats
+          </LinkButton>
+          <LinkButton to="/casefiles" variant="ghost" size="sm">
+            More cases
+          </LinkButton>
+          <LinkButton to="/" variant="ghost" size="sm">
+            Home
+          </LinkButton>
+        </div>
       </div>
     </main>
   )

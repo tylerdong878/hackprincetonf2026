@@ -324,10 +324,16 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
   const c = daily.case
   const startRef = useRef<HTMLButtonElement>(null)
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
-      <div className="flex items-end gap-4">
-        <ConMascot size={150} shape="door" className="shrink-0" />
-        <ConBubble text={c.briefing} size="md" className="mb-2 min-w-0 flex-1" onDone={() => startRef.current?.focus({ preventScroll: true })} />
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 lg:grid lg:max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:items-center lg:gap-14 lg:px-6 lg:py-12">
+      {/* Laptop: the Con and his line on the left, the Grain on the right (Figma "Case — Briefing"). */}
+      <div className="flex items-end gap-4 lg:flex-col-reverse lg:items-start lg:gap-6">
+        <ConMascot size={150} shape="door" className="shrink-0 lg:h-[420px] lg:w-auto" />
+        <ConBubble
+          text={c.briefing}
+          size="md"
+          className="mb-2 min-w-0 flex-1 lg:mb-0 lg:w-full lg:flex-none"
+          onDone={() => startRef.current?.focus({ preventScroll: true })}
+        />
       </div>
       <section className="folder-open panel p-5 sm:p-6" aria-labelledby="grain-h">
         <div className="flex items-baseline justify-between gap-3">
@@ -569,91 +575,146 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   const flipClass = flip === 'out' ? 'flip-out' : flip === 'in' ? 'flip-in' : ''
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3" style={{ paddingBottom: Math.max(barH, 96) + 20 }}>
-      <ProgressDots posts={posts} cards={prog.cards} current={idx} />
-      <p className="dateline mt-2 text-center">
-        Card {idx + 1} of {posts.length} · {DAILY_RANGE}
-      </p>
+    <main
+      className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3 lg:grid lg:max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-10 lg:px-6 lg:pt-6"
+      style={{ paddingBottom: Math.max(barH, 96) + 20 }}
+    >
+      {/* Laptop: the card on the left, the Evidence Kit beside it (Figma "Case — Investigation"). */}
+      <div className="min-w-0">
+        <ProgressDots posts={posts} cards={prog.cards} current={idx} />
+        <p className="dateline mt-2 text-center">
+          Card {idx + 1} of {posts.length} · {DAILY_RANGE}
+        </p>
 
-      {idx === 0 && !answered && !tipSeen && (
-        <aside
-          className="mt-3 border-2 border-ink bg-sheet px-4 py-3 text-[14.5px] leading-relaxed shadow-[var(--hard)]"
-          aria-label="How to spot the Con"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <p>
-              <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
-              big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
-              short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
-            </p>
-            <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
-              ×
-            </button>
-          </div>
-        </aside>
-      )}
+        {idx === 0 && !answered && !tipSeen && (
+          <aside
+            className="mt-3 border-2 border-ink bg-sheet px-4 py-3 text-[14.5px] leading-relaxed shadow-[var(--hard)]"
+            aria-label="How to spot the Con"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p>
+                <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
+                big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
+                short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
+              </p>
+              <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
+                ×
+              </button>
+            </div>
+          </aside>
+        )}
 
-      <div key={post.id} className="card-in mt-4">
-        <div className={flipClass} style={{ transformOrigin: 'center' }}>
-          {answered ? (
-            <CardBack post={post} rec={rec} caseNumber={game.number} />
-          ) : (
-            <div className="flex flex-col gap-3">
-              <FeedCard post={post} caseNumber={game.number} size="daily" />
+        <div key={post.id} className="card-in mt-4">
+          <div className={flipClass} style={{ transformOrigin: 'center' }}>
+            {answered ? (
+              <CardBack post={post} rec={rec} caseNumber={game.number} />
+            ) : (
+              <div className="flex flex-col gap-3">
+                <FeedCard post={post} caseNumber={game.number} size="daily" />
 
-              {/* Check: one evidence view, inline */}
-              <div className="mt-1 flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  aria-expanded={checkOpen}
-                  onClick={() => setCheckOpen((o) => !o)}
-                  className={`press inline-flex items-center gap-2.5 border-2 border-ink px-3.5 py-2 shadow-[var(--hard)] ${
-                    checkOpen ? 'bg-sheet text-ink' : 'bg-ink text-sheet hover:bg-[#2a2a2a]'
-                  }`}
-                >
-                  <IconLens size={18} />
-                  <span className="caps text-[16px] font-bold">Check</span>
-                  <span className={`num caps text-[12.5px] font-semibold ${checkOpen ? 'text-press' : 'text-press-soft'}`}>{prog.cluesLeft} left</span>
-                </button>
-                <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
-              </div>
-              {checkOpen && (
-                <div className="rise-in flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
-                  {TOOLS.map((t) => {
-                    const has = post.tools?.includes(t.id)
-                    const isOpen = !!opened[t.id]
-                    const out = prog.cluesLeft <= 0 && !isOpen
-                    return (
-                      <ToolRow
-                        key={t.id}
-                        icon={t.icon}
-                        label={t.label}
-                        sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
-                        state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
-                        busy={busyTool === t.id}
-                        disabled={!has || out || busyTool != null}
-                        onClick={() => check(t.id)}
-                        title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
-                        compact
-                      />
-                    )
-                  })}
+                {/* Check: one evidence view, inline (phones; laptops use the Evidence Kit panel) */}
+                <div className="flex flex-col gap-3 lg:hidden">
+                  <div className="mt-1 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      aria-expanded={checkOpen}
+                      onClick={() => setCheckOpen((o) => !o)}
+                      className={`press inline-flex items-center gap-2.5 border-2 border-ink px-3.5 py-2 shadow-[var(--hard)] ${
+                        checkOpen ? 'bg-sheet text-ink' : 'bg-ink text-sheet hover:bg-[#2a2a2a]'
+                      }`}
+                    >
+                      <IconLens size={18} />
+                      <span className="caps text-[16px] font-bold">Check</span>
+                      <span className={`num caps text-[12.5px] font-semibold ${checkOpen ? 'text-press' : 'text-press-soft'}`}>{prog.cluesLeft} left</span>
+                    </button>
+                    <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
+                  </div>
+                  {checkOpen && (
+                    <div className="rise-in flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
+                      {TOOLS.map((t) => {
+                        const has = post.tools?.includes(t.id)
+                        const isOpen = !!opened[t.id]
+                        const out = prog.cluesLeft <= 0 && !isOpen
+                        return (
+                          <ToolRow
+                            key={t.id}
+                            icon={t.icon}
+                            label={t.label}
+                            sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
+                            state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
+                            busy={busyTool === t.id}
+                            disabled={!has || out || busyTool != null}
+                            onClick={() => check(t.id)}
+                            title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
+                            compact
+                          />
+                        )
+                      })}
+                    </div>
+                  )}
+                  {notice && (
+                    <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+                      {notice}
+                    </p>
+                  )}
+                  {TOOLS.filter((t) => opened[t.id]).map((t) => (
+                    <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
+                  ))}
                 </div>
-              )}
-              {notice && (
-                <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
-                  {notice}
-                </p>
-              )}
-              {TOOLS.filter((t) => opened[t.id]).map((t) => (
-                <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
-              ))}
-              {err != null && <ErrorState error={err} onRetry={() => setErr(null)} title="That answer didn’t go through." />}
+                {err != null && <ErrorState error={err} onRetry={() => setErr(null)} title="That answer didn’t go through." />}
+              </div>
+            )}
+          </div>
+        </div>
+        {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
+      </div>
+
+      <aside className="hidden lg:sticky lg:top-[96px] lg:flex lg:flex-col lg:gap-4" aria-label="Evidence Kit">
+        <section className="border-2 border-ink bg-sheet p-4 shadow-[var(--hard)]">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-head text-[28px] leading-none font-bold">Evidence Kit</h2>
+            <span className="flex items-center gap-2">
+              <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
+              <span className="num caps text-[12.5px] font-semibold text-press">{prog.cluesLeft} left</span>
+            </span>
+          </div>
+          <p className="mt-2 text-[14px] leading-snug text-muted">
+            {answered
+              ? 'This card is answered. Anything you opened stays here.'
+              : `Each tool costs one magnifier (${game.clue_budget} a day). Reopening one is free.`}
+          </p>
+          {!answered && (
+            <div className="mt-3 flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
+              {TOOLS.map((t) => {
+                const has = post.tools?.includes(t.id)
+                const isOpen = !!opened[t.id]
+                const out = prog.cluesLeft <= 0 && !isOpen
+                return (
+                  <ToolRow
+                    key={t.id}
+                    icon={t.icon}
+                    label={t.label}
+                    sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
+                    state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
+                    busy={busyTool === t.id}
+                    disabled={!has || out || busyTool != null}
+                    onClick={() => check(t.id)}
+                    title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
+                  />
+                )
+              })}
             </div>
           )}
-        </div>
-      </div>
-      {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
+          {notice && (
+            <p role="alert" className="mt-3 border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+              {notice}
+            </p>
+          )}
+        </section>
+        {TOOLS.filter((t) => opened[t.id]).map((t) => (
+          <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
+        ))}
+      </aside>
 
       {/* The trick picker opens as a bottom sheet over the card. */}
       {picker && !answered && (
@@ -663,72 +724,81 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
       {/* Sticky action bar */}
       <div
         ref={barRef}
-        className={`fixed inset-x-0 bottom-0 z-20 bg-sheet px-4 pb-[max(12px,env(safe-area-inset-bottom))] ${
+        className={`fixed inset-x-0 bottom-0 z-20 bg-sheet px-4 pb-[max(12px,env(safe-area-inset-bottom))] lg:px-6 ${
           picker && !answered ? 'border-t-[3px] border-press pt-2' : 'border-t-[3px] border-ink pt-3'
         }`}
       >
-        <div className="mx-auto max-w-lg">
-          {answered ? (
-            <>
-              {finishErr != null && (
-                <div className="mb-2">
-                  <ErrorState error={finishErr} onRetry={finish} title="Couldn’t close today’s Grain." />
+        {/* Laptop: the buttons sit under the card column; the right cell lines up with the Evidence Kit. */}
+        <div className="mx-auto max-w-lg lg:grid lg:max-w-[1112px] lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:gap-x-10">
+        <div className="min-w-0">
+            {answered ? (
+              <>
+                {finishErr != null && (
+                  <div className="mb-2">
+                    <ErrorState error={finishErr} onRetry={finish} title="Couldn’t close today’s Grain." />
+                  </div>
+                )}
+                <button
+                  ref={nextBtn}
+                  type="button"
+                  onClick={next}
+                  disabled={finishing}
+                  className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
+                >
+                  {!finishing && <IconArrow size={22} />}
+                  {finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'}
+                </button>
+              </>
+            ) : picker ? (
+              <div className="sheet-up">
+                <div className="flex justify-center pb-2" aria-hidden="true">
+                  <span className="h-1.5 w-12 bg-[#B9AE99]" />
                 </div>
-              )}
-              <button
-                ref={nextBtn}
-                type="button"
-                onClick={next}
-                disabled={finishing}
-                className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
-              >
-                {!finishing && <IconArrow size={22} />}
-                {finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'}
-              </button>
-            </>
-          ) : picker ? (
-            <div className="sheet-up">
-              <div className="flex justify-center pb-2" aria-hidden="true">
-                <span className="h-1.5 w-12 bg-[#B9AE99]" />
+                <button
+                  type="button"
+                  className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline"
+                  onClick={() => setPicker(false)}
+                >
+                  <IconArrowLeft size={15} /> Back
+                </button>
+                <TrickPicker
+                  options={choices}
+                  onPick={(t) => answer(true, t)}
+                  disabled={pending}
+                  notSureLabel="Just doctored, not sure how"
+                  className="pb-2"
+                />
               </div>
-              <button
-                type="button"
-                className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline"
-                onClick={() => setPicker(false)}
-              >
-                <IconArrowLeft size={15} /> Back
-              </button>
-              <TrickPicker
-                options={choices}
-                onPick={(t) => answer(true, t)}
-                disabled={pending}
-                notSureLabel="Just doctored, not sure how"
-                className="pb-2"
-              />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => answer(false, null)}
-                className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-4 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
-              >
-                <IconCheck size={24} strokeWidth={2.6} /> Real
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => setPicker(true)}
-                className="press caps flex items-center justify-center gap-2 border-2 border-press bg-sheet py-4 text-[22px] font-bold text-press shadow-[var(--hard)] hover:bg-press/[0.06] disabled:opacity-60"
-              >
-                <IconX size={24} strokeWidth={2.6} /> Doctored
-              </button>
-              <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
-                {pending ? 'Checking with the case file…' : <span className="hidden md:inline">Keys: R real · D doctored · C check</span>}
-              </p>
-            </div>
-          )}
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => answer(false, null)}
+                  className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-4 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
+                >
+                  <IconCheck size={24} strokeWidth={2.6} /> Real
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => setPicker(true)}
+                  className="press caps flex items-center justify-center gap-2 border-2 border-press bg-sheet py-4 text-[22px] font-bold text-press shadow-[var(--hard)] hover:bg-press/[0.06] disabled:opacity-60"
+                >
+                  <IconX size={24} strokeWidth={2.6} /> Doctored
+                </button>
+                <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
+                  {pending ? 'Checking with the case file…' : <span className="hidden md:inline lg:hidden">Keys: R real · D doctored · C check</span>}
+                </p>
+              </div>
+            )}
+        </div>
+        <div className="hidden lg:block" aria-hidden="true">
+          <p className="dateline !text-ink">
+            Card {idx + 1} of {posts.length} · {DAILY_RANGE}
+          </p>
+          <p className="dateline mt-1 !text-[11px]">Keys: R real · D doctored · C check · Enter next</p>
+        </div>
         </div>
       </div>
     </main>
@@ -738,7 +808,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
 function DailyTopBar({ daily }: { daily: DailyResponse | null }) {
   return (
     <header className="sticky top-0 z-30 bg-sheet">
-      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2">
+      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2 lg:max-w-[1160px] lg:px-6">
         <div className="min-w-0 flex-1">
           <Brand size={27} />
           <p className="dateline mt-0.5 truncate !text-[12px]">
