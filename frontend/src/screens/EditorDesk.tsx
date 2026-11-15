@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { FeedCard } from '../components/PostCard'
 import { DiffView } from '../components/Reveal'
 import { SiteHeader } from '../components/Header'
+import { IconArrowLeft, IconCheck, IconLock, IconX } from '../components/Icon'
 import { Workshop } from '../components/Workshop'
 import { Button, Chip, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
 import { api, ApiError, getEditorToken, setEditorToken } from '../lib/api'
@@ -44,7 +45,7 @@ function DeskGate({ error, onToken, children }: { error: unknown; onToken: () =>
   const hadToken = !!getEditorToken()
   return (
     <form
-      className="mx-auto mt-4 flex w-full max-w-md flex-col gap-3 rounded-2xl border border-line bg-surface p-6"
+      className="panel mx-auto mt-4 flex w-full max-w-md flex-col gap-3 p-6"
       onSubmit={(e) => {
         e.preventDefault()
         if (!token.trim()) return
@@ -52,9 +53,11 @@ function DeskGate({ error, onToken, children }: { error: unknown; onToken: () =>
         onToken()
       }}
     >
-      <h2 className="font-display text-xl font-semibold">🔐 Editor’s Desk is locked</h2>
+      <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+        <IconLock size={22} className="text-press" /> Editor’s Desk is locked
+      </h2>
       <p className="text-sm text-muted">Puzzle editors only. Enter the desk token once; it’s kept for this browser tab.</p>
-      <label htmlFor="desk-token" className="text-sm font-semibold">
+      <label htmlFor="desk-token" className="caps text-[13px] font-semibold tracking-[0.06em]">
         Desk token
       </label>
       <input
@@ -64,10 +67,10 @@ function DeskGate({ error, onToken, children }: { error: unknown; onToken: () =>
         autoFocus
         value={token}
         onChange={(e) => setToken(e.target.value)}
-        className="rounded-xl border border-line bg-bg px-3 py-2 text-sm text-text"
+        className="border-2 border-ink bg-white px-3 py-2 text-[15px] text-ink"
       />
       {hadToken && (
-        <p role="alert" className="text-sm text-doctored">
+        <p role="alert" className="text-sm font-bold text-press">
           That token didn’t work. Try again.
         </p>
       )}
@@ -88,13 +91,14 @@ export function EditorQueue() {
   return (
     <>
       <SiteHeader active="editor" />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <h1 className="font-display text-3xl font-bold">Editor’s Desk</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16 sm:pt-10">
+        <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">Editor’s Desk</h1>
+        <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
+        <p className="mt-3 max-w-3xl text-[17px] italic">
           A human puzzle editor approves every puzzle before it goes live. Open one to play-test it, check the answer key, the diffs
           and the blind-solver log, then approve or reject it.
         </p>
-        <div className="mt-6">
+        <div className="mt-10">
           {q.status === 'loading' && <Loading label="Loading the puzzle queue…" />}
           {q.status === 'error' && (
             <DeskGate error={q.error} onToken={q.reload}>
@@ -103,18 +107,18 @@ export function EditorQueue() {
           )}
           {q.status === 'ok' &&
             (q.data.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-muted">No cases on file yet.</p>
+              <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">No cases on file yet.</p>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-line thin-scroll">
-                <table className="w-full min-w-[720px] border-collapse text-sm">
-                  <thead className="bg-surface-2 text-left text-xs text-muted">
+              <div className="overflow-x-auto border-2 border-ink bg-sheet shadow-[var(--hard)] thin-scroll">
+                <table className="w-full min-w-[720px] border-collapse text-[15px]">
+                  <thead className="caps bg-ink text-left text-[12.5px] tracking-[0.08em] text-sheet">
                     <tr>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Case</th>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Topic</th>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Date</th>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Tricks used</th>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Blind solver</th>
-                      <th scope="col" className="px-4 py-2.5 font-semibold">Status</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Case</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Topic</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Date</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Tricks used</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Blind solver</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -122,13 +126,13 @@ export function EditorQueue() {
                       const m = metaOf(item)
                       const solver = item.solver
                       return (
-                        <tr key={item.id} className="border-t border-line bg-surface hover:bg-surface-2">
+                        <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet hover:bg-[#F4ECDB]">
                           <td className="px-4 py-3">
-                            <a href={href(`/editor/${item.id}`)} className="font-semibold underline-offset-2 hover:underline">
-                              {item.number != null && <span className="mr-1.5 font-mono text-xs text-muted">{caseNo(item.number)}</span>}
+                            <a href={href(`/editor/${item.id}`)} className="font-bold underline-offset-4 hover:underline hover:decoration-2">
+                              {item.number != null && <span className="num mr-1.5 text-[13px] font-semibold text-muted">{caseNo(item.number)}</span>}
                               {item.title ?? item.id}
                             </a>
-                            {m.daily && <span className="ml-2 text-xs text-con">daily</span>}
+                            {m.daily && <span className="caps ml-2 bg-press px-1.5 py-0.5 text-[11px] font-semibold tracking-[0.06em] text-white">daily</span>}
                           </td>
                           <td className="px-4 py-3 text-muted">{item.topic ?? '—'}</td>
                           <td className="px-4 py-3 whitespace-nowrap text-muted">{shortDate(m.created_at ?? undefined) || '—'}</td>
@@ -141,13 +145,17 @@ export function EditorQueue() {
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-xs">
+                          <td className="px-4 py-3 text-[13px]">
                             {solver?.pass != null ? (
-                              <span style={{ color: solver.pass ? 'var(--real)' : 'var(--doctored)' }} className="font-semibold">
-                                {solver.pass ? '✓ pass' : '✗ fail'}
+                              <span
+                                style={{ color: solver.pass ? 'var(--real)' : 'var(--doctored)' }}
+                                className="inline-flex items-center gap-1 font-bold"
+                              >
+                                {solver.pass ? <IconCheck size={14} strokeWidth={2.6} /> : <IconX size={14} strokeWidth={2.6} />}
+                                {solver.pass ? 'pass' : 'fail'}
                               </span>
                             ) : item.has_solver_log ? (
-                              <span className="font-semibold text-text">log on file</span>
+                              <span className="font-bold text-ink not-italic">log on file</span>
                             ) : m.origin === 'seed' ? (
                               <span className="text-muted">hand-built</span>
                             ) : (
@@ -156,7 +164,7 @@ export function EditorQueue() {
                             {(solver?.difficulty ?? m.difficulty) && (
                               <span className="text-muted"> · {solver?.difficulty ?? m.difficulty}</span>
                             )}
-                            {item.has_pipeline_log && <span className="block text-con">agent run logged</span>}
+                            {item.has_pipeline_log && <span className="block font-bold text-press">agent run logged</span>}
                           </td>
                           <td className="px-4 py-3">
                             <StatusBadge status={m.status} />
@@ -231,15 +239,16 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
     <>
       <div className="flex flex-wrap items-start gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-xs text-muted">
+          <p className="dateline">
             Case {caseNo(game.number)} · {game.id}
           </p>
-          <h1 className="mt-1 font-display text-3xl font-bold">{game.title}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <h1 className="mt-1 font-display text-4xl leading-tight font-bold">{game.title}</h1>
+          <div className="double-rule-thin mt-2 max-w-2xl" aria-hidden="true" />
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[15px] text-muted">
             <StatusBadge status={meta.status} />
             <span>{meta.origin === 'pipeline' ? 'Built by the pipeline' : meta.origin === 'seed' ? 'Hand-built by the team' : meta.origin}</span>
             {meta.difficulty && <span>· {meta.difficulty}</span>}
-            {meta.daily && <span className="text-con">· daily case</span>}
+            {meta.daily && <span className="font-bold text-press">· daily case</span>}
           </div>
           {meta.status === 'rejected' && meta.rejection_reason && (
             <p className="mt-2 text-sm">
@@ -247,28 +256,30 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
             </p>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           <Button variant="con" size="sm" onClick={() => setWorkshop(true)}>
             Agent run ▸
           </Button>
           <Button variant="real" onClick={() => act('approve')} disabled={busy != null || meta.status === 'approved'}>
-            {busy === 'approve' ? 'Approving…' : meta.status === 'approved' ? '✓ Approved' : '✓ Approve'}
+            {busy !== 'approve' && <IconCheck size={18} strokeWidth={2.6} />}
+            {busy === 'approve' ? 'Approving…' : meta.status === 'approved' ? 'Approved' : 'Approve'}
           </Button>
           <Button variant="danger" onClick={() => setRejectOpen((o) => !o)} disabled={busy != null} aria-expanded={rejectOpen}>
-            ✗ Reject…
+            <IconX size={18} strokeWidth={2.6} />
+            Reject…
           </Button>
         </div>
       </div>
 
       {rejectOpen && (
         <form
-          className="rise-in mt-4 flex flex-col gap-2 rounded-2xl border border-doctored/50 bg-surface p-4"
+          className="rise-in mt-5 flex flex-col gap-2 border-2 border-press bg-sheet p-4 shadow-[var(--hard)]"
           onSubmit={(e) => {
             e.preventDefault()
             if (reason.trim()) act('reject')
           }}
         >
-          <label htmlFor="reject-reason" className="text-sm font-semibold">
+          <label htmlFor="reject-reason" className="text-[15px] font-bold">
             Why reject this case? (The pipeline uses this to revise it.)
           </label>
           <textarea
@@ -277,7 +288,7 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
             onChange={(e) => setReason(e.target.value)}
             rows={3}
             required
-            className="rounded-xl border border-line bg-bg px-3 py-2 text-sm text-text"
+            className="border-2 border-ink bg-white px-3 py-2 text-[15px] text-ink"
             placeholder="e.g. Post 3’s quote is too long for a fair-use excerpt."
           />
           <div className="flex gap-2">
@@ -292,21 +303,21 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
       )}
       {err != null && <ErrorState error={err} className="mt-4" title="That didn’t go through." />}
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-10 grid gap-8 lg:grid-cols-2">
         <section aria-labelledby="preview-h" className="min-w-0">
           <SectionLabel className="mb-3">
             <span id="preview-h">Player preview</span>
           </SectionLabel>
-          <div className="mb-4 rounded-2xl border border-line bg-surface p-4 text-sm">
-            <p className="font-con text-base">{game.briefing}</p>
-            <p className="mt-2 text-xs text-muted">
+          <div className="con-bubble mb-5 px-4 py-3">
+            <p className="text-[17px] leading-snug">{game.briefing}</p>
+            <p className="mt-2 text-[12.5px] text-[#C9C2B5] not-italic">
               {game.posts.length} posts · {game.clue_budget} clues · topic: {game.topic}
             </p>
           </div>
           <div className="flex flex-col gap-4">
             {game.posts.map((p, i) => (
               <div key={p.id}>
-                <p className="mb-1 text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Post {i + 1}</p>
+                <p className="caps mb-1.5 text-[12px] font-semibold tracking-[0.1em] text-muted">Post {i + 1}</p>
                 <FeedCard post={p} caseNumber={game.number} compact />
               </div>
             ))}
@@ -319,49 +330,53 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
           </SectionLabel>
           <div className="flex flex-col gap-4">
             {data.answer_key.clean_case && (
-              <div className="rounded-2xl border-2 border-con bg-con/10 p-4 text-sm">
+              <div className="border-2 border-press bg-sheet p-4 text-[15px] shadow-[var(--hard)]">
                 <b>Clean case:</b> no post is doctored.
-                {data.answer_key.con_line_clean && <p className="mt-1 font-con">“{data.answer_key.con_line_clean}”</p>}
+                {data.answer_key.con_line_clean && <p className="mt-1 italic">“{data.answer_key.con_line_clean}”</p>}
               </div>
             )}
             {game.posts.map((p, i) => {
               const k = data.answer_key.posts?.[p.id]
               if (!k) return null
               return (
-                <article key={p.id} className="rounded-2xl border border-line bg-surface p-4">
+                <article key={p.id} className="panel p-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] font-bold tracking-[0.16em] text-muted uppercase">Post {i + 1}</span>
+                    <span className="caps text-[12px] font-semibold tracking-[0.1em] text-muted">Post {i + 1}</span>
                     {k.doctored ? (
-                      <Chip color="var(--doctored)">✗ Doctored · {trickLabel(k.trick)}</Chip>
+                      <Chip color="var(--doctored)">
+                        <IconX size={13} strokeWidth={2.6} /> Doctored · {trickLabel(k.trick)}
+                      </Chip>
                     ) : (
-                      <Chip color="var(--real)">✓ Real{k.suspicious_real ? ' · built to look fake' : ''}</Chip>
+                      <Chip color="var(--real)">
+                        <IconCheck size={13} strokeWidth={2.6} /> Real{k.suspicious_real ? ' · built to look fake' : ''}
+                      </Chip>
                     )}
                   </div>
                   {k.tell && (
-                    <p className="mt-2 text-sm">
+                    <p className="mt-2 text-[15px]">
                       <b>The tell:</b> {k.tell}
                     </p>
                   )}
-                  {k.explanation && <p className="mt-1.5 text-sm text-muted">{k.explanation}</p>}
+                  {k.explanation && <p className="mt-1.5 text-[15px] text-muted">{k.explanation}</p>}
                   {k.doctored && k.diff && (
                     <div className="mt-3">
                       <DiffView post={p} caseNumber={game.number} diff={k.diff} />
                     </div>
                   )}
-                  <ul className="mt-3 flex flex-col gap-1 text-xs text-muted">
+                  <ul className="mt-3 flex flex-col gap-1 border-t border-[#CFC6B4] pt-2 text-[13px] text-muted italic">
                     {k.con_line_fooled && (
                       <li>
-                        <span className="font-semibold text-text">Con, if fooled:</span> “{k.con_line_fooled}”
+                        <span className="font-bold text-ink not-italic">Con, if fooled:</span> “{k.con_line_fooled}”
                       </li>
                     )}
                     {k.con_line_caught && (
                       <li>
-                        <span className="font-semibold text-text">Con, if caught:</span> “{k.con_line_caught}”
+                        <span className="font-bold text-ink not-italic">Con, if caught:</span> “{k.con_line_caught}”
                       </li>
                     )}
                     {k.con_line_false_alarm && (
                       <li>
-                        <span className="font-semibold text-text">Con, on a false alarm:</span> “{k.con_line_false_alarm}”
+                        <span className="font-bold text-ink not-italic">Con, on a false alarm:</span> “{k.con_line_false_alarm}”
                       </li>
                     )}
                   </ul>
@@ -369,15 +384,19 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
               )
             })}
 
-            <section className="rounded-2xl border border-line bg-surface p-4" aria-labelledby="safety-h">
+            <section className="panel p-4" aria-labelledby="safety-h">
               <SectionLabel className="mb-2">
                 <span id="safety-h">Safety checks</span>
               </SectionLabel>
-              <ul className="flex flex-col gap-1.5 text-sm">
+              <ul className="flex flex-col gap-1.5 text-[15px]">
                 {checks.map((c) => (
                   <li key={c.label} className="flex items-start gap-2">
-                    <span className="font-bold" style={{ color: c.ok ? 'var(--real)' : 'var(--doctored)' }}>
-                      {c.ok ? '✓' : '✗'}
+                    <span
+                      className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center border-[1.5px] border-ink"
+                      style={{ background: c.ok ? 'var(--ink)' : 'var(--press)', color: c.ok ? 'var(--sheet)' : '#fff' }}
+                      aria-hidden="true"
+                    >
+                      {c.ok ? <IconCheck size={13} strokeWidth={3} /> : <IconX size={13} strokeWidth={3} />}
                     </span>
                     <span>
                       <span className="sr-only">{c.ok ? 'Pass: ' : 'Fail: '}</span>
@@ -388,8 +407,8 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
               </ul>
               {(meta.sources ?? []).length > 0 && (
                 <>
-                  <p className="mt-3 text-xs font-semibold text-muted">Sources</p>
-                  <ul className="mt-1 flex flex-col gap-0.5 text-xs">
+                  <p className="caps mt-4 text-[12px] font-semibold tracking-[0.1em] text-muted">Sources</p>
+                  <ul className="mt-1 flex flex-col gap-0.5 text-[13px]">
                     {(meta.sources ?? []).map((s) => (
                       <li key={s} className="break-all">
                         <a href={s} target="_blank" rel="noopener noreferrer" className="text-focus underline underline-offset-2">
@@ -402,14 +421,14 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
               )}
             </section>
 
-            <section className="rounded-2xl border border-line bg-surface p-4" aria-labelledby="solver-h">
+            <section className="panel p-4" aria-labelledby="solver-h">
               <SectionLabel className="mb-2">
                 <span id="solver-h">Blind-solver log</span>
               </SectionLabel>
               {data.solver_log ? (
-                <pre className="max-h-96 overflow-auto font-mono text-xs leading-relaxed whitespace-pre-wrap thin-scroll">{data.solver_log}</pre>
+                <pre className="max-h-96 overflow-auto border-[1.5px] border-[#CFC6B4] bg-white p-3 font-code text-xs leading-relaxed whitespace-pre-wrap thin-scroll">{data.solver_log}</pre>
               ) : (
-                <p className="text-sm text-muted">No solver log: this case was hand-built by the team, not run through the pipeline.</p>
+                <p className="text-[15px] text-muted">No solver log: this case was hand-built by the team, not run through the pipeline.</p>
               )}
             </section>
           </div>
@@ -427,9 +446,10 @@ export function EditorCaseScreen({ caseId }: { caseId: string }) {
   return (
     <>
       <SiteHeader active="editor" />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
-        <LinkButton to="/editor" size="sm" variant="ghost" className="mb-4 -ml-2">
-          ← Puzzle queue
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-6 pb-16">
+        <LinkButton to="/editor" size="sm" variant="ghost" className="mb-5 -ml-3">
+          <IconArrowLeft size={16} />
+          Puzzle queue
         </LinkButton>
         {d.status === 'loading' && <Loading label="Opening the puzzle for review…" />}
         {d.status === 'error' && (

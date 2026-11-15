@@ -1,5 +1,6 @@
 // Shared hooks and small pieces used across screens.
 import { useEffect, useState } from 'react'
+import { IconFlame } from '../components/Icon'
 import { ErrorState } from '../components/ui'
 import { api, ApiError, caseCache } from '../lib/api'
 import { computeLean, computeStreak, leanLabel } from '../lib/format'
@@ -50,17 +51,19 @@ export function RatingBadge({ profile }: { profile: Profile | null }) {
   return (
     <a
       href="#/dossier"
-      className="ml-1 hidden items-center gap-1.5 rounded-full border border-con/50 bg-con/10 px-3 py-1 text-sm font-semibold sm:inline-flex"
+      className="ml-1 hidden h-9 items-stretch border-2 border-ink bg-sheet text-[13px] text-ink hover:bg-surface-2 sm:inline-flex"
       aria-label={`Detective rating ${profile.rating}, ${profile.rank}${streak ? `, ${streak}-day streak` : ''}. Open your stats.`}
     >
       {streak > 0 && (
-        <span aria-hidden="true">
-          <span className="flame">🔥</span>
-          <span className="num">{streak}</span>
+        <span aria-hidden="true" className="flex items-center gap-1 border-r border-ink px-2">
+          <IconFlame size={16} className="flame text-press" />
+          <span className="num font-semibold">{streak}</span>
         </span>
       )}
-      <span className="num">{profile.rating}</span>
-      <span className="text-muted">{profile.rank}</span>
+      <span className="caps flex items-center gap-1.5 px-2.5 font-semibold">
+        <span className="num">{profile.rating}</span>
+        <span className="hidden lg:inline">{profile.rank}</span>
+      </span>
     </a>
   )
 }
@@ -85,7 +88,7 @@ export function NextCaseError({ error, onRetry }: { error: unknown; onRetry: () 
   if (!error) return null
   if (error instanceof ApiError && error.status === 404) {
     return (
-      <p role="status" className="mt-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+      <p role="status" className="mt-3 border-2 border-ink bg-surface px-4 py-3 text-sm text-muted">
         You’ve solved every case file on record. The Con is preparing new ones. Try the featured case again, or start as a new
         detective.
       </p>

@@ -22,40 +22,40 @@ export function LeanMeter({
   const v = has ? Math.max(-1, Math.min(1, lean as number)) : 0
   const name = label ?? (has ? labelFor(v) : null)
   const pos = ((v + 1) / 2) * 100
-  const muted = onPaper ? 'text-[#5B5140]' : 'text-muted'
+  const muted = onPaper ? 'text-[#4A4234]' : 'text-muted'
 
   return (
     <div className="w-full">
       <div className="flex items-baseline justify-between gap-2">
-        <span className={`text-xs font-bold tracking-[0.16em] uppercase ${muted}`}>Gullible ↔ Paranoid</span>
-        {name && <span className="font-display text-lg font-semibold">{name}</span>}
+        <span className={`caps text-[12px] font-semibold tracking-[0.1em] ${muted}`}>Gullible ↔ Paranoid</span>
+        {name && <span className="caps text-xl font-bold text-ink">{name}</span>}
       </div>
       <div
-        className="relative mt-2 h-4 rounded-full"
+        className="relative mt-2 flex h-4 border-2 border-ink"
         role="meter"
         aria-label="How your guesses leaned, from gullible to paranoid"
         aria-valuemin={-1}
         aria-valuemax={1}
         aria-valuenow={has ? Number(v.toFixed(2)) : undefined}
         aria-valuetext={name ? `${name}${has ? ` (${v.toFixed(2)})` : ''}` : 'Not enough answers yet'}
-        style={{
-          background:
-            'linear-gradient(90deg, var(--doctored) 0%, color-mix(in srgb, var(--doctored) 35%, var(--real)) 28%, var(--real) 50%, color-mix(in srgb, var(--alarm) 45%, var(--real)) 72%, var(--alarm) 100%)',
-        }}
       >
-        {/* the sweet spot */}
-        <span className="absolute inset-y-0 left-[42.5%] w-[15%] rounded-full border-2 border-white/70" aria-hidden="true" />
+        {/* five bands: press red, pink, paper (the sweet spot), tan, ochre */}
+        <span className="h-full flex-1 bg-press" aria-hidden="true" />
+        <span className="h-full flex-1 bg-[#D98A84]" aria-hidden="true" />
+        <span className="h-full flex-1 bg-sheet outline-[1.5px] outline-offset-[-3px] outline-ink outline-dashed" aria-hidden="true" />
+        <span className="h-full flex-1 bg-[#D9B77A]" aria-hidden="true" />
+        <span className="h-full flex-1 bg-ochre" aria-hidden="true" />
         {has && (
           <span
-            className="meter-slide absolute top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-[#12141C] shadow-lg"
+            className="meter-slide absolute top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-sheet bg-ink"
             style={{ left: `${pos}%` }}
             aria-hidden="true"
           />
         )}
       </div>
-      <div className={`mt-1.5 flex justify-between text-[11px] ${muted}`} aria-hidden="true">
+      <div className={`mt-1.5 grid grid-cols-5 text-center text-[12px] ${muted}`} aria-hidden="true">
         {BANDS.map((b) => (
-          <span key={b} className={b === name ? 'font-bold text-current' : ''} style={b === name ? { color: 'inherit' } : undefined}>
+          <span key={b} className={b === name ? 'font-bold text-ink' : ''}>
             {b}
           </span>
         ))}

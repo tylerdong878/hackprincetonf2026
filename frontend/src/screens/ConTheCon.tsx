@@ -1,7 +1,29 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import halftone from '../assets/figma/halftone.svg'
 import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
 import { TOOLS } from '../components/EvidenceKit'
+import {
+  IconArrow,
+  IconArrowLeft,
+  IconAxis,
+  IconCalendar,
+  IconCheck,
+  IconEye,
+  IconEyeOff,
+  IconGlasses,
+  IconHash,
+  IconLens,
+  IconMask,
+  IconPen,
+  IconReplay,
+  IconScissors,
+  IconSkip,
+  IconTrophy,
+  IconX,
+  IconZap,
+  IconZzz,
+} from '../components/Icon'
 import { SiteHeader } from '../components/Header'
 import { FeedCard } from '../components/PostCard'
 import { chartDomain, niceStep, PostChart } from '../components/PostChart'
@@ -20,41 +42,47 @@ const MIN_KEEP = 4
 
 type Tool = FoolTool | 'none'
 
-const TOOL_META: Record<Tool, { icon: string; label: string; hint: string }> = {
-  crop: { icon: '✂️', label: 'Crop', hint: 'Tap words to cut them. Deletion only: you can’t add words.' },
-  axis: { icon: '📉', label: 'Axis', hint: 'Slide where the y-axis starts. Same numbers, steeper story.' },
-  window: { icon: '🗓️', label: 'Window', hint: 'Pick which two months to compare.' },
-  drop: { icon: '🔢', label: 'Drop context', hint: 'Hide the number that puts the claim in context.' },
-  none: { icon: '🙈', label: 'Leave it real', hint: 'The bluff: send it untouched and see if the Con doubts the truth.' },
+const TOOL_META: Record<Tool, { icon: ReactNode; label: string; hint: string }> = {
+  crop: { icon: <IconScissors size={18} />, label: 'Crop', hint: 'Tap words to cut them. Deletion only: you can’t add words.' },
+  axis: { icon: <IconAxis size={18} />, label: 'Axis', hint: 'Slide where the y-axis starts. Same numbers, steeper story.' },
+  window: { icon: <IconCalendar size={18} />, label: 'Window', hint: 'Pick which two months to compare.' },
+  drop: { icon: <IconHash size={18} />, label: 'Drop context', hint: 'Hide the number that puts the claim in context.' },
+  none: { icon: <IconEyeOff size={18} />, label: 'Leave it real', hint: 'The bluff: send it untouched and see if the Con doubts the truth.' },
 }
 
 // ---- the three bosses (CONTRACT §8.1) ----------------------------------------------------------
 interface Boss {
   level: ConLevel
   name: string
-  icon: string
   blurb: string
   checks: boolean
 }
 const BOSSES: Boss[] = [
-  { level: 1, name: 'Rookie Con', icon: '🃏', blurb: 'judges by vibes, no evidence', checks: false },
-  { level: 2, name: 'Street Con', icon: '🕶️', blurb: 'one check, fast brain', checks: true },
-  { level: 3, name: 'Master Con', icon: '🎩', blurb: 'one check, full brain', checks: true },
+  { level: 1, name: 'Rookie Con', blurb: 'judges by vibes, no evidence', checks: false },
+  { level: 2, name: 'Street Con', blurb: 'one check, fast brain', checks: true },
+  { level: 3, name: 'Master Con', blurb: 'one check, full brain', checks: true },
 ]
+
+/** Each boss's mark: the Rookie wears the mask, the Street Con shades, the Master Con is the noir silhouette. */
+function BossIcon({ level, size = 20, className = '' }: { level: ConLevel; size?: number; className?: string }) {
+  if (level === 1) return <IconMask size={size} className={className} />
+  if (level === 2) return <IconGlasses size={size} className={className} />
+  return <ConMascot size={size + 2} className={className} />
+}
 const bossOf = (l: number | null | undefined) => BOSSES.find((b) => b.level === l) ?? BOSSES[2]
 
 /** CONTRACT §8.2 wording. `win` = the Con got it wrong. */
-const OUTCOME: Record<FoolOutcome, { title: string; sub: string; color: string; win: boolean | null; icon: string }> = {
-  caught: { title: 'BUSTED', sub: 'The Con caught your edit.', color: 'var(--doctored)', win: false, icon: '🚨' },
-  fooled_the_con: { title: 'FOOLED THE CON', sub: 'Your edit got past the AI.', color: 'var(--real)', win: true, icon: '🎉' },
+const OUTCOME: Record<FoolOutcome, { title: string; sub: string; color: string; win: boolean | null; icon: ReactNode }> = {
+  caught: { title: 'BUSTED', sub: 'The Con caught your edit.', color: 'var(--doctored)', win: false, icon: <IconX size={34} strokeWidth={2.4} /> },
+  fooled_the_con: { title: 'FOOLED THE CON', sub: 'Your edit got past the AI.', color: 'var(--press)', win: true, icon: <IconTrophy size={34} /> },
   con_false_alarm: {
     title: 'FALSE ALARM',
     sub: 'You sent the truth, untouched, and the Con called it doctored. You win.',
     color: 'var(--alarm)',
     win: true,
-    icon: '🎉',
+    icon: <IconTrophy size={34} />,
   },
-  con_trusted: { title: 'TRUSTED', sub: 'A real post, called real. A draw.', color: 'var(--real)', win: null, icon: '🤝' },
+  con_trusted: { title: 'TRUSTED', sub: 'A real post, called real. A draw.', color: 'var(--ink)', win: null, icon: <IconCheck size={34} strokeWidth={2.4} /> },
 }
 const isWin = (o: FoolOutcome) => OUTCOME[o]?.win === true
 
@@ -133,20 +161,20 @@ function rememberSaved(r: SavedRound) {
 function editLabel(item: FoolDeckItem | undefined, e: FoolEdit): string {
   switch (e.type) {
     case 'axis':
-      return `📉 Axis from ${withUnit(e.y_min, item?.post.chart?.unit)}`
+      return `Axis from ${withUnit(e.y_min, item?.post.chart?.unit)}`
     case 'window':
-      return `🗓️ ${formatMonth(e.window[0])} vs ${formatMonth(e.window[1])}`
+      return `${formatMonth(e.window[0])} vs ${formatMonth(e.window[1])}`
     case 'crop': {
       const words = item?.editable.quote_words ?? []
       const cut = words.filter((_, i) => !e.keep_word_indices.includes(i))
-      return `✂️ Cut “${cut.slice(0, 4).join(' ')}${cut.length > 4 ? '…' : ''}”`
+      return `Cut “${cut.slice(0, 4).join(' ')}${cut.length > 4 ? '…' : ''}”`
     }
     case 'drop': {
       const d = item?.editable.stat?.droppable.find((x) => x.id === e.drop)
-      return `🔢 Hide ${d ? `“${d.text.slice(0, 40)}${d.text.length > 40 ? '…' : ''}”` : e.drop}`
+      return `Hide ${d ? `“${d.text.slice(0, 40)}${d.text.length > 40 ? '…' : ''}”` : e.drop}`
     }
     default:
-      return '🙈 Bluff: untouched'
+      return 'Bluff: untouched'
   }
 }
 
@@ -318,27 +346,28 @@ function BossBoard({
             role="radio"
             aria-checked={level === b.level}
             onClick={() => onLevel(b.level)}
-            className={`flex flex-col items-center rounded-xl border px-1.5 py-1.5 text-center transition ${
-              level === b.level ? 'border-con bg-con/20' : 'border-line bg-surface hover:border-muted'
+            className={`flex flex-col items-center border-2 border-ink px-1.5 py-1.5 text-center ${
+              level === b.level ? 'bg-ink text-sheet' : 'bg-sheet text-ink hover:bg-surface-2'
             }`}
           >
-            <span className="text-sm font-semibold whitespace-nowrap">
-              <span aria-hidden="true">{b.icon}</span> {b.name}
+            <span className="caps flex items-center gap-1.5 text-[13px] font-semibold whitespace-nowrap">
+              <BossIcon level={b.level} size={16} /> {b.name}
             </span>
-            <span className="text-[11px] leading-tight text-muted">{b.blurb}</span>
+            <span className={`text-[11.5px] leading-tight ${level === b.level ? 'text-[#C9C2B5]' : 'text-muted'}`}>{b.blurb}</span>
           </button>
         ))}
       </div>
     )
   }
   return (
-    <section className="overflow-hidden rounded-2xl border-2 border-con/60 bg-[#0E0F16] text-[#ECEAE4]" aria-labelledby="busters-h">
-      <div className="flex items-center justify-between gap-2 border-b border-con/40 bg-con/20 px-4 py-2">
-        <h2 id="busters-h" className="font-con text-base tracking-[0.2em] uppercase">
+    <section className="panel overflow-hidden" aria-labelledby="busters-h">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b-2 border-ink px-4 py-2.5">
+        <h2 id="busters-h" className="caps flex items-center gap-2 text-[15px] font-bold tracking-[0.12em] whitespace-nowrap">
+          <IconMask size={22} className="text-press" />
           ★ Con Busters ★
         </h2>
-        <span className="text-xs text-[#B9B6C8]">
-          This session: <b className="num text-white">{sessionWins}</b> fooled / <span className="num">{rounds.length}</span>
+        <span className="text-[13px] whitespace-nowrap text-muted">
+          This session: <b className="num text-[17px] text-ink">{sessionWins}</b> fooled / <span className="num">{rounds.length}</span>
         </span>
       </div>
       <div role="radiogroup" aria-label="Pick your boss" className="flex flex-col">
@@ -353,39 +382,47 @@ function BossBoard({
               role="radio"
               aria-checked={on}
               onClick={() => onLevel(b.level)}
-              className={`flex items-center gap-3 border-t border-white/5 px-4 py-2.5 text-left transition first:border-t-0 ${
-                on ? 'bg-con/25' : 'hover:bg-white/5'
+              className={`flex items-center gap-3 border-t border-[#CFC6B4] px-4 py-2.5 text-left first:border-t-0 ${
+                on ? 'bg-ink text-sheet' : 'hover:bg-surface-2'
               }`}
             >
-              <span className="num w-12 shrink-0 text-[11px] font-bold tracking-widest text-[#B9B6C8] uppercase">Boss {b.level}</span>
-              <span className="text-2xl" aria-hidden="true">
-                {b.icon}
+              <span className={`caps w-12 shrink-0 text-[11.5px] font-semibold tracking-[0.1em] ${on ? 'text-press-soft' : 'text-press'}`}>
+                Boss <span className="num">{b.level}</span>
+              </span>
+              <span className="flex w-7 justify-center" aria-hidden="true">
+                <BossIcon level={b.level} size={22} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-display text-base leading-tight font-semibold">
+                <span className="block font-display text-[17px] leading-tight font-bold">
                   {b.name}
-                  {beaten && <span className="ml-2 rounded bg-[#2F9E6A] px-1.5 py-0.5 align-middle text-[10px] font-bold tracking-wider">BEATEN</span>}
+                  {beaten && (
+                    <span className="caps ml-2 border-[1.5px] border-current px-1.5 py-px align-middle text-[10.5px] font-semibold tracking-[0.1em] text-press">
+                      BEATEN
+                    </span>
+                  )}
                 </span>
-                <span className="block text-xs text-[#B9B6C8]">{b.blurb}</span>
+                <span className={`block text-[12.5px] ${on ? 'text-[#C9C2B5]' : 'text-muted'}`}>{b.blurb}</span>
               </span>
               <span className="shrink-0 text-right">
-                <span className="num block text-lg leading-none font-bold">
+                <span className="num block text-2xl leading-none font-bold">
                   {rec.fooled}
-                  <span className="text-sm text-[#B9B6C8]">/{rec.played}</span>
+                  <span className={`text-sm ${on ? 'text-[#C9C2B5]' : 'text-muted'}`}>/{rec.played}</span>
                 </span>
-                <span className="text-[10px] tracking-wider text-[#B9B6C8] uppercase">fooled</span>
+                <span className={`caps text-[10.5px] tracking-[0.1em] ${on ? 'text-[#C9C2B5]' : 'text-muted'}`}>fooled</span>
               </span>
               <span
-                className={`ml-1 h-4 w-4 shrink-0 rounded-full border-2 ${on ? 'border-[#C9B8FF] bg-[#8B5CF6]' : 'border-[#5A5870]'}`}
+                className={`ml-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${on ? 'border-sheet' : 'border-ink'}`}
                 aria-hidden="true"
-              />
+              >
+                {on && <span className="h-1.5 w-1.5 rounded-full bg-press-soft" />}
+              </span>
             </button>
           )
         })}
       </div>
       {masterBeaten && (
-        <p className="pop border-t border-[#E3A42B]/50 bg-[#E3A42B]/15 px-4 py-2 text-center text-sm font-bold text-[#F5C563]">
-          🏅 Fooled the Master Con
+        <p className="pop caps flex items-center justify-center gap-2 border-t-2 border-ink bg-ochre px-4 py-2 text-center text-[14px] font-semibold tracking-[0.06em] text-ink">
+          <IconTrophy size={17} /> Fooled the Master Con
         </p>
       )}
     </section>
@@ -397,10 +434,10 @@ function CropTool({ words, removed, onChange }: { words: string[]; removed: numb
   const kept = words.length - removed.length
   return (
     <div>
-      <p className="mb-2 text-sm text-muted" aria-live="polite">
+      <p className="mb-3 text-sm text-muted" aria-live="polite">
         Keeping <b className="num text-text">{kept}</b> of <span className="num">{words.length}</span> words · minimum {MIN_KEEP}
       </p>
-      <div className="flex flex-wrap gap-1.5 rounded-xl bg-white p-3 text-[15px] text-[#1B1B1F] feed-font">
+      <div className="feed-font flex flex-wrap gap-1.5 text-[15px] text-[#1B1B1F]">
         {words.map((w, i) => {
           const isOut = removed.includes(i)
           const locked = !isOut && kept <= MIN_KEEP
@@ -413,8 +450,10 @@ function CropTool({ words, removed, onChange }: { words: string[]; removed: numb
               disabled={locked}
               title={locked ? `Keep at least ${MIN_KEEP} words` : isOut ? 'Tap to restore' : 'Tap to cut'}
               onClick={() => onChange(isOut ? removed.filter((x) => x !== i) : [...removed, i])}
-              className={`min-h-[34px] rounded-md px-1.5 py-0.5 transition ${
-                isOut ? 'bg-[#FDE2DF] text-[#B8322A] line-through decoration-2 opacity-70' : 'hover:bg-[#EEF2F6]'
+              className={`min-h-[34px] border px-2 py-0.5 transition ${
+                isOut
+                  ? 'border-press bg-[#F6D5D1] text-press line-through decoration-[1.5px]'
+                  : 'border-[#CFC6B4] bg-white hover:border-ink'
               } disabled:cursor-not-allowed`}
             >
               {w}
@@ -423,8 +462,8 @@ function CropTool({ words, removed, onChange }: { words: string[]; removed: numb
         })}
       </div>
       {removed.length > 0 && (
-        <button type="button" className="mt-2 text-xs font-semibold text-muted hover:text-text" onClick={() => onChange([])}>
-          ↺ Restore all words
+        <button type="button" className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold text-ink hover:underline" onClick={() => onChange([])}>
+          <IconReplay size={16} /> Restore all words
         </button>
       )}
     </div>
@@ -450,10 +489,11 @@ function AxisTool({ item, yMin, onChange }: { item: FoolDeckItem; yMin: number; 
             {spec?.unit && <span className="text-muted"> {spec.unit}</span>}
           </span>
           <span
-            className="num rounded-full px-2.5 py-0.5 text-sm font-bold"
+            className="caps border-[1.5px] px-2 py-0.5 text-[13px] font-semibold"
             style={{
-              background: factor >= 1.5 ? 'color-mix(in srgb, var(--doctored) 20%, transparent)' : 'var(--surface-2)',
-              color: factor >= 1.5 ? 'var(--doctored)' : 'var(--muted)',
+              background: factor >= 1.5 ? 'var(--press)' : 'var(--sheet)',
+              borderColor: factor >= 1.5 ? 'var(--press)' : 'var(--ink)',
+              color: factor >= 1.5 ? '#FFFFFF' : 'var(--muted)',
             }}
             aria-live="polite"
           >
@@ -467,7 +507,7 @@ function AxisTool({ item, yMin, onChange }: { item: FoolDeckItem; yMin: number; 
           step={step}
           value={v}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full accent-[var(--con)]"
+          className="w-full accent-[var(--press)]"
           aria-valuetext={`${formatNumber(v, digits)}${spec?.unit ? ` ${spec.unit}` : ''}`}
         />
         <span className="flex justify-between text-[11px] text-muted">
@@ -480,7 +520,7 @@ function AxisTool({ item, yMin, onChange }: { item: FoolDeckItem; yMin: number; 
           Honest (0)
         </Button>
         <Button size="sm" variant="con" onClick={() => onChange(max)} disabled={v === max}>
-          📈 Max drama
+          <IconAxis size={16} /> Max drama
         </Button>
       </div>
       <p className="text-xs text-muted">
@@ -502,7 +542,7 @@ function WindowTool({ item, value, onChange }: { item: FoolDeckItem; value: [str
       <select
         value={value[i]}
         onChange={(e) => onChange(i === 0 ? [e.target.value, value[1]] : [value[0], e.target.value])}
-        className="num rounded-xl border border-line bg-bg px-3 py-2 text-sm text-text"
+        className="num border-2 border-ink bg-white px-3 py-2 text-sm text-text"
       >
         {s.map((p) => (
           <option key={p.label} value={p.label}>
@@ -533,18 +573,19 @@ function DropTool({ item, drop, onChange }: { item: FoolDeckItem; drop: string |
   if (!stat) return <p className="text-sm text-muted">This post has no droppable context.</p>
   return (
     <div className="flex flex-col gap-2">
-      <p className="rounded-xl bg-white p-3 text-[15px] leading-relaxed text-[#1B1B1F] feed-font">{stat.full}</p>
+      <p className="feed-font rounded-[10px] border border-[#CFD4DA] bg-white p-3 text-[15px] leading-relaxed text-[#1B1B1F]">{stat.full}</p>
       {stat.droppable.map((d) => (
         <button
           key={d.id}
           type="button"
           aria-pressed={drop === d.id}
           onClick={() => onChange(drop === d.id ? null : d.id)}
-          className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
-            drop === d.id ? 'border-doctored bg-doctored/15' : 'border-line hover:border-muted'
+          className={`flex items-start gap-2 border-2 px-3 py-2.5 text-left text-sm ${
+            drop === d.id ? 'border-press bg-[#F6D5D1]' : 'border-ink bg-sheet hover:bg-surface-2'
           }`}
         >
-          <span className="font-semibold">{drop === d.id ? '🙈 Hidden: ' : '👁 Showing: '}</span>
+          <span className={`mt-px ${drop === d.id ? 'text-press' : 'text-ink'}`}>{drop === d.id ? <IconEyeOff size={16} /> : <IconEye size={16} />}</span>
+          <span className="font-semibold">{drop === d.id ? 'Hidden: ' : 'Showing: '}</span>
           <span className={drop === d.id ? 'line-through opacity-70' : ''}>{d.text}</span>
         </button>
       ))}
@@ -573,29 +614,36 @@ function Inspecting({ post, level, since }: { post: Post; level: ConLevel; since
         : 'Reading it, then ruling…'
   return (
     <div className="flex flex-col items-center gap-5 py-6 text-center" role="status" aria-live="polite">
-      <div className="relative">
-        <ConMascot size={150} shape="door" />
-        <span className="magnify absolute top-10 -left-2 text-5xl" aria-hidden="true">
-          🔍
+      {/* the Con as a newspaper photo, a red lens sweeping the post */}
+      <div className="panel relative w-full max-w-[420px] p-2.5">
+        <div className="relative overflow-hidden bg-[#E6DDCB]" style={{ aspectRatio: '476 / 470' }}>
+          <img src={halftone} alt="" aria-hidden="true" draggable={false} className="absolute inset-x-0 bottom-0 h-[48%] w-full select-none" />
+          <span className="absolute bottom-0 left-1/2 h-[86%] -translate-x-1/2">
+            <ConMascot size={340} shape="door" className="!h-full !w-auto" />
+          </span>
+        </div>
+        <span className="magnify absolute top-[22%] right-[14%] text-press" aria-hidden="true">
+          <IconLens size={96} strokeWidth={2.2} />
         </span>
       </div>
-      <p key={step} className="ack-in font-con text-xl tracking-wide">
+      <p key={step} className="ack-in font-con text-3xl italic sm:text-4xl">
         {step}
       </p>
-      <p className="text-sm text-muted">
-        {boss.icon} {boss.name} · live AI · <span className="num">{t.toFixed(1)} s</span>
+      <p className="caps flex items-center gap-1.5 text-[13px] tracking-[0.08em] text-muted">
+        <BossIcon level={boss.level} size={16} /> {boss.name} · live AI · <span className="num">{t.toFixed(1)} s</span>
       </p>
-      <div className="flex flex-wrap justify-center gap-2" aria-hidden="true">
-        {TOOLS.map((tool) => (
+      <div className="flex flex-wrap justify-center gap-3" aria-hidden="true">
+        {TOOLS.map((tool, i) => (
           <span
             key={tool.id}
-            className={`rounded-full border border-line px-3 py-1 text-xs text-muted ${boss.checks ? 'pulse-dot' : 'line-through opacity-40'}`}
+            className={`flex items-center gap-2.5 border-2 border-dashed border-ink bg-sheet px-3.5 py-2 text-[15px] font-bold ${boss.checks ? '' : 'line-through opacity-40'}`}
           >
             {tool.icon} {tool.label}
+            {boss.checks && <span className="pulse-dot ml-1 h-2 w-2 rounded-full bg-press" style={{ animationDelay: `${i * 0.3}s` }} />}
           </span>
         ))}
       </div>
-      <div className="w-full max-w-md text-left opacity-90">
+      <div className="w-full max-w-xl text-left">
         <FeedCard post={post} caseNumber={0} compact watermarkText={WATERMARK} />
       </div>
     </div>
@@ -653,36 +701,45 @@ function Verdict({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted">
-          {boss.icon} {boss.name} {boss.checks ? 'opened ONE tool:' : 'opened no evidence:'}
-        </span>
-        {TOOLS.map((t) => (
-          <span
-            key={t.id}
-            className={`rounded-full border px-3 py-1 text-sm font-semibold transition ${
-              t.id === checked ? 'pop border-con bg-con text-on-accent' : 'border-line text-muted opacity-60'
-            } ${!boss.checks ? 'line-through' : ''}`}
-          >
-            {t.icon} {t.label}
-          </span>
-        ))}
-        {!res.con.checked?.length && <span className="text-sm text-muted">it judged on sight</span>}
-        {!done && (
-          <button type="button" className="ml-auto text-xs font-semibold text-muted hover:text-text" onClick={() => setStage(n + 2)}>
-            Skip ⏭
-          </button>
-        )}
+      <div>
+        <p className="caps mb-2.5 flex items-center gap-1.5 text-[13px] font-semibold tracking-[0.08em] text-ink">
+          <BossIcon level={boss.level} size={16} /> {boss.name} {boss.checks ? 'opened ONE tool:' : 'opened no evidence:'}
+        </p>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {TOOLS.map((t) => (
+            <span
+              key={t.id}
+              className={`flex min-w-[180px] items-center gap-2.5 px-3.5 py-2.5 text-[15px] font-bold ${
+                t.id === checked
+                  ? 'pop border-2 border-ink bg-press text-white shadow-[var(--hard)]'
+                  : 'border-2 border-[#CFC6B4] text-muted'
+              } ${!boss.checks ? 'line-through' : ''}`}
+            >
+              {t.icon} {t.label}
+            </span>
+          ))}
+          {!res.con.checked?.length && <span className="text-sm text-muted italic">it judged on sight</span>}
+          {!done && (
+            <button
+              type="button"
+              className="caps ml-auto inline-flex items-center gap-1 text-[13px] font-semibold tracking-[0.06em] text-ink hover:underline"
+              onClick={() => setStage(n + 2)}
+            >
+              Skip <IconSkip size={15} />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <ConMascot size={72} className="shrink-0" />
-        <div className="flex min-w-0 flex-1 flex-col gap-2" aria-live="polite">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="flex items-start gap-4">
+        <ConMascot size={76} className="shrink-0" />
+        <div className="flex min-w-0 flex-1 flex-col gap-3" aria-live="polite">
           {lines.slice(0, Math.max(0, Math.min(stage, n))).map((line, i) => (
             <ConBubble
               key={i}
               text={line}
-              size="sm"
+              size="md"
               speed={16}
               typewriter={!cached && i === stage - 1 && stage <= n}
               onDone={!cached && i === stage - 1 && stage <= n ? () => window.setTimeout(() => setStage((s) => (s === i + 1 ? s + 1 : s)), 350) : undefined}
@@ -692,71 +749,87 @@ function Verdict({
       </div>
 
       {stage >= n + 1 && (
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm text-muted">Verdict:</span>
+        <div className="flex flex-col items-start gap-3 lg:pt-2">
+          <span className="caps text-[13px] font-semibold tracking-[0.08em] text-ink">Verdict:</span>
           <span
-            className="stamp stamp-thunk text-2xl"
+            className="stamp stamp-thunk mx-2 bg-sheet text-5xl sm:text-6xl"
             style={{
-              color: res.con.verdict === 'doctored' ? 'var(--doctored)' : 'var(--real)',
+              color: res.con.verdict === 'doctored' ? 'var(--doctored)' : 'var(--ink)',
               ['--stamp-rot' as string]: '-5deg',
             }}
           >
             {res.con.verdict === 'doctored' ? 'Doctored' : 'Real'}
           </span>
-          {res.con.trick_guess && res.con.verdict === 'doctored' && <span className="text-sm">guess: {trickLabel(res.con.trick_guess)}</span>}
-          {conf != null && <span className="num text-sm text-muted">{conf}% sure</span>}
+          <span className="mt-1 flex flex-wrap items-baseline gap-x-3 text-[17px]">
+            {res.con.trick_guess && res.con.verdict === 'doctored' && <span>guess: {trickLabel(res.con.trick_guess)}</span>}
+            {conf != null && <span className="text-muted"><span className="num text-ink">{conf}%</span> sure</span>}
+          </span>
         </div>
       )}
+      </div>
 
       {done && (
         <div ref={resultRef} tabIndex={-1} className="rise-in flex flex-col gap-4 focus-visible:outline-none">
+          <div className="double-rule" aria-hidden="true" />
           <section
-            className="rounded-2xl border-2 p-5 text-center"
-            style={{ borderColor: o.color, background: `color-mix(in srgb, ${o.color} 14%, transparent)` }}
+            className="flex flex-col gap-4 border-2 border-l-[10px] border-ink bg-sheet px-6 py-5 shadow-[var(--hard)] sm:flex-row sm:items-center"
             aria-label="Outcome"
           >
-            <p className="font-display text-3xl font-bold tracking-wide sm:text-4xl" style={{ color: o.color }}>
-              <span aria-hidden="true">{o.icon} </span>
+            <span className="shrink-0" style={{ color: o.color }} aria-hidden="true">
+              {o.icon}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-[28px] leading-tight font-bold sm:text-[38px]">{o.sub}</p>
+              {level === 3 && o.win === true && (
+                <p className="pop caps mt-2 inline-flex items-center gap-1.5 bg-ochre px-2 py-0.5 text-[14px] font-semibold tracking-[0.06em] text-ink">
+                  <IconTrophy size={16} /> You fooled the Master Con
+                </p>
+              )}
+            </div>
+            <span
+              className="stamp stamp-thunk shrink-0 self-start bg-sheet text-3xl sm:mr-4 sm:self-center sm:text-4xl"
+              style={{ color: o.color, ['--stamp-rot' as string]: '-4deg' }}
+            >
               {o.title}
-            </p>
-            <p className="mt-1 text-sm text-muted">{o.sub}</p>
-            {level === 3 && o.win === true && <p className="pop mt-3 text-base font-bold text-alarm">🏅 You fooled the Master Con</p>}
+            </span>
           </section>
 
           {o.win === true && next && (
-            <div className="pop flex flex-wrap items-center gap-3 rounded-2xl border-2 border-con bg-con/15 px-4 py-3">
-              <span className="text-3xl" aria-hidden="true">
-                {next.icon}
+            <div className="pop flex flex-wrap items-center gap-4 border-2 border-press bg-sheet px-4 py-3 shadow-[var(--hard)]">
+              <span className="text-press" aria-hidden="true">
+                <BossIcon level={next.level} size={30} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-lg font-semibold">
+                <p className="font-display text-xl font-bold">
                   {boss.name} beaten. Next boss: {next.name}
                 </p>
                 <p className="text-sm text-muted">{next.blurb}</p>
               </div>
               <Button variant="primary" onClick={() => onLevelUp(next.level)}>
-                Take on the {next.name} →
+                Take on the {next.name} <IconArrow size={17} />
               </Button>
             </div>
           )}
 
           {res.con_line && (
-            <div className="flex items-end gap-2.5">
-              <ConMascot size={44} className="shrink-0" />
+            <div className="flex items-start gap-4 lg:pr-[324px]">
+              <ConMascot size={76} className="shrink-0" />
               <ConBubble text={res.con_line} size="md" className="min-w-0 flex-1" typewriter={!cached} />
             </div>
           )}
           {res.diff ? (
             <DiffView post={res.edited_post} caseNumber={0} diff={res.diff} shownLabel="What the Con saw" watermarkText={WATERMARK} />
           ) : (
-            <p className="rounded-xl border border-line bg-surface p-4 text-sm">
+            <p className="panel p-4 text-[15px]">
               {res.changed ? 'Your edit changed the post.' : 'You left it untouched: the post was real, word for word.'}
               {res.trick && <> Trick: {trickLabel(res.trick)}.</>}
             </p>
           )}
-          <p className="text-xs text-muted">
+          <p className="text-[13px] text-muted">
             {cached ? (
-              <>⚡ Replay of a real verdict</>
+              <>
+                <IconZap size={13} className="-mt-0.5 text-press" /> Replay of a real verdict
+              </>
             ) : (
               <>
                 Judged live by the blind solver · <span className="num">{elapsed.toFixed(1)} s</span>
@@ -765,10 +838,12 @@ function Verdict({
             · {boss.name}. The same blind solver checks every Daily is fair.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" onClick={onDeck}>
-              Doctor another post →
+            <Button variant="primary" size="lg" onClick={onDeck}>
+              <IconArrow size={18} /> Doctor another post
             </Button>
-            <Button onClick={onAgain}>Try this post again</Button>
+            <Button size="lg" onClick={onAgain}>
+              <IconReplay size={18} /> Try this post again
+            </Button>
           </div>
         </div>
       )}
@@ -798,16 +873,19 @@ function SavedRounds({ deck, onPlay, busy }: { deck: FoolDeckItem[]; onPlay: (r:
               type="button"
               disabled={busy}
               onClick={() => onPlay(r)}
-              className="flex w-full items-center gap-3 rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-left text-sm transition hover:border-con disabled:opacity-50"
+              className="press flex w-full items-center gap-3 border-2 border-ink bg-sheet px-3 py-2.5 text-left text-sm hover:bg-surface-2 disabled:opacity-50"
             >
-              <span aria-hidden="true">⚡</span>
+              <IconZap size={18} className="text-press" />
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{title}</span>
-                <span className="block truncate text-xs text-muted">
-                  {editLabel(it, r.edit)} · {bossOf(r.level).name}
+                <span className="block truncate font-bold">{title}</span>
+                <span className="flex items-center gap-1.5 truncate text-[12.5px] text-muted">
+                  <span className="shrink-0 text-ink">{TOOL_META[r.edit.type]?.icon}</span>
+                  <span className="truncate">
+                    {editLabel(it, r.edit)} · {bossOf(r.level).name}
+                  </span>
                 </span>
               </span>
-              <span className="text-xs font-semibold text-con">Replay →</span>
+              <span className="caps text-[12.5px] font-semibold tracking-[0.06em] text-press">Replay →</span>
             </button>
           </li>
         )
@@ -935,15 +1013,16 @@ export function ConTheCon() {
     <>
       <SiteHeader active="con" />
       <main
-        className="mx-auto w-full max-w-6xl flex-1 px-4 py-6"
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-8"
         ref={top}
         style={editing ? { paddingBottom: Math.max(barH, 0) + 24 } : undefined}
       >
-        <div className="mb-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:items-start">
-          <div>
-            <p className="text-xs font-bold tracking-[0.18em] text-con uppercase">Bonus round · challenge mode</p>
-            <h1 className="font-display text-3xl font-bold sm:text-4xl">Con the Con 🎭</h1>
-            <p className="mt-1 max-w-xl text-sm text-muted">
+        <div className="mb-8 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:items-start">
+          <div className="min-w-0">
+            <p className="caps inline-block bg-press px-2.5 py-1 text-[12px] font-semibold tracking-[0.1em] text-white">Bonus round · challenge mode</p>
+            <h1 className="caps mt-4 text-[52px] leading-[0.95] font-bold tracking-[0.01em] sm:text-[76px]">Con the Con</h1>
+            <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
+            <p className="mt-3 max-w-2xl text-[17px] leading-relaxed text-ink italic">
               Your turn to be the con artist. Doctor a real post with one trick, then send it to a boss. Each boss is our blind-solver AI
               with more to work with. Fool it and you climb the board.
             </p>
@@ -957,29 +1036,32 @@ export function ConTheCon() {
             {deck.status === 'error' && <ErrorState error={deck.error} onRetry={deck.reload} title="Couldn’t load the Fool Deck." />}
             {deck.status === 'ok' &&
               (deck.data.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-line p-6 text-center text-sm text-muted">The Fool Deck is empty right now.</p>
+                <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-sm text-muted">The Fool Deck is empty right now.</p>
               ) : (
                 <>
-                  <SectionLabel className="mb-3">
-                    Pick a real post to doctor · facing {boss.icon} {boss.name}
-                  </SectionLabel>
-                  <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="mb-5">
+                    <SectionLabel className="!text-[13px] !text-ink">
+                      Pick a real post to doctor · facing <BossIcon level={boss.level} size={16} className="align-[-3px]" /> {boss.name}
+                    </SectionLabel>
+                    <div className="double-rule-thin mt-2" aria-hidden="true" />
+                  </div>
+                  <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {deck.data.map((it) => (
                       <li key={it.id}>
                         <button
                           type="button"
                           onClick={() => choose(it)}
-                          className="group flex h-full w-full flex-col gap-3 rounded-2xl border-2 border-line bg-surface p-3 text-left transition hover:-translate-y-0.5 hover:border-con"
+                          className="press group flex h-full w-full flex-col gap-3 border-2 border-ink bg-sheet p-3.5 text-left shadow-[var(--hard)] hover:border-press"
                         >
+                          <span className="caps text-[12.5px] font-semibold tracking-[0.1em] text-muted">{it.kind}</span>
                           <FeedCard post={it.post} caseNumber={0} compact watermarkText={WATERMARK} />
-                          <span className="flex flex-wrap items-center gap-1.5 px-1 pb-1">
-                            <span className="text-xs font-bold tracking-[0.14em] text-muted uppercase">{it.kind}</span>
+                          <span className="mt-auto flex flex-wrap items-center gap-2 pt-2">
                             {it.tools.map((t) => (
-                              <span key={t} className="rounded-full border border-line px-2 py-0.5 text-xs">
+                              <span key={t} className="flex items-center gap-1.5 border-[1.5px] border-ink bg-white px-2 py-1 text-[14px] font-bold">
                                 {TOOL_META[t]?.icon} {TOOL_META[t]?.label ?? t}
                               </span>
                             ))}
-                            <span className="ml-auto text-sm font-semibold text-con group-hover:underline">Doctor it →</span>
+                            <span className="caps ml-auto text-[15px] font-semibold tracking-[0.04em] text-press group-hover:underline">Doctor it →</span>
                           </span>
                         </button>
                       </li>
@@ -988,11 +1070,15 @@ export function ConTheCon() {
                 </>
               ))}
             {bestLines.length > 0 && (
-              <section className="mt-8">
-                <SectionLabel className="mb-2">The Con’s best lines this session</SectionLabel>
-                <ul className="flex flex-col gap-2">
+              <section className="mt-12">
+                <h2 className="font-display text-3xl font-bold">The Con’s best lines this session</h2>
+                <div className="double-rule-thin mt-2 mb-5" aria-hidden="true" />
+                <ul className="grid gap-5 md:grid-cols-3">
                   {bestLines.map((r, i) => (
-                    <li key={i} className="con-bubble rounded-l-sm rounded-r-xl px-4 py-2 text-sm">
+                    <li key={i} className="con-bubble px-5 py-4 text-[16px] leading-snug">
+                      <span aria-hidden="true" className="caps mb-1 block text-[11.5px] font-semibold tracking-[0.1em] text-press-soft not-italic">
+                        The Con
+                      </span>
                       “{r.con_line}”
                     </li>
                   ))}
@@ -1006,9 +1092,9 @@ export function ConTheCon() {
           <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <section aria-label="Live preview" className="min-w-0">
               <div className="md:sticky md:top-[72px]">
-                <SectionLabel className="mb-2">{edit.type === 'none' ? 'The real post' : 'Your doctored post (live preview)'}</SectionLabel>
+                <SectionLabel className="mb-2 !text-press">{edit.type === 'none' ? 'The real post' : 'Your doctored post (live preview)'}</SectionLabel>
                 <FeedCard post={preview} caseNumber={0} watermarkText={WATERMARK} renderChart={(spec) => <PostChart spec={spec} height={230} />} />
-                <p className="mt-2 text-xs text-muted">
+                <p className="mt-4 border-l-4 border-press py-1 pl-3 text-[14px] text-ink">
                   {edit.type === 'none' ? (
                     <>Untouched, it stays under the real outlet’s name.</>
                   ) : (
@@ -1024,8 +1110,12 @@ export function ConTheCon() {
             <section aria-label="Your tools" className="min-w-0">
               <div className="mb-3 flex items-center justify-between">
                 <SectionLabel>Pick one trick</SectionLabel>
-                <button type="button" className="text-sm font-semibold text-muted hover:text-text" onClick={() => setPhase('pick')}>
-                  ← Back to the deck
+                <button
+                  type="button"
+                  className="caps inline-flex items-center gap-1 text-[13px] font-semibold tracking-[0.06em] text-ink hover:underline"
+                  onClick={() => setPhase('pick')}
+                >
+                  <IconArrowLeft size={15} /> Back to the deck
                 </button>
               </div>
               <div role="tablist" aria-label="Editing tools" className="flex flex-wrap gap-2">
@@ -1036,8 +1126,8 @@ export function ConTheCon() {
                     role="tab"
                     aria-selected={st.tool === t}
                     onClick={() => setSt({ ...st, tool: t })}
-                    className={`rounded-xl border px-3.5 py-2 text-sm font-semibold transition ${
-                      st.tool === t ? 'border-con bg-con text-on-accent' : 'border-line bg-surface hover:border-muted'
+                    className={`flex items-center gap-2 border-2 border-ink px-3.5 py-2 text-[15px] font-bold ${
+                      st.tool === t ? 'bg-ink text-sheet' : 'bg-sheet text-ink hover:bg-surface-2'
                     }`}
                   >
                     {TOOL_META[t].icon} {TOOL_META[t].label}
@@ -1045,8 +1135,8 @@ export function ConTheCon() {
                   </button>
                 ))}
               </div>
-              <div role="tabpanel" className="mt-4 rounded-2xl border border-line bg-surface p-4">
-                <p className="mb-3 text-sm text-muted">{TOOL_META[st.tool].hint}</p>
+              <div role="tabpanel" className="mt-4 border-2 border-ink bg-sheet p-5">
+                <p className="mb-2 text-[16px] font-bold">{TOOL_META[st.tool].hint}</p>
                 {st.tool === 'crop' && (
                   <CropTool words={item.editable.quote_words ?? []} removed={st.removed} onChange={(removed) => setSt({ ...st, removed })} />
                 )}
@@ -1059,10 +1149,12 @@ export function ConTheCon() {
                     score against.
                   </p>
                 )}
-                {st.tool !== 'none' && edit.type === 'none' && <p className="mt-3 text-xs text-alarm">No change yet, so this would go in as a bluff.</p>}
+                {st.tool !== 'none' && edit.type === 'none' && (
+                  <p className="mt-4 border-[1.5px] border-ochre bg-ochre/10 px-3 py-2 text-[13.5px] text-ink">No change yet, so this would go in as a bluff.</p>
+                )}
               </div>
               {editErr && (
-                <p role="alert" className="mt-3 rounded-xl border border-doctored/50 bg-doctored/10 px-3 py-2 text-sm">
+                <p role="alert" className="mt-3 border-2 border-press bg-[#F6D5D1] px-3 py-2 text-sm">
                   {editErr}
                 </p>
               )}
@@ -1074,7 +1166,7 @@ export function ConTheCon() {
               {/* Mobile: a fixed bar (content pads itself by its measured height). Desktop: inline. */}
               <div
                 ref={barRef}
-                className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-line bg-bg/95 px-4 pt-2.5 pb-[max(10px,env(safe-area-inset-bottom))] backdrop-blur md:static md:mt-4 md:border-0 md:bg-transparent md:p-0"
+                className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t-2 border-ink bg-bg px-4 pt-2.5 pb-[max(10px,env(safe-area-inset-bottom))] md:static md:mt-6 md:border-0 md:bg-transparent md:p-0"
               >
                 <div className="md:hidden">
                   <BossBoard level={level} onLevel={setLevel} board={board} rounds={rounds} compact />
@@ -1083,14 +1175,15 @@ export function ConTheCon() {
                   type="button"
                   onClick={submit}
                   disabled={phase === 'judging'}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-con py-3.5 font-display text-lg font-semibold text-on-accent shadow-[0_10px_30px_-12px_var(--con)] transition hover:brightness-110 active:scale-[0.98] disabled:opacity-70 sm:text-xl"
+                  className="press caps flex w-full items-center justify-center gap-2.5 border-2 border-ink bg-press py-3.5 text-xl font-bold tracking-[0.04em] text-white shadow-[var(--hard)] hover:bg-press-dark disabled:opacity-70 sm:text-2xl"
                 >
+                  {edit.type === 'none' && phase !== 'judging' && <IconEyeOff size={22} />}
                   {phase === 'judging'
                     ? 'Sending…'
                     : edit.type === 'none'
-                      ? `🙈 Bluff the ${boss.name}`
+                      ? `Bluff the ${boss.name}`
                       : `Send it to the ${boss.name}`}{' '}
-                  <span aria-hidden="true">→</span>
+                  <IconArrow size={22} />
                 </button>
               </div>
             </section>
@@ -1100,7 +1193,7 @@ export function ConTheCon() {
         {phase === 'judging' && ack && preview && <Inspecting post={preview} level={level} since={judgeStart.current} />}
 
         {phase === 'result' && judged && (
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-6xl">
             <Verdict
               key={`${judged.res.outcome}-${rounds.length}`}
               judged={judged}
@@ -1126,34 +1219,41 @@ export function ConTheCon() {
         )}
 
         {(phase === 'asleep' || phase === 'resting') && (
-          <div role="alert" className="mx-auto max-w-md rounded-2xl border border-line bg-surface p-6 text-center">
-            <ConMascot size={120} className="mx-auto opacity-70" />
+          <div role="alert" className="panel mx-auto max-w-2xl px-6 py-8 text-center sm:px-12">
+            <div className="relative mx-auto w-fit">
+              <ConMascot size={150} className="opacity-60 grayscale" />
+              <span className="absolute -top-2 -right-16 text-muted" aria-hidden="true">
+                <IconZzz size={64} strokeWidth={2.2} />
+              </span>
+            </div>
             {phase === 'resting' ? (
               <>
-                <p className="mt-3 font-display text-2xl font-semibold">The Con is resting. 😴</p>
-                <p className="mt-2 text-sm text-muted">
+                <p className="mt-4 font-display text-4xl font-bold">The Con is resting.</p>
+                <p className="mx-auto mt-3 max-w-md text-[16px] text-ink">
                   {restMsg ?? 'Live rounds are capped so everyone gets a turn.'} Saved rounds replay real verdicts and are always free.
                 </p>
                 {savedMiss && (
-                  <p className="mt-2 text-sm text-alarm">That replay isn’t saved on this server any more. Try another one.</p>
+                  <p className="mt-2 text-sm font-bold text-press">That replay isn’t saved on this server any more. Try another one.</p>
                 )}
               </>
             ) : (
               <>
-                <p className="mt-3 font-display text-2xl font-semibold">The Con is asleep. 💤</p>
-                <p className="mt-2 text-sm text-muted">
+                <p className="mt-4 font-display text-4xl font-bold">The Con is asleep.</p>
+                <p className="mx-auto mt-3 max-w-md text-[16px] text-ink">
                   No AI available right now, and there’s no earlier verdict saved for this exact edit. We won’t invent one.
                 </p>
               </>
             )}
             <SavedRounds deck={deckList} onPlay={playSaved} busy={false} />
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="mt-7 flex flex-wrap justify-center gap-4">
               {phase === 'asleep' && (
-                <Button variant="primary" onClick={submit}>
-                  Try again
+                <Button variant="primary" size="lg" onClick={submit}>
+                  <IconReplay size={18} /> Try again
                 </Button>
               )}
-              <Button onClick={() => setPhase(item ? 'edit' : 'pick')}>{item ? 'Change the edit' : 'Back to the deck'}</Button>
+              <Button size="lg" onClick={() => setPhase(item ? 'edit' : 'pick')}>
+                {item ? <IconPen size={17} /> : <IconArrowLeft size={17} />} {item ? 'Change the edit' : 'Back to the deck'}
+              </Button>
             </div>
           </div>
         )}

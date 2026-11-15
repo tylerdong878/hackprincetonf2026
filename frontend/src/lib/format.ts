@@ -94,40 +94,42 @@ export interface OutcomeStyle {
   emoji: string
 }
 
-/** One mapping for every stamp, tile and grid (CONTRACT §8.2). */
+/** One mapping for every stamp, tile and grid (Figma "Outcome legend": Fooled = red square with an x,
+ *  False alarm = ochre with a warning sign, Trusted = ink with a check, Caught = paper with a salt crystal).
+ *  Render the glyph with <OutcomeGlyph> / <OutcomeSquare>; `icon` is the plain-text fallback. */
 export const OUTCOMES: Record<Outcome, OutcomeStyle> = {
   trusted: {
     word: 'Trusted',
     icon: '✓',
-    color: 'var(--real)',
-    fill: 'var(--real)',
-    ink: '#FFFFFF',
+    color: 'var(--ink)',
+    fill: 'var(--ink)',
+    ink: '#FBF7EE',
     blurb: 'It was real, and you trusted it.',
     emoji: '🟩',
   },
   caught: {
     word: 'Caught',
     icon: '✓',
-    color: 'var(--salt-edge)',
-    fill: 'var(--salt)',
-    ink: 'var(--salt-ink)',
+    color: 'var(--ink)',
+    fill: 'var(--sheet)',
+    ink: 'var(--ink)',
     blurb: 'Doctored, and you caught it.',
     emoji: '🧂',
   },
   false_alarm: {
     word: 'False alarm',
     icon: '⚠',
-    color: 'var(--alarm)',
-    fill: 'var(--alarm)',
-    ink: '#1B1B1F',
+    color: 'var(--ochre)',
+    fill: 'var(--ochre)',
+    ink: '#141414',
     blurb: 'It was real. Surprising, but true.',
     emoji: '🟨',
   },
   fooled: {
     word: 'Fooled',
     icon: '✗',
-    color: 'var(--doctored)',
-    fill: 'var(--doctored)',
+    color: 'var(--press)',
+    fill: 'var(--press)',
     ink: '#FFFFFF',
     blurb: 'Doctored, and it got past you.',
     emoji: '🟥',

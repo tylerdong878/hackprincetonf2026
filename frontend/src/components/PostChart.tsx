@@ -21,10 +21,10 @@ const MUTED = '#536471'
 const GRID = '#E7E9EC'
 const AXIS = '#B8BEC6'
 const SERIES = '#2a78d6'
-const TRICK = '#C62F24' // the trick marker (red on white: 5.6:1)
-const TRICK_BG = '#FDE7E4'
-const HONEST = '#1E7A4C'
-const HONEST_BG = '#E3F4EA'
+const TRICK = '#C8231B' // the trick marker: press red (red on white: 5.6:1)
+const TRICK_BG = '#FBE4E1'
+const HONEST = '#141414' // honest = ink (the redesign drops green)
+const HONEST_BG = '#EFE9DC'
 
 export function niceStep(range: number, target = 5): number {
   if (!(range > 0)) return 1
@@ -71,7 +71,7 @@ function TooltipBox({ active, payload, label, unit }: { active?: boolean; payloa
   if (!active || !payload?.length) return null
   const v = payload[0].value
   return (
-    <div className="rounded-md border border-[#E1E4E8] bg-white px-2.5 py-1.5 text-xs shadow-md feed-font" style={{ color: INK }}>
+    <div className="rounded-[6px] border border-[#E1E4E8] bg-white px-2.5 py-1.5 text-xs shadow-[0_2px_6px_rgba(0,0,0,0.15)] feed-font" style={{ color: INK }}>
       <div style={{ color: MUTED }}>{label}</div>
       <div className="font-semibold">
         {typeof v === 'number' ? formatNumber(v) : v} {unit}
@@ -86,7 +86,7 @@ export interface ChartMarks {
   floor?: boolean
   /** X labels to highlight (e.g. the cherry-picked months). */
   labels?: string[]
-  /** 'trick' = red (what the post did), 'honest' = green (what the honest view uses). */
+  /** 'trick' = press red (what the post did), 'honest' = ink (what the honest view uses). */
   tone?: 'trick' | 'honest'
 }
 

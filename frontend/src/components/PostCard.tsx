@@ -1,11 +1,13 @@
 import { useEffect, useRef, type ReactNode, type Ref } from 'react'
 import { initials, relativeTime, trickLabel, watermark } from '../lib/format'
+import { IconCheck, IconChevron, IconData, IconLens, IconX } from './Icon'
 import type { ChartSpec, Post, VerdictChoice } from '../lib/types'
 import { PostChart } from './PostChart'
+import { TrickIcon, TrickPicker } from './TrickPicker'
 
 // Feed cards are always light, like a real app (SPEC §3.1), so they use light-mode steps.
-const CARD_REAL = '#1E7A4C'
-const CARD_DOCTORED = '#B8322A'
+const CARD_REAL = '#141414'
+const CARD_DOCTORED = '#C8231B'
 
 function VerifiedBadge() {
   return (
@@ -70,7 +72,7 @@ export function FeedCard({
         ? 'text-[18px] leading-snug'
         : 'text-[15px] leading-[1.45]'
   return (
-    <div className="feed-font @container relative overflow-hidden rounded-xl bg-feed-card text-[#0F1419] shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
+    <div className="feed-font @container relative overflow-hidden rounded-[12px] border border-[#CFD4DA] bg-feed-card text-[#0F1419] shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
       <div className={compact ? 'p-3' : 'p-4'}>
         <header className="flex items-start gap-3">
           <div
@@ -97,14 +99,14 @@ export function FeedCard({
         {post.body && <p className={`mt-2.5 break-words whitespace-pre-line ${bodyClass}`}>{post.body}</p>}
 
         {post.quote && (
-          <blockquote className="mt-3 rounded-lg border border-[#E1E4E8] bg-[#F7F9FA] px-3.5 py-3">
+          <blockquote className="mt-3 rounded-[8px] border border-[#E1E4E8] bg-[#F7F9FA] px-3.5 py-3">
             <p className={size === 'daily' ? 'text-[17px] leading-snug' : 'text-[15px] leading-[1.45]'}>“{post.quote.text}”</p>
             {post.quote.speaker && <footer className="mt-1.5 text-[13px] text-[#536471]">— {post.quote.speaker}</footer>}
           </blockquote>
         )}
 
         {post.chart && (
-          <div className="mt-3 rounded-lg border border-[#E1E4E8] p-3">
+          <div className="mt-3 rounded-[8px] border border-[#E1E4E8] p-3">
             {renderChart ? renderChart(post.chart) : <PostChart spec={post.chart} height={compact ? 170 : 200} compact={compact} />}
           </div>
         )}
@@ -124,7 +126,7 @@ export function FeedCard({
       {doctoredStamp &&
         (stampCorner ? (
           <span
-            className="stamp stamp-thunk pointer-events-none absolute top-3 right-3 bg-white text-[15px] shadow-sm"
+            className="stamp stamp-thunk pointer-events-none absolute top-3 right-3 bg-white text-[15px]"
             style={{ color: CARD_DOCTORED, borderWidth: 3, ['--stamp-rot' as string]: '6deg', ['--stamp-rot-from' as string]: '16deg' }}
             aria-hidden="true"
           >
@@ -150,7 +152,7 @@ export function PostThumb({ post, className = '' }: { post: Post; className?: st
   const excerpt = post.quote?.text ? `“${post.quote.text}”` : post.body || post.chart?.title || ''
   return (
     <div
-      className={`feed-font flex min-w-0 items-center gap-2.5 rounded-lg bg-feed-card px-2.5 py-2 text-[#0F1419] shadow-[0_1px_2px_rgba(0,0,0,0.25)] ${className}`}
+      className={`feed-font flex min-w-0 items-center gap-2.5 rounded-[8px] border border-[#CFD4DA] bg-feed-card px-2.5 py-2 text-[#0F1419] ${className}`}
     >
       <div
         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
@@ -167,9 +169,7 @@ export function PostThumb({ post, className = '' }: { post: Post; className?: st
         <p className="truncate text-[12px] text-[#536471]">{excerpt}</p>
       </div>
       {post.chart && (
-        <span className="shrink-0 text-base" aria-hidden="true">
-          📊
-        </span>
+        <IconData size={16} className="shrink-0 text-[#536471]" />
       )}
     </div>
   )
@@ -231,7 +231,9 @@ export function PostCard({
     return () => document.removeEventListener('pointerdown', onDown)
   }, [pickerOpen])
 
-  const frameBorder = isReal ? 'var(--real)' : isDoctored ? 'var(--doctored)' : 'color-mix(in srgb, var(--paper) 22%, transparent)'
+  // Case-file frame (Figma "Case Files post frame"): manila sheet, ink rule when marked real, press red
+  // when marked doctored, and the focus-blue ring only on the post being inspected.
+  const frameBorder = isReal ? 'var(--ink)' : isDoctored ? 'var(--press)' : '#B9A57A'
   const n = index + 1
 
   return (
@@ -245,26 +247,28 @@ export function PostCard({
         const t = e.target as HTMLElement
         if (!t.closest('button, a')) onSelect?.('tap')
       }}
-      className={`relative rounded-2xl border-2 p-2 pt-7 transition-[opacity,border-color,box-shadow] duration-200 focus-visible:outline-none ${
+      className={`relative mt-4 border-2 bg-manila p-2.5 pt-3 transition-[opacity,border-color,box-shadow] duration-200 focus-visible:outline-none sm:p-3 ${
         locked ? 'opacity-70' : ''
       }`}
       style={{
         borderColor: frameBorder,
-        background: 'color-mix(in srgb, var(--paper) 5%, transparent)',
-        boxShadow: selected ? '0 0 0 3px var(--focus)' : undefined,
+        boxShadow: selected ? '0 0 0 3px var(--bg), 0 0 0 6px var(--focus)' : undefined,
       }}
     >
       {/* case-file tab */}
-      <div className="absolute top-1.5 left-3 flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] text-muted uppercase">
+      <div
+        className="caps absolute -top-[15px] left-3 flex items-center gap-1.5 border-2 bg-manila px-2.5 py-0.5 text-[11.5px] font-semibold tracking-[0.1em]"
+        style={{ borderColor: frameBorder, color: selected ? 'var(--focus)' : 'var(--ink)' }}
+      >
         <span>Post {n}</span>
-        {selected && <span className="text-focus normal-case tracking-normal">· inspecting</span>}
+        {selected && <span>· inspecting</span>}
       </div>
 
       {/* verdict stamp, top right */}
       {verdict && (
         <span
           key={`${verdict.doctored}`}
-          className="stamp stamp-thunk absolute top-1 right-3 z-10 bg-white text-[13px] shadow-sm"
+          className="stamp stamp-thunk absolute top-4 right-5 z-10 bg-white text-[15px]"
           style={{ color: isReal ? CARD_REAL : CARD_DOCTORED, ['--stamp-rot' as string]: '4deg', ['--stamp-rot-from' as string]: '14deg' }}
           aria-hidden="true"
         >
@@ -275,33 +279,27 @@ export function PostCard({
       <FeedCard post={post} caseNumber={caseNumber} />
 
       {/* verdict row */}
-      <div className="relative mt-2 flex flex-wrap items-center gap-2 px-0.5">
+      <div className="relative mt-2.5 flex flex-wrap items-center gap-2">
         {onInspect && (
           <button
             type="button"
             disabled={locked}
             onClick={onInspect}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-text"
+            className="press caps inline-flex min-h-[42px] items-center gap-2 border-2 border-ink bg-sheet px-3 text-[14px] font-semibold text-ink shadow-[var(--hard-sm)] hover:bg-surface-2"
             aria-label={`Open the evidence kit for post ${n}`}
           >
-            <span aria-hidden="true">🔍</span> Evidence
+            <IconLens size={17} /> Evidence
           </button>
         )}
 
         {isDoctored && (
-          <span
-            className="rounded-full border px-2.5 py-0.5 text-xs font-semibold"
-            style={{
-              color: 'var(--doctored)',
-              borderColor: 'color-mix(in srgb, var(--doctored) 55%, transparent)',
-              background: 'color-mix(in srgb, var(--doctored) 12%, transparent)',
-            }}
-          >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-press px-3 py-1 text-[13px] font-bold text-white">
+            {verdict?.trick && <TrickIcon trick={verdict.trick} size={14} />}
             {verdict?.trick ? trickLabel(verdict.trick) : 'Trick: not sure'}
           </span>
         )}
 
-        <div role="group" aria-label={`Verdict for post ${n}`} className="ml-auto inline-flex overflow-hidden rounded-xl border border-line bg-surface">
+        <div role="group" aria-label={`Verdict for post ${n}`} className="ml-auto inline-flex">
           <button
             type="button"
             disabled={locked}
@@ -310,11 +308,11 @@ export function PostCard({
               onPickerOpenChange?.(false)
               onMark?.(false, null)
             }}
-            className={`inline-flex min-h-[40px] items-center gap-1.5 px-3.5 text-sm font-semibold transition ${
-              isReal ? 'bg-real text-on-accent' : 'text-text hover:bg-surface-2'
+            className={`caps inline-flex min-h-[42px] items-center gap-1.5 border-2 border-ink px-4 text-[15px] font-bold transition ${
+              isReal ? 'bg-ink text-sheet' : 'bg-white text-ink hover:bg-sheet'
             }`}
           >
-            <span aria-hidden="true">✓</span> Real
+            <IconCheck size={17} strokeWidth={2.6} /> Real
           </button>
           <button
             ref={doctoredBtn}
@@ -327,11 +325,11 @@ export function PostCard({
               if (!isDoctored) onMark?.(true, null)
               onPickerOpenChange?.(!pickerOpen)
             }}
-            className={`inline-flex min-h-[40px] items-center gap-1.5 border-l border-line px-3.5 text-sm font-semibold transition ${
-              isDoctored ? 'bg-doctored text-on-accent' : 'text-text hover:bg-surface-2'
+            className={`caps -ml-[2px] inline-flex min-h-[42px] items-center gap-1.5 border-2 px-4 text-[15px] font-bold transition ${
+              isDoctored ? 'border-ink bg-press text-white' : 'border-press bg-white text-press hover:bg-press/[0.06]'
             }`}
           >
-            <span aria-hidden="true">✗</span> Doctored <span aria-hidden="true">▾</span>
+            <IconX size={17} strokeWidth={2.6} /> Doctored <IconChevron size={16} />
           </button>
         </div>
 
@@ -347,41 +345,20 @@ export function PostCard({
                 doctoredBtn.current?.focus()
               }
             }}
-            className="rise-in absolute top-full right-0 z-30 mt-2 w-[min(100%,320px)] rounded-xl border border-line bg-surface p-3 shadow-2xl"
+            className="panel rise-in absolute top-full right-0 z-30 mt-2 w-[min(100%,480px)] p-3"
           >
-            <p className="mb-2 text-xs font-semibold text-muted">Which trick? Naming it right earns +50.</p>
-            <div className="flex flex-wrap gap-2">
-              {trickOptions.map((t, i) => (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={verdict?.trick === t}
-                  onClick={() => {
-                    onMark?.(true, t)
-                    onPickerOpenChange?.(false)
-                  }}
-                  className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
-                    verdict?.trick === t ? 'border-doctored bg-doctored text-on-accent' : 'border-line hover:border-doctored'
-                  }`}
-                >
-                  {i < 3 && <kbd className="mr-1.5 font-mono text-[11px] opacity-70">{i + 1}</kbd>}
-                  {trickLabel(t)}
-                </button>
-              ))}
-              <button
-                type="button"
-                aria-pressed={isDoctored && !verdict?.trick}
-                onClick={() => {
-                  onMark?.(true, null)
-                  onPickerOpenChange?.(false)
-                }}
-                className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
-                  isDoctored && !verdict?.trick ? 'border-muted bg-surface-2' : 'border-line hover:border-muted'
-                }`}
-              >
-                Not sure
-              </button>
-            </div>
+            <TrickPicker
+              options={trickOptions}
+              value={verdict?.trick ?? null}
+              notSure={isDoctored && !verdict?.trick}
+              columns={2}
+              heading={null}
+              headingNode={<p className="mb-2 text-[13px] font-bold text-ink">Which trick? Naming it right earns +50.</p>}
+              onPick={(t) => {
+                onMark?.(true, t)
+                onPickerOpenChange?.(false)
+              }}
+            />
           </div>
         )}
       </div>
