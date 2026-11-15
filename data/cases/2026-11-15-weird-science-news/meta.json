@@ -1,0 +1,16 @@
+{
+  "status": "awaiting_approval",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T00:11:55Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+    "https://www.npr.org/2026/11/13/nx-s1-6039312/spacex-nasa-starship-iss-dragon-falcon-musk",
+    "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds"
+  ],
+  "rejection_reason": null
+}
