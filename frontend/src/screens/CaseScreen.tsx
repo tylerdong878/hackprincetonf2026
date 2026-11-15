@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { ClueTokens, normalizeEvidence, type KitNotice } from '../components/EvidenceKit'
-import { Brand } from '../components/Header'
+import { BarHeader } from '../components/Header'
+import { IconGear } from '../components/Icon'
 import { Workshop } from '../components/Workshop'
 import { ErrorState, Loading } from '../components/ui'
 import { api, ApiError, BACKEND_START_CMD, caseCache } from '../lib/api'
@@ -28,44 +29,38 @@ function CaseTopBar({
   onToggleWorkshop: () => void
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/90 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
-        <span className="hidden sm:inline-flex">
-          <Brand />
-        </span>
-        <span className="sm:hidden">
-          <Brand compact />
-        </span>
-        <div className="min-w-0 flex-1 truncate text-sm">
-          <span className="font-mono font-semibold text-muted">Case {caseNo(game.number)}</span>
-          <span className="text-muted"> · </span>
-          <span className="font-semibold">{game.title}</span>
-        </div>
-        {stage === 'investigating' && (
-          <span className="hidden md:inline-flex">
-            <ClueTokens left={cluesLeft} total={game.clue_budget} />
-          </span>
-        )}
-        {stage !== 'briefing' && (
-          <button
-            type="button"
-            aria-expanded={workshopOpen}
-            aria-controls="workshop"
-            onClick={onToggleWorkshop}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
-              workshopOpen ? 'border-con bg-con text-on-accent' : 'border-con/60 text-text hover:bg-con/15'
-            }`}
-          >
-            <span className="hidden sm:inline">Workshop</span>
-            <span className="sm:hidden" aria-hidden="true">
-              ⚙
+    <BarHeader
+      right={
+        <>
+          {stage === 'investigating' && (
+            <span className="hidden flex-col items-start gap-0.5 md:flex">
+              <span className="caps text-[11px] font-semibold tracking-[0.1em] text-muted">Clues</span>
+              <ClueTokens left={cluesLeft} total={game.clue_budget} />
             </span>
-            <span className="sr-only sm:hidden">Workshop</span>
-            <span aria-hidden="true">{workshopOpen ? '◂' : '▸'}</span>
-          </button>
-        )}
+          )}
+          {stage !== 'briefing' && (
+            <button
+              type="button"
+              aria-expanded={workshopOpen}
+              aria-controls="workshop"
+              onClick={onToggleWorkshop}
+              className={`press caps ml-2 inline-flex shrink-0 items-center gap-2 border-2 border-ink px-3 py-2 text-[14px] font-semibold sm:px-4 ${
+                workshopOpen ? 'bg-ink text-sheet' : 'bg-sheet text-ink shadow-[var(--hard)] hover:bg-surface-2'
+              }`}
+            >
+              <IconGear size={17} />
+              <span className="hidden sm:inline">Workshop</span>
+              <span className="sr-only sm:hidden">Workshop</span>
+            </button>
+          )}
+        </>
+      }
+    >
+      <div className="min-w-0 leading-tight">
+        <p className="caps truncate text-[11.5px] font-semibold tracking-[0.08em] text-muted">Case {caseNo(game.number)}</p>
+        <p className="truncate text-[17px] italic sm:text-[19px]">{game.title}</p>
       </div>
-    </header>
+    </BarHeader>
   )
 }
 

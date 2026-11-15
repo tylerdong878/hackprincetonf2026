@@ -2,28 +2,27 @@ import { useState, type ReactNode } from 'react'
 import { formatNumber, outcomeStyle, withUnit } from '../lib/format'
 import { useReducedMotion, useTween } from '../lib/hooks'
 import type { ChartDiff, ChartSpec, Diff, Post } from '../lib/types'
+import { IconPlay, IconReplay, OutcomeGlyph } from './Icon'
 import { FeedCard } from './PostCard'
 import { chartDomain, PostChart } from './PostChart'
 import { SectionLabel } from './ui'
 
-/** The outcome stamp (CONTRACT §8.2 colors: green trusted, salt caught, amber false alarm, red fooled). */
+/** The outcome stamp (Figma "Outcomes": ink Trusted, paper Caught with a salt crystal, ochre False alarm, red Fooled). */
 export function OutcomeBadge({ outcome, animate = true, size = 'md' }: { outcome: string; animate?: boolean; size?: 'sm' | 'md' | 'lg' }) {
   const s = outcomeStyle(outcome)
-  const salt = outcome === 'caught'
-  const sizes = { sm: 'text-xs', md: 'text-sm md:text-base', lg: 'text-lg sm:text-xl' }
+  const sizes = { sm: 'text-[13px] px-2 py-0.5', md: 'text-[15px] md:text-base px-2.5 py-1', lg: 'text-lg sm:text-xl px-3 py-1' }
+  const glyph = { sm: 14, md: 17, lg: 20 }[size]
   return (
     <span
-      className={`stamp inline-flex items-center gap-1.5 ${animate ? 'stamp-thunk' : ''} ${sizes[size]}`}
+      className={`caps inline-flex items-center gap-1.5 border-2 border-ink font-bold leading-none whitespace-nowrap ${animate ? 'stamp-thunk' : ''} ${sizes[size]}`}
       style={{
         background: s.fill,
-        borderColor: salt ? s.ink : s.fill,
         color: s.ink,
-        boxShadow: salt ? 'inset 0 0 0 1.5px var(--salt)' : undefined,
-        ['--stamp-rot' as string]: '-2deg',
+        ['--stamp-rot' as string]: '0deg',
         ['--stamp-rot-from' as string]: '-9deg',
       }}
     >
-      <span aria-hidden="true">{salt ? '🧂' : s.icon}</span>
+      <OutcomeGlyph outcome={outcome} size={glyph} />
       {s.word}
     </span>
   )
@@ -89,8 +88,13 @@ function useAxisDrop(pair: ChartPair | null) {
 
 function DropButton({ dropped, onClick, className = '' }: { dropped: boolean; onClick: () => void; className?: string }) {
   return (
-    <button type="button" className={`self-start text-xs font-semibold text-con hover:underline ${className}`} onClick={onClick}>
-      {dropped ? '↺ Replay the axis drop' : '▶ Drop the axis to 0'}
+    <button
+      type="button"
+      className={`press caps inline-flex items-center gap-1.5 self-start border-2 border-ink bg-sheet px-2.5 py-1 text-[13px] font-semibold text-ink shadow-[var(--hard-sm)] hover:bg-surface-2 ${className}`}
+      onClick={onClick}
+    >
+      {dropped ? <IconReplay size={15} /> : <IconPlay size={15} />}
+      {dropped ? 'Replay the axis drop' : 'Drop the axis to 0'}
     </button>
   )
 }
@@ -136,7 +140,7 @@ function HonestCaption({ pair, onLight = false }: { pair: ChartPair; onLight?: b
   )
 }
 
-const dot = (color: string) => <span className="mr-1.5 inline-block h-2 w-2 rounded-full align-middle" style={{ background: color }} aria-hidden="true" />
+const dot = (color: string) => <span className="mr-1.5 inline-block h-2.5 w-2.5 align-middle" style={{ background: color }} aria-hidden="true" />
 
 export function change(spec: ChartSpec): { text: string; from: string; to: string } | null {
   const pts = spec.points
@@ -199,7 +203,7 @@ export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
           <mark
             key={i}
             className="rounded-sm px-0.5 text-inherit underline decoration-2 underline-offset-[3px]"
-            style={{ background: 'color-mix(in srgb, #22804F 25%, transparent)', textDecorationColor: '#22804F' }}
+            style={{ background: 'var(--highlight)', textDecorationColor: '#141414' }}
           >
             <span className="sr-only">[restored: </span>
             {r.s}
@@ -215,9 +219,9 @@ export function Restored({ runs }: { runs: { s: string; hit: boolean }[] }) {
 
 function OriginalPanel({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl bg-white text-[#1B1B1F] shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
+    <div className="flex h-full flex-col overflow-hidden border-2 border-ink bg-white text-[#1B1B1F]">
       <div className="flex-1 p-4">{children}</div>
-      {note && <div className="border-t border-[#E7E2D6] bg-[#F7F4EE] px-4 py-2 text-[13px] text-[#4A4A55]">{note}</div>}
+      {note && <div className="border-t border-dashed border-[#CFC6B4] bg-sheet px-4 py-2 text-[13px] text-[#4A4A55]">{note}</div>}
     </div>
   )
 }
@@ -333,7 +337,7 @@ export function DetailChanges({ changed }: { changed: { from: string; to: string
       {changed.map((c, i) => (
         <span key={i}>
           Really <b className="font-mono">{c.from}</b>, posted as{' '}
-          <s className="font-mono decoration-[#B8322A] decoration-2">{c.to}</s>
+          <s className="font-mono decoration-[#C8231B] decoration-2">{c.to}</s>
         </span>
       ))}
     </span>
@@ -350,8 +354,8 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
 
   // No auto-play: the player first sees the chart exactly as posted (the trick marked in red),
   // then chooses to drop the axis. The honest view sits beside it (below it on a phone).
-  const box = 'rounded-xl bg-white p-2.5 text-[14px] leading-relaxed text-[#1B1B1F]'
-  const label = 'text-[11px] font-bold tracking-[0.14em] text-muted uppercase'
+  const box = 'border-[1.5px] border-ink bg-white p-2.5 text-[14.5px] leading-relaxed text-[#1B1B1F]'
+  const label = 'caps text-[12px] font-semibold tracking-[0.1em] text-muted'
 
   if (pair) {
     return (
@@ -394,7 +398,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const runs = diff.removed?.length ? highlightRuns(diff.original, diff.removed) : restoredRuns(diff.shown, diff.original)
     return (
       <div className={box}>
-        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The full quote</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The full quote</p>
         <p>
           “<Restored runs={runs} />”
         </p>
@@ -405,7 +409,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const runs = diff.missing ? highlightRuns(diff.original, [diff.missing]) : [{ s: diff.original, hit: false }]
     return (
       <div className={box}>
-        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The full numbers</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The full numbers</p>
         <p>
           <Restored runs={runs} />
         </p>
@@ -421,7 +425,7 @@ export function MiniDiff({ diff, post }: { diff: Diff; post?: Post }) {
     const changed = diff.changed ?? []
     return (
       <div className={box}>
-        <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-[#5E5E68] uppercase">The original</p>
+        <p className="caps mb-1 text-[12px] font-semibold tracking-[0.1em] text-[#5A544B]">The original</p>
         <p>
           <Restored runs={highlightRuns(diff.original, changed.map((c) => c.from))} />
         </p>

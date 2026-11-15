@@ -1,7 +1,27 @@
 import { SiteHeader } from '../components/Header'
+import { PostChart } from '../components/PostChart'
+import { IconArrow, IconArrowLeft, IconBook, IconLens, IconWarn } from '../components/Icon'
+import { TrickIcon } from '../components/TrickPicker'
 import { LinkButton, SectionLabel } from '../components/ui'
 import { CASEBOOK } from '../lib/content'
 import { href } from '../lib/router'
+import type { ChartSpec } from '../lib/types'
+
+/** The worked example's own numbers, drawn the way the post drew them (Figma "Trick page"). */
+const EXAMPLE_CHART: Record<string, ChartSpec> = {
+  'misleading-chart': {
+    type: 'bar',
+    unit: '¢/kWh',
+    y_min: 19,
+    points: [
+      { label: 'Apr 2025', value: 19.91 },
+      { label: 'Jul 2026', value: 25.19 },
+    ],
+  },
+}
+
+/** The Casebook copy carries an emoji in front of each tool line; the UI shows icons, so drop it here. */
+const noEmoji = (s: string) => s.replace(/^[\p{Extended_Pictographic}️‍]+\s*/u, '')
 
 export function Casebook({ trickId }: { trickId?: string }) {
   const page = trickId ? CASEBOOK.find((t) => t.id === trickId) : undefined
@@ -9,68 +29,96 @@ export function Casebook({ trickId }: { trickId?: string }) {
   return (
     <>
       <SiteHeader active="casebook" />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
         {page ? (
-          <article className="mx-auto max-w-3xl">
-            <LinkButton to="/casebook" size="sm" variant="ghost" className="-ml-2">
-              ← All tricks
-            </LinkButton>
-            <p className="mt-4 text-4xl" aria-hidden="true">
-              {page.icon}
-            </p>
-            <h1 className="mt-2 font-display text-4xl font-bold">{page.name}</h1>
-            <p className="mt-3 text-lg text-muted">{page.what}</p>
+          <article className="mx-auto max-w-4xl">
+            <a
+              href={href('/casebook')}
+              className="caps -ml-1 inline-flex items-center gap-1.5 px-1 py-1 text-[14px] font-semibold hover:underline hover:decoration-2 hover:underline-offset-4"
+            >
+              <IconArrowLeft size={16} />
+              All tricks
+            </a>
+            <div className="mt-8 flex items-end gap-4">
+              <TrickIcon trick={page.id} size={44} className="mb-2 hidden text-press sm:inline-block" />
+              <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">{page.name}</h1>
+            </div>
+            <div className="double-rule mt-2" aria-hidden="true" />
+            <p className="mt-4 text-xl leading-relaxed italic sm:text-[22px]">{page.what}</p>
 
-            <div className="mt-8 grid gap-4">
-              <section className="paper-texture rounded-2xl p-5">
-                <h2 className="text-xs font-bold tracking-[0.18em] text-[#6B5E45] uppercase">Worked example (real material)</h2>
-                <p className="mt-2 text-[15px]">{page.example}</p>
+            <div className="mt-10 grid gap-8">
+              <section className="panel p-6">
+                <SectionLabel className="!text-ink">Worked example (real material)</SectionLabel>
+                <div className={EXAMPLE_CHART[page.id] ? 'mt-3 grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' : 'mt-3'}>
+                  <p className="max-w-2xl text-[17px] leading-relaxed">{page.example}</p>
+                  {EXAMPLE_CHART[page.id] && (
+                    <div className="border-[1.5px] border-ink bg-white p-3 text-[#1B1B1F]" aria-hidden="true">
+                      <PostChart spec={EXAMPLE_CHART[page.id]} height={220} showTitle={false} marks={{ floor: true, tone: 'trick' }} />
+                    </div>
+                  )}
+                </div>
               </section>
-              <section className="rounded-2xl border-l-4 border-doctored bg-surface p-5">
-                <SectionLabel>The tell</SectionLabel>
-                <p className="mt-2 text-[15px]">{page.tell}</p>
+              <section className="relative border-l-[6px] border-press py-2 pr-10 pl-6">
+                <IconWarn size={24} className="absolute top-2 right-2 text-press" />
+                <SectionLabel className="!text-press">The tell</SectionLabel>
+                <p className="mt-2 text-xl leading-snug font-bold sm:text-[22px]">{page.tell}</p>
               </section>
-              <section className="rounded-2xl border-l-4 border-focus bg-surface p-5">
-                <SectionLabel>How to check it</SectionLabel>
-                <p className="mt-2 text-[15px]">
-                  <b>In the game:</b> {page.tool}
-                </p>
-                <p className="mt-2 text-[15px]">
-                  <b>In real life:</b> {page.realWorld}
-                </p>
+              <section className="relative border-l-[6px] border-ink py-2 pr-10 pl-6">
+                <IconLens size={24} className="absolute top-2 right-2 text-ink" />
+                <SectionLabel className="!text-ink">How to check it</SectionLabel>
+                <dl className="mt-3 grid gap-x-5 gap-y-3 text-[17px] sm:grid-cols-[auto_1fr]">
+                  <dt className="font-bold">In the game:</dt>
+                  <dd>{noEmoji(page.tool)}</dd>
+                  <dt className="font-bold">In real life:</dt>
+                  <dd>{page.realWorld}</dd>
+                </dl>
               </section>
             </div>
-            <div className="mt-8 flex flex-wrap gap-2">
-              <LinkButton to="/" variant="primary">
+            <div className="mt-10 flex flex-wrap gap-4">
+              <LinkButton to="/" variant="primary" size="lg">
+                <IconArrow size={20} />
                 Play a case
               </LinkButton>
-              <LinkButton to="/casebook">More tricks</LinkButton>
+              <LinkButton to="/casebook" size="lg">
+                <IconBook size={20} />
+                More tricks
+              </LinkButton>
             </div>
           </article>
         ) : (
           <>
-            <h1 className="font-display text-3xl font-bold">The Con’s Tricks</h1>
-            <p className="mt-1 max-w-2xl text-sm text-muted">
+            <p className="caps mb-4 inline-block bg-press px-3 py-1 text-[12.5px] font-semibold tracking-[0.08em] text-white">
+              The trick library
+            </p>
+            <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">The Con’s Tricks</h1>
+            <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
+            <p className="mt-3 max-w-3xl text-[17px] italic">
               Misinformation mostly runs on a handful of repeatable tricks. Learn the tell for each, and which check exposes it.
             </p>
             {trickId && (
-              <p className="mt-4 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+              <p className="mt-6 border-2 border-ink bg-sheet px-4 py-3 text-[15px] text-muted">
                 That trick isn’t on the Con’s list yet. Here are the ones that are.
               </p>
             )}
-            <ul className="mt-6 grid gap-4 md:grid-cols-3">
-              {CASEBOOK.map((t) => (
+            <ul className="mt-10 grid gap-8 md:grid-cols-2">
+              {CASEBOOK.map((t, i) => (
                 <li key={t.id}>
                   <a
                     href={href(`/casebook/${t.id}`)}
-                    className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition hover:-translate-y-0.5 hover:border-con/60"
+                    className="press group flex h-full min-h-[15rem] border-2 border-ink bg-sheet shadow-[var(--hard)] hover:border-press"
                   >
-                    <span className="text-3xl" aria-hidden="true">
-                      {t.icon}
+                    <span className="flex w-24 shrink-0 flex-col items-center justify-between bg-ink py-8 text-sheet transition-colors group-hover:bg-press sm:w-28">
+                      <TrickIcon trick={t.id} size={44} />
+                      <span className="text-[17px] italic">No. {i + 1}</span>
                     </span>
-                    <span className="mt-3 font-display text-xl font-semibold">{t.name}</span>
-                    <span className="mt-1 flex-1 text-sm text-muted">{t.what}</span>
-                    <span className="mt-4 text-sm font-semibold text-con">Read the tell →</span>
+                    <span className="flex min-w-0 flex-1 flex-col p-6">
+                      <span className="caps text-3xl leading-none font-bold sm:text-[38px]">{t.name}</span>
+                      <span className="mt-3 flex-1 text-[16px] leading-relaxed">{t.what}</span>
+                      <span className="caps mt-5 inline-flex items-center gap-1.5 self-end text-[15px] font-semibold text-press">
+                        Read the tell
+                        <IconArrow size={16} className="transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </span>
                   </a>
                 </li>
               ))}

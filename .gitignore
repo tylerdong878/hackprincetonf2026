@@ -30,3 +30,10 @@ Thumbs.db
 
 # iMessage bot state (per-phone sessions, poll cursor)
 data/imessage/
+
+# Redesign preview build (never the live dist)
+frontend/dist-figma/
+frontend/dist-figma*/
+frontend/dist-cases/
+frontend/dist-publish/
+frontend/dist.prev/

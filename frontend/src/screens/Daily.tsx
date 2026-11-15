@@ -1,11 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ConMascot } from '../components/Art'
 import { ConBubble } from '../components/ConBubble'
-import { AccountView, DataView, normalizeEvidence, SourceView, TOOLS } from '../components/EvidenceKit'
+import { AccountView, DataView, normalizeEvidence, SourceView, ToolRow, TOOLS } from '../components/EvidenceKit'
 import { Brand, SoundToggle } from '../components/Header'
+import {
+  ClueToken,
+  IconArrow,
+  IconArrowLeft,
+  IconCheck,
+  IconGlasses,
+  IconLens,
+  IconMask,
+  IconSparkles,
+  IconX,
+  OutcomeSquare,
+  SaltCrystal,
+} from '../components/Icon'
 import { FeedCard, PostThumb } from '../components/PostCard'
 import { MiniDiff, OutcomeBadge } from '../components/Reveal'
-import { Button, ErrorState, Loading } from '../components/ui'
+import { TrickPicker } from '../components/TrickPicker'
+import { btnClass, Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, BACKEND_START_CMD } from '../lib/api'
 import { CON_QUIPS, pick } from '../lib/content'
 import { outcomeStyle, shortDate, trickLabel } from '../lib/format'
@@ -70,7 +84,7 @@ function SaltBurst() {
       {grains.map((g, i) => (
         <span
           key={i}
-          className="burst-grain absolute rounded-[2px] border border-[#12141C]/40 bg-white"
+          className="burst-grain absolute border border-ink bg-white"
           style={{
             width: g.size,
             height: g.size,
@@ -86,19 +100,24 @@ function SaltBurst() {
 
 export function ProgressDots({ posts, cards, current }: { posts: Post[]; cards: Record<string, CardRecord>; current: number }) {
   return (
-    <ol className="flex items-center justify-center gap-2" aria-label="Today’s cards">
+    <ol className="flex items-center justify-center gap-2.5" aria-label="Today’s cards">
       {posts.map((p, i) => {
         const rec = cards[p.id]
         const outcome = rec?.reveal?.result.outcome
         const label = outcome ? outcomeStyle(outcome).word : rec?.skipped ? 'answered earlier' : i === current ? 'current card' : 'not played yet'
+        const here = i === current
         return (
-          <li key={p.id} aria-label={`Card ${i + 1}: ${label}`} aria-current={i === current ? 'step' : undefined}>
+          <li key={p.id} aria-label={`Card ${i + 1}: ${label}`} aria-current={here ? 'step' : undefined}>
             {outcome ? (
-              <span className="pop flex h-8 w-8 items-center justify-center text-xl leading-none">{outcomeStyle(outcome).emoji}</span>
+              <span className={`pop flex ${here ? 'outline-2 outline-offset-2 outline-press' : ''}`}>
+                <OutcomeSquare outcome={outcome} size={32} />
+              </span>
             ) : (
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 num text-xs font-semibold ${
-                  i === current ? 'border-con bg-con/15 text-text' : 'border-line text-muted'
+                className={`num flex h-8 w-8 items-center justify-center text-[14px] font-semibold ${
+                  here
+                    ? 'border-2 border-ink bg-sheet text-ink outline-2 outline-offset-2 outline-press'
+                    : 'border-[1.5px] border-dashed border-[#B9AE99] text-muted'
                 }`}
               >
                 {rec?.skipped ? '·' : i + 1}
@@ -113,11 +132,9 @@ export function ProgressDots({ posts, cards, current }: { posts: Post[]; cards: 
 
 function Magnifiers({ left, total }: { left: number; total: number }) {
   return (
-    <span className="inline-flex items-center gap-0.5" role="img" aria-label={`${left} of ${total} checks left`}>
+    <span className="inline-flex items-center gap-1" role="img" aria-label={`${left} of ${total} checks left`}>
       {Array.from({ length: total }, (_, i) => (
-        <span key={i} className={i < left ? '' : 'opacity-25 grayscale'} aria-hidden="true">
-          🔍
-        </span>
+        <ClueToken key={i} spent={i >= left} size={24} />
       ))}
     </span>
   )
@@ -133,15 +150,11 @@ export function RarityBadge({ bonus, className = '' }: { bonus: RarityBonus; cla
   const shaker = /shaker/i.test(bonus.label) || bonus.points >= 100
   return (
     <span
-      className={`pop inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 font-display text-sm font-bold whitespace-nowrap shadow-[0_6px_18px_-8px_var(--con)] ${className}`}
-      style={{
-        borderColor: shaker ? 'var(--alarm)' : 'var(--con)',
-        background: shaker
-          ? 'linear-gradient(135deg, color-mix(in srgb, var(--alarm) 30%, var(--surface)), color-mix(in srgb, var(--con) 22%, var(--surface)))'
-          : 'color-mix(in srgb, var(--con) 18%, var(--surface))',
-      }}
+      className={`pop caps inline-flex items-center gap-1.5 border-2 border-ink px-2.5 py-1 text-[13px] font-bold whitespace-nowrap shadow-[var(--hard-sm)] ${
+        shaker ? 'bg-highlight text-ink' : 'bg-sheet text-press'
+      } ${className}`}
     >
-      <span aria-hidden="true">{shaker ? '🧂' : '💎'}</span>
+      {shaker ? <SaltCrystal size={16} /> : <IconSparkles size={15} />}
       {bonus.label}
       {/[!.]$/.test(bonus.label) ? '' : shaker ? '!' : ''} <span className="num">+{bonus.points}</span>
     </span>
@@ -154,8 +167,9 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
   const bonus = rarityBonusOf(reveal)
   if (!crowd) {
     return (
-      <p className="rounded-xl border border-dashed border-line px-3 py-2 text-sm text-muted">
-        🕵️ Be one of the first 10 detectives to answer this one. Crowd stats unlock at 10.
+      <p className="flex items-start gap-2 border-[1.5px] border-dashed border-[#B9AE99] px-3 py-2 text-sm text-muted">
+        <IconGlasses size={18} className="mt-0.5 text-ink" />
+        <span>Be one of the first 10 detectives to answer this one. Crowd stats unlock at 10.</span>
       </p>
     )
   }
@@ -165,19 +179,19 @@ function CrowdLine({ reveal }: { reveal: AnswerResponse }) {
   const verb = reveal.result.doctored ? 'caught this' : 'trusted this'
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex h-3 overflow-hidden rounded-full bg-surface-2" aria-hidden="true">
-        <span className="h-full bg-real" style={{ width: `${realPct}%` }} />
-        <span className="h-full bg-doctored" style={{ width: `${doctoredPct}%` }} />
+      <div className="flex h-3.5 overflow-hidden border-2 border-ink bg-sheet" aria-hidden="true">
+        <span className="h-full bg-ink" style={{ width: `${realPct}%` }} />
+        <span className="h-full bg-press" style={{ width: `${doctoredPct}%` }} />
       </div>
-      <p className="text-sm">
+      <p className="text-[15px] font-bold">
         <b className="num">{realPct}%</b> said Real · <b className="num">{doctoredPct}%</b> said Doctored
-        <span className="text-muted">
+        <span className="font-normal text-muted">
           {' '}
           · <span className="num">{crowd.n}</span> detectives
         </span>
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm font-semibold" style={{ color: correct < 50 ? 'var(--con)' : 'var(--muted)' }}>
+        <p className="text-[15px] font-bold" style={{ color: correct < 50 ? 'var(--press)' : 'var(--muted)' }}>
           {correct < 50 ? (
             <>
               Only <span className="num">{correct}%</span> {verb}.
@@ -205,8 +219,8 @@ function Points({ value, delay = 120 }: { value: number; delay?: number }) {
   const v = Math.round(useTween(0, value, go, 520, reduced))
   return (
     <span
-      className="pop num ml-auto text-2xl font-bold"
-      style={{ color: value > 0 ? 'var(--real)' : value < 0 ? 'var(--doctored)' : 'var(--muted)' }}
+      className="pop num ml-auto text-4xl leading-none font-bold"
+      style={{ color: value > 0 ? 'var(--ink)' : value < 0 ? 'var(--press)' : 'var(--muted)' }}
       aria-label={`${value} points`}
     >
       {v > 0 ? `+${v}` : v < 0 ? `−${Math.abs(v)}` : '0'}
@@ -223,8 +237,8 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
 
   if (!reveal) {
     return (
-      <div className="rounded-2xl border-2 border-line bg-surface p-5 text-center">
-        <p className="font-display text-lg font-semibold">You answered this card earlier.</p>
+      <div className="panel p-5 text-center">
+        <p className="font-display text-xl font-bold">You answered this card earlier.</p>
         <p className="mt-1 text-sm text-muted">Its reveal is waiting on your end card.</p>
         <div className="mt-4 opacity-80">
           <FeedCard post={post} caseNumber={caseNumber} compact />
@@ -240,8 +254,8 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border-2 bg-surface p-4 sm:p-5 ${win ? 'thud' : 'shake'}`}
-      style={{ borderColor: s.color }}
+      className={`relative overflow-hidden border-2 bg-sheet p-4 shadow-[var(--hard)] sm:p-5 ${win ? 'thud' : 'shake'}`}
+      style={{ borderColor: r.outcome === 'trusted' || r.outcome === 'caught' ? 'var(--ink)' : s.color }}
       aria-live="polite"
     >
       {win && <SaltBurst />}
@@ -251,18 +265,24 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
         <OutcomeBadge outcome={r.outcome} size="lg" />
         <Points value={pts} />
       </div>
-      <p className="mt-2 font-display text-lg font-semibold">
+      <p className="mt-3 font-head text-2xl leading-tight font-bold">
         {r.doctored ? <>Doctored · {trickLabel(r.trick)}</> : r.suspicious_real ? <>Real · sounds fake, isn’t</> : <>Real</>}
       </p>
-      <p className="text-sm text-muted">
-        You said <span className="font-semibold text-text">{you}</span>
-        {r.trick_named_correctly && <span className="font-semibold text-real"> · named the trick (+50)</span>}
+      <p className="text-[15px] text-muted">
+        You said <span className="font-bold text-ink">{you}</span>
+        {r.trick_named_correctly && <span className="font-bold text-ink"> · named the trick (+50)</span>}
       </p>
 
       {(r.tell || r.explanation) && (
-        <p className="mt-3 text-[15px]">
-          {r.doctored ? <b className="font-display">The tell: </b> : <b className="font-display text-real">✓ Checks out: </b>}
-          {r.tell || r.explanation}
+        <p className={`mt-3 border-l-4 pl-3 text-[16px] leading-snug font-bold ${r.doctored ? 'border-press' : 'border-ink'}`}>
+          {r.doctored ? (
+            <b>The tell: </b>
+          ) : (
+            <b className="inline-flex items-baseline gap-1">
+              <IconCheck size={15} strokeWidth={2.6} className="self-center" /> Checks out:
+            </b>
+          )}{' '}
+          <span className="font-normal">{r.tell || r.explanation}</span>
         </p>
       )}
 
@@ -272,13 +292,13 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
         </div>
       )}
 
-      <div className="mt-4 flex items-end gap-2.5">
-        <ConMascot size={40} className="shrink-0" />
-        <ConBubble text={quip} size="sm" speed={14} className="min-w-0 flex-1" />
+      <div className="mt-5 flex items-start gap-3">
+        <ConMascot size={48} shape="circle" className="mt-1 shrink-0" />
+        <ConBubble text={quip} size="md" speed={14} className="min-w-0 flex-1" />
       </div>
 
       {!rec.restored && (
-        <div className="mt-4">
+        <div className="mt-5 border-t border-[#CFC6B4] pt-4">
           <CrowdLine reveal={reveal} />
         </div>
       )}
@@ -289,10 +309,8 @@ function CardBack({ post, rec, caseNumber }: { post: Post; rec: CardRecord; case
 function EvidenceInline({ tool, ev }: { tool: ToolId; ev: AnyEvidence }) {
   const t = TOOLS.find((x) => x.id === tool)
   return (
-    <section className="fade-in" aria-label={`${t?.label} evidence`}>
-      <p className="mb-1.5 text-[11px] font-bold tracking-[0.16em] text-muted uppercase">
-        {t?.icon} {t?.label}
-      </p>
+    <section className="fade-in border-2 border-ink bg-sheet p-3 shadow-[var(--hard)]" aria-label={`${t?.label} evidence`}>
+      <p className="caps mb-2 text-[12.5px] font-semibold tracking-[0.08em] text-press">{t?.label}</p>
       {tool === 'source' && <SourceView ev={ev as SourceEvidence} />}
       {tool === 'data' && <DataView ev={ev as DataEvidence} />}
       {tool === 'account' && <AccountView ev={ev as AccountEvidence} />}
@@ -306,47 +324,56 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
   const c = daily.case
   const startRef = useRef<HTMLButtonElement>(null)
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-5 px-4 py-6">
-      <div className="flex items-end gap-3">
-        <ConMascot size={96} shape="door" className="shrink-0" />
-        <ConBubble text={c.briefing} size="md" className="min-w-0 flex-1" onDone={() => startRef.current?.focus({ preventScroll: true })} />
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6">
+      <div className="flex items-end gap-4">
+        <ConMascot size={150} shape="door" className="shrink-0" />
+        <ConBubble text={c.briefing} size="md" className="mb-2 min-w-0 flex-1" onDone={() => startRef.current?.focus({ preventScroll: true })} />
       </div>
-      <section className="folder-open paper-texture rounded-2xl p-6 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]" aria-labelledby="grain-h">
-        <p className="font-mono text-xs font-semibold tracking-[0.18em] text-[#6B5E45] uppercase">{shortDate(`${daily.date}T12:00:00`)}</p>
-        <h1 id="grain-h" className="mt-1 font-display text-4xl font-bold">
+      <section className="folder-open panel p-5 sm:p-6" aria-labelledby="grain-h">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="dateline font-bold !text-ink">{shortDate(`${daily.date}T12:00:00`)}</p>
+        </div>
+        <div className="double-rule mt-2" aria-hidden="true" />
+        <h1 id="grain-h" className="logotype mt-4 text-[44px] text-ink sm:text-5xl">
           Grain of Salt #{daily.daily_number}
         </h1>
-        {daily.theme && (
-          <p className="mt-1 inline-flex rounded-full bg-[#12141C] px-3 py-1 text-sm font-semibold text-[#EFE4CC]">{daily.theme}</p>
-        )}
-        <p className="mt-3 text-[15px] text-[#4B4232]">{c.title}</p>
-        <ul className="mt-5 grid grid-cols-3 gap-2 border-y border-dashed border-[#B9A985] py-4 text-center">
-          <li>
-            <span className="num block text-2xl font-bold">{c.posts.length}</span>
-            <span className="text-xs text-[#6B5E45]">cards</span>
+        {daily.theme && <p className="caps mt-3 inline-flex bg-ink px-3 py-1 text-[13px] font-semibold text-sheet">{daily.theme}</p>}
+        <p className="mt-3 font-head text-[26px] leading-tight font-bold">{c.title}</p>
+        <ul className="mt-5 grid grid-cols-3 gap-2 border-y-2 border-dotted border-[#8C8270] py-4 text-center">
+          <li className="flex flex-col items-center gap-1">
+            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">cards</span>
+            <span className="num block text-4xl leading-none font-bold">{c.posts.length}</span>
           </li>
-          <li>
-            <span className="block text-xl" aria-hidden="true">
-              {'🔍'.repeat(Math.min(5, c.clue_budget))}
+          <li className="flex flex-col items-center gap-1">
+            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">{c.clue_budget} checks</span>
+            <span className="flex items-center gap-0.5" aria-hidden="true">
+              {Array.from({ length: Math.min(5, c.clue_budget) }, (_, i) => (
+                <ClueToken key={i} size={26} />
+              ))}
             </span>
-            <span className="text-xs text-[#6B5E45]">{c.clue_budget} checks</span>
           </li>
-          <li>
-            <span className="num block text-2xl font-bold">0–3</span>
-            <span className="text-xs text-[#6B5E45]">doctored</span>
+          <li className="flex flex-col items-center gap-1">
+            <span className="caps text-[12px] font-semibold tracking-[0.08em] text-muted">doctored</span>
+            <span className="num block text-4xl leading-none font-bold">0–3</span>
           </li>
         </ul>
-        <p className="mt-4 rounded-xl border-2 border-[#2A2418] px-4 py-2.5 text-center font-con text-lg">{DAILY_RANGE}. Maybe none.</p>
-        <p className="mt-3 text-center text-[13px] text-[#4B4232]">
-          +100 per right call · −50 for accusing the truth · bonus for rare catches
-        </p>
-        <button
-          ref={startRef}
-          type="button"
-          onClick={onStart}
-          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#12141C] px-6 py-4 font-display text-xl font-semibold text-[#EFE4CC] transition hover:bg-black active:scale-[0.98]"
-        >
-          Start <span aria-hidden="true">→</span>
+        <p className="mt-5 border-2 border-press bg-[#F8E2DC] px-4 py-3 text-center text-[18px] text-press italic">{DAILY_RANGE}. Maybe none.</p>
+        <ul className="mt-4 flex flex-col gap-1.5 text-[15px]" aria-label="+100 per right call · −50 for accusing the truth · bonus for rare catches">
+          <li className="flex items-baseline gap-3">
+            <span className="num w-12 text-lg font-bold">+100</span> per right call
+          </li>
+          <li className="flex items-baseline gap-3">
+            <span className="num w-12 text-lg font-bold text-press">−50</span> for accusing the truth
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="flex w-12 justify-start">
+              <SaltCrystal size={20} />
+            </span>{' '}
+            bonus for rare catches
+          </li>
+        </ul>
+        <button ref={startRef} type="button" onClick={onStart} className={`${btnClass('ink', 'lg')} mt-6 w-full py-4 text-xl`}>
+          <IconArrow size={22} /> Start
         </button>
       </section>
     </main>
@@ -534,11 +561,11 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3" style={{ paddingBottom: Math.max(barH, 96) + 20 }}>
       <ProgressDots posts={posts} cards={prog.cards} current={idx} />
-      <p className="mt-1 text-center text-xs text-muted">
+      <p className="dateline mt-2 text-center">
         Card {idx + 1} of {posts.length} · {DAILY_RANGE}
       </p>
 
-      <div key={post.id} className="card-in mt-3">
+      <div key={post.id} className="card-in mt-4">
         <div className={flipClass} style={{ transformOrigin: 'center' }}>
           {answered ? (
             <CardBack post={post} rec={rec} caseNumber={game.number} />
@@ -546,45 +573,47 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
             <div className="flex flex-col gap-3">
               <FeedCard post={post} caseNumber={game.number} size="daily" />
 
-              {/* 🔍 Check: one evidence view, inline */}
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Check: one evidence view, inline */}
+              <div className="mt-1 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   aria-expanded={checkOpen}
                   onClick={() => setCheckOpen((o) => !o)}
-                  className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition ${
-                    checkOpen ? 'border-focus bg-focus/10' : 'border-line bg-surface hover:border-muted'
+                  className={`press inline-flex items-center gap-2.5 border-2 border-ink px-3.5 py-2 shadow-[var(--hard)] ${
+                    checkOpen ? 'bg-sheet text-ink' : 'bg-ink text-sheet hover:bg-[#2a2a2a]'
                   }`}
                 >
-                  🔍 Check <span className="num text-xs text-muted">{prog.cluesLeft} left</span>
+                  <IconLens size={18} />
+                  <span className="caps text-[16px] font-bold">Check</span>
+                  <span className={`num caps text-[12.5px] font-semibold ${checkOpen ? 'text-press' : 'text-press-soft'}`}>{prog.cluesLeft} left</span>
                 </button>
                 <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
               </div>
               {checkOpen && (
-                <div className="rise-in grid gap-2 sm:grid-cols-3" role="group" aria-label="Pick one evidence tool">
+                <div className="rise-in flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
                   {TOOLS.map((t) => {
                     const has = post.tools?.includes(t.id)
                     const isOpen = !!opened[t.id]
                     const out = prog.cluesLeft <= 0 && !isOpen
                     return (
-                      <button
+                      <ToolRow
                         key={t.id}
-                        type="button"
+                        icon={t.icon}
+                        label={t.label}
+                        sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
+                        state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
+                        busy={busyTool === t.id}
                         disabled={!has || out || busyTool != null}
                         onClick={() => check(t.id)}
                         title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
-                        className="flex items-center gap-2 rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-left text-sm font-semibold transition hover:border-muted disabled:opacity-45"
-                      >
-                        <span aria-hidden="true">{t.icon}</span>
-                        <span className="min-w-0 flex-1">{t.label}</span>
-                        <span className="font-mono text-[11px] text-muted">{busyTool === t.id ? '…' : isOpen ? 'open' : has ? '−1🔍' : '—'}</span>
-                      </button>
+                        compact
+                      />
                     )
                   })}
                 </div>
               )}
               {notice && (
-                <p role="alert" className="rounded-xl border border-alarm/50 bg-alarm/10 px-3 py-2 text-sm">
+                <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
                   {notice}
                 </p>
               )}
@@ -596,12 +625,19 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
           )}
         </div>
       </div>
-      {game.notice && <p className="mt-5 text-center text-xs text-muted">{game.notice}</p>}
+      {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
+
+      {/* The trick picker opens as a bottom sheet over the card. */}
+      {picker && !answered && (
+        <button type="button" aria-label="Close the trick picker" className="fade-in fixed inset-0 z-10 bg-ink/45" onClick={() => setPicker(false)} />
+      )}
 
       {/* Sticky action bar */}
       <div
         ref={barRef}
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-bg/95 px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur"
+        className={`fixed inset-x-0 bottom-0 z-20 bg-sheet px-4 pb-[max(12px,env(safe-area-inset-bottom))] ${
+          picker && !answered ? 'border-t-[3px] border-press pt-2' : 'border-t-[3px] border-ink pt-3'
+        }`}
       >
         <div className="mx-auto max-w-lg">
           {answered ? (
@@ -616,41 +652,31 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                 type="button"
                 onClick={next}
                 disabled={finishing}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-con py-4 font-display text-xl font-semibold text-on-accent shadow-[0_10px_30px_-12px_var(--con)] transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+                className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
               >
-                {finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'} <span aria-hidden="true">→</span>
+                {!finishing && <IconArrow size={22} />}
+                {finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'}
               </button>
             </>
           ) : picker ? (
-            <div className="rise-in" role="group" aria-label="What’s the trick?">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-sm font-semibold">What’s the trick? <span className="text-muted">(+50 if right)</span></p>
-                <button type="button" className="text-sm font-semibold text-muted hover:text-text" onClick={() => setPicker(false)}>
-                  ← Back
-                </button>
+            <div className="sheet-up">
+              <div className="flex justify-center pb-2" aria-hidden="true">
+                <span className="h-1.5 w-12 bg-[#B9AE99]" />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {choices.map((t, i) => (
-                  <button
-                    key={t}
-                    type="button"
-                    disabled={pending}
-                    onClick={() => answer(true, t)}
-                    className="flex items-center gap-2 rounded-xl border border-doctored/60 bg-doctored/10 px-3 py-3 text-left text-sm font-semibold transition hover:bg-doctored/20 active:scale-[0.98] disabled:opacity-50"
-                  >
-                    <kbd className="font-mono text-[11px] text-muted">{i + 1}</kbd>
-                    {trickLabel(t)}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => answer(true, null)}
-                  className="col-span-2 rounded-xl border border-line px-3 py-2.5 text-sm font-semibold text-muted transition hover:text-text disabled:opacity-50"
-                >
-                  Just doctored, not sure how
-                </button>
-              </div>
+              <button
+                type="button"
+                className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline"
+                onClick={() => setPicker(false)}
+              >
+                <IconArrowLeft size={15} /> Back
+              </button>
+              <TrickPicker
+                options={choices}
+                onPick={(t) => answer(true, t)}
+                disabled={pending}
+                notSureLabel="Just doctored, not sure how"
+                className="pb-2"
+              />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -658,19 +684,19 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                 type="button"
                 disabled={pending}
                 onClick={() => answer(false, null)}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-real py-4 font-display text-xl font-semibold text-on-accent shadow-[0_10px_24px_-12px_var(--real)] transition hover:brightness-110 active:scale-[0.97] disabled:opacity-60"
+                className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-4 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
               >
-                <span aria-hidden="true">✓</span> Real
+                <IconCheck size={24} strokeWidth={2.6} /> Real
               </button>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => setPicker(true)}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-doctored py-4 font-display text-xl font-semibold text-on-accent shadow-[0_10px_24px_-12px_var(--doctored)] transition hover:brightness-110 active:scale-[0.97] disabled:opacity-60"
+                className="press caps flex items-center justify-center gap-2 border-2 border-press bg-sheet py-4 text-[22px] font-bold text-press shadow-[var(--hard)] hover:bg-press/[0.06] disabled:opacity-60"
               >
-                <span aria-hidden="true">✗</span> Doctored
+                <IconX size={24} strokeWidth={2.6} /> Doctored
               </button>
-              <p className="col-span-2 -mt-1 text-center text-[11px] text-muted" aria-live="polite">
+              <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
                 {pending ? 'Checking with the case file…' : <span className="hidden md:inline">Keys: R real · D doctored · C check</span>}
               </p>
             </div>
@@ -683,18 +709,21 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
 
 function DailyTopBar({ daily }: { daily: DailyResponse | null }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/90 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-3xl items-center gap-3 px-4">
-        <Brand compact />
-        <div className="min-w-0 flex-1 truncate text-sm">
-          <span className="font-display text-base font-semibold">Grain of Salt{daily ? ` #${daily.daily_number}` : ''}</span>
-          {daily?.theme && <span className="text-muted"> · {daily.theme}</span>}
+    <header className="sticky top-0 z-30 bg-sheet">
+      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2">
+        <div className="min-w-0 flex-1">
+          <Brand size={27} />
+          <p className="dateline mt-0.5 truncate !text-[12px]">
+            {daily ? <>No. {daily.daily_number}</> : 'The Daily Grain'}
+            {daily?.theme && <> · {daily.theme}</>}
+          </p>
         </div>
-        <a href="#/" className="rounded-lg px-2 py-1 text-sm font-semibold text-muted hover:text-text">
+        <a href="#/" className="caps px-1.5 py-1 text-[13px] font-bold text-ink hover:underline">
           Home
         </a>
         <SoundToggle className="-mr-1.5" />
       </div>
+      <div className="double-rule" aria-hidden="true" />
     </header>
   )
 }
@@ -717,14 +746,14 @@ export function DailyScreen() {
       {data.status === 'error' && (
         <main className="flex flex-1 items-center px-4 py-16">
           {data.error instanceof ApiError && data.error.status === 404 ? (
-            <div className="mx-auto max-w-md rounded-2xl border border-line bg-surface p-6 text-center">
-              <h1 className="font-display text-2xl font-semibold">No Grain today yet.</h1>
+            <div className="panel mx-auto max-w-md p-6 text-center">
+              <h1 className="font-display text-3xl font-bold">No Grain today yet.</h1>
               <p className="mt-2 text-sm text-muted">The Con is still preparing today’s puzzle. Try a Case File or Con the Con meanwhile.</p>
-              <div className="mt-4 flex justify-center gap-2">
-                <a href="#/con" className="rounded-xl bg-con px-4 py-2.5 font-semibold text-on-accent">
-                  Con the Con 🎭
+              <div className="mt-5 flex justify-center gap-3">
+                <a href="#/con" className={btnClass('primary')}>
+                  <IconMask size={20} /> Con the Con
                 </a>
-                <a href="#/casefiles" className="rounded-xl border border-line px-4 py-2.5 font-semibold">
+                <a href="#/casefiles" className={btnClass('secondary')}>
                   Case Files
                 </a>
               </div>
@@ -740,7 +769,7 @@ export function DailyScreen() {
           <DailyEnd daily={daily} result={finalResult} alreadyPlayed={!result} />
         ) : daily.already_played ? (
           <main className="mx-auto max-w-md px-4 py-10 text-center">
-            <p className="font-display text-xl font-semibold">You’ve already played today’s Grain.</p>
+            <p className="font-display text-2xl font-bold">You’ve already played today’s Grain.</p>
             <p className="mt-1 text-muted">Come back tomorrow for #{daily.daily_number + 1}.</p>
             <Button className="mt-4" variant="primary" onClick={() => navigate('/con')}>
               Con the Con meanwhile →

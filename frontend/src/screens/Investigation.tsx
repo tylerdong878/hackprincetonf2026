@@ -4,6 +4,7 @@ import { BottomSheet } from '../components/BottomSheet'
 import { ConBubble } from '../components/ConBubble'
 import { ClueTokens, EvidenceKit, type KitNotice } from '../components/EvidenceKit'
 import { PostCard } from '../components/PostCard'
+import { IconArrow } from '../components/Icon'
 import { ErrorState, SectionLabel } from '../components/ui'
 import { CON_LINES, pick } from '../lib/content'
 import { useIsMobile } from '../lib/hooks'
@@ -100,14 +101,14 @@ export function Investigation({
     [isMobile],
   )
 
-  // Keyboard play (SPEC §3.12): Tab through posts, R / D to mark, 1–3 to name the trick, E for evidence.
+  // Keyboard play (SPEC §3.12): Tab through posts, R / D to mark, 1–4 to name the trick, E for evidence.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || locked) return
       const target = e.target as HTMLElement | null
       if (target?.closest('input, textarea, select, [contenteditable="true"]')) return
       const k = e.key.toLowerCase()
-      if (!['r', 'd', 'e', '1', '2', '3'].includes(k)) return
+      if (!['r', 'd', 'e', '1', '2', '3', '4'].includes(k)) return
       const id = selectedId ?? posts[0]?.id
       if (!id) return
       e.preventDefault()
@@ -151,35 +152,73 @@ export function Investigation({
     />
   )
 
+  const trickKeys = `1–${Math.max(1, Math.min(4, game.trick_options.length))}`
+
   const submitBtn = (
     <button
       type="button"
       onClick={onSubmit}
       disabled={!allMarked || submitting}
-      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-con px-4 py-2.5 font-semibold text-on-accent shadow-[0_6px_20px_-8px_var(--con)] transition hover:brightness-110 disabled:opacity-40 disabled:shadow-none"
+      className="press caps inline-flex shrink-0 items-center gap-2 border-2 border-sheet bg-press px-4 py-2.5 text-[16px] font-bold text-white hover:bg-press-dark disabled:border-dashed disabled:border-[#8C8270] disabled:bg-transparent disabled:text-[#8C8270]"
       title={allMarked ? 'Submit your verdicts' : 'Mark every post Real or Doctored first'}
     >
-      {submitting ? 'Closing the case…' : 'Submit verdicts'} <span aria-hidden="true">→</span>
+      {submitting ? 'Closing the case…' : 'Submit verdicts'} <IconArrow size={17} />
     </button>
+  )
+
+  const progress = (
+    <span className="flex gap-1" aria-hidden="true">
+      {posts.map((p) => (
+        <span key={p.id} className={`h-2 w-5 border border-sheet ${verdicts[p.id] ? 'bg-sheet' : ''}`} />
+      ))}
+    </span>
   )
 
   return (
     <>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-4 pb-36 md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-6 md:pb-28">
+      <main className="mx-auto w-full max-w-[1360px] flex-1 px-4 pt-6 pb-40 sm:px-6 md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-8 md:pb-32">
         <section aria-labelledby="feed-heading" className="min-w-0">
-          <div className="mx-auto flex max-w-[620px] flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <SectionLabel>
-              <span id="feed-heading">The feed</span>
-            </SectionLabel>
-            <p className="hidden text-xs text-muted lg:block">
-              <kbd className="font-mono">Tab</kbd> move · <kbd className="font-mono">R</kbd> real · <kbd className="font-mono">D</kbd> doctored ·{' '}
-              <kbd className="font-mono">1–3</kbd> trick · <kbd className="font-mono">E</kbd> evidence
+          <div className="mx-auto max-w-[680px]">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <SectionLabel>
+                <span id="feed-heading">The feed</span>
+              </SectionLabel>
+              <p className="hidden text-[12px] text-muted lg:block">
+                <kbd>Tab</kbd> move · <kbd>R</kbd> real · <kbd>D</kbd> doctored · <kbd>{trickKeys}</kbd> trick · <kbd>E</kbd> evidence
+              </p>
+            </div>
+            {/* jump strip: one tab per post */}
+            <nav aria-label="Posts in this case" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {posts.map((p, i) => {
+                const v = verdicts[p.id]
+                const on = selectedId === p.id
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    aria-current={on ? 'true' : undefined}
+                    onClick={() => {
+                      setSelectedId(p.id)
+                      cardRefs.current[p.id]?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                      focusCard(p.id)
+                    }}
+                    className={`caps flex flex-col items-center border-2 px-2 py-1.5 leading-tight ${
+                      on ? 'border-ink bg-ink text-sheet' : 'border-[#CFC6B4] bg-sheet text-ink hover:border-ink'
+                    }`}
+                  >
+                    <span className="text-[15px] font-bold">Post {i + 1}</span>
+                    <span className={`text-[11px] font-semibold tracking-[0.06em] ${on ? 'text-press-soft' : v?.doctored ? 'text-press' : 'text-muted'}`}>
+                      {on ? 'inspecting' : v ? (v.doctored ? 'marked doctored' : 'marked real') : 'not marked'}
+                    </span>
+                  </button>
+                )
+              })}
+            </nav>
+            <p className="mt-3 mb-6 border-[1.5px] border-dashed border-press px-3 py-2.5 text-center text-[17px] text-press italic">
+              Some posts may be doctored. Maybe none are.
             </p>
           </div>
-          <p className="mx-auto mt-2 mb-4 max-w-[620px] rounded-xl border border-dashed border-line px-3 py-2 text-center font-con text-sm text-muted">
-            Some posts may be doctored. Maybe none are.
-          </p>
-          <div className="mx-auto flex max-w-[620px] flex-col gap-6">
+          <div className="mx-auto flex max-w-[680px] flex-col gap-8">
             {posts.map((p, i) => (
               <PostCard
                 key={p.id}
@@ -205,18 +244,18 @@ export function Investigation({
             ))}
           </div>
           {submitError != null && (
-            <div className="mx-auto mt-6 max-w-[620px]">
+            <div className="mx-auto mt-6 max-w-[680px]">
               <ErrorState error={submitError} onRetry={onSubmit} title="Couldn’t submit your verdicts." />
             </div>
           )}
-          {game.notice && <p className="mx-auto mt-6 max-w-[620px] text-center text-xs text-muted">{game.notice}</p>}
+          {game.notice && <p className="mx-auto mt-6 max-w-[680px] text-center text-xs text-muted italic">{game.notice}</p>}
         </section>
 
         {!isMobile && (
-          <aside aria-label="Evidence Kit" className="hidden min-w-0 md:block">
+          <aside aria-label="Evidence Kit" className="hidden min-w-0 border-l border-ink pl-6 md:block">
             <div
               ref={kitRef}
-              className="sticky top-[72px] max-h-[calc(100vh-72px-104px)] overflow-y-auto rounded-2xl border border-line bg-surface p-4 thin-scroll"
+              className="panel sticky top-[88px] max-h-[calc(100vh-88px-120px)] overflow-y-auto p-5 thin-scroll"
             >
               {kit}
             </div>
@@ -224,14 +263,17 @@ export function Investigation({
         )}
       </main>
 
-      {/* Bottom dock (desktop) */}
-      <div className="fixed inset-x-0 bottom-0 z-20 hidden border-t border-line bg-bg/95 backdrop-blur md:block">
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
-          <ConMascot size={48} className="shrink-0" />
-          <ConBubble key={conLine} text={conLine} size="sm" speed={18} className="min-w-0 flex-1 md:max-w-2xl" />
-          <p className="ml-auto shrink-0 text-sm text-muted" aria-live="polite">
-            <span className="font-mono font-semibold text-text">{marked}</span> of {posts.length} marked
-          </p>
+      {/* Bottom dock (desktop): the Con on an ink bar */}
+      <div className="fixed inset-x-0 bottom-0 z-20 hidden border-t-4 border-press bg-ink text-sheet md:block">
+        <div className="mx-auto flex max-w-[1360px] items-center gap-4 px-6 py-3">
+          <ConMascot size={56} className="shrink-0 border-sheet" />
+          <ConBubble key={conLine} text={conLine} size="md" speed={18} className="min-w-0 flex-1 !border-l-0 !px-0 !shadow-none md:max-w-2xl" />
+          <div className="ml-auto flex shrink-0 flex-col items-start gap-1.5" aria-live="polite">
+            <p className="caps text-[12.5px] font-semibold tracking-[0.06em]">
+              <span className="num">{marked}</span> of {posts.length} marked
+            </p>
+            {progress}
+          </div>
           {submitBtn}
         </div>
       </div>
@@ -240,14 +282,16 @@ export function Investigation({
       <div className="fixed inset-x-0 bottom-0 z-20 md:hidden">
         {toastVisible && (
           <div className="fade-in pointer-events-none mx-4 mb-2 flex items-end gap-2">
-            <ConMascot size={36} className="shrink-0" />
+            <ConMascot size={40} className="shrink-0" />
             <ConBubble key={conLine} text={conLine} size="sm" typewriter={false} className="min-w-0 flex-1" />
           </div>
         )}
-        <div className="flex items-center gap-3 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur">
-          <ClueTokens left={cluesLeft} total={game.clue_budget} />
-          <p className="ml-auto text-xs whitespace-nowrap text-muted" aria-live="polite">
-            <span className="font-mono font-semibold text-text">{marked}</span>/{posts.length}
+        <div className="flex items-center gap-3 border-t-4 border-press bg-ink px-4 py-3 text-sheet">
+          <span className="bg-sheet px-1.5 py-1">
+            <ClueTokens left={cluesLeft} total={game.clue_budget} />
+          </span>
+          <p className="caps ml-auto text-xs whitespace-nowrap" aria-live="polite">
+            <span className="num font-semibold">{marked}</span>/{posts.length}
             <span className="sr-only"> marked</span>
           </p>
           {submitBtn}

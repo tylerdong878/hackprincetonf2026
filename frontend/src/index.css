@@ -1,55 +1,49 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------
-   Color tokens (SPEC §3.1). Dark is the default; light follows the OS.
+   Newsprint tokens (Figma redesign). One light theme: the dark theme is gone.
+   The old semantic names (--bg, --surface, --real, --con, ...) are kept and
+   mapped onto the newsprint palette so every screen shares one source.
    ------------------------------------------------------------------ */
 :root {
-  color-scheme: dark;
-  --bg: #12141c;
-  --surface: #1c1f2b;
-  --surface-2: #252938;
-  --line: #2f3445;
-  --paper: #efe4cc;
-  --paper-ink: #2a2418;
-  --feed-card: #ffffff;
-  --text: #eceae4;
-  --muted: #9a9aa6;
-  --real: #2f9e6a;
-  --doctored: #d2453a;
-  --alarm: #e3a42b;
-  --con: #8b5cf6;
-  --focus: #7fb2ff;
-  --on-accent: #ffffff;
-  --lamp: rgba(239, 228, 204, 0.07);
-  /* "caught" is salt: a white stamp with dark ink (CONTRACT §8.2) */
-  --salt: #f4f1e8;
-  --salt-ink: #1b1b1f;
-  --salt-edge: #f4f1e8;
-}
+  color-scheme: light;
+  /* palette */
+  --ink: #141414;
+  --newsprint: #f2e8d5;
+  --sheet: #fbf7ee; /* "paper" in the Figma: sheets and panels */
+  --manila: #e6d3a8;
+  --press: #c8231b;
+  --press-dark: #9e1a14;
+  --press-soft: #f07a72; /* the Con's label on ink */
+  --ochre: #b9822a;
+  --chart-blue: #2a78d6;
+  --highlight: #ffe58a;
+  --rule-soft: #cfc6b4;
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-    --bg: #f6f1e7;
-    --surface: #ffffff;
-    --surface-2: #efe9dc;
-    --line: #ddd5c4;
-    --paper: #efe4cc;
-    --paper-ink: #2a2418;
-    --feed-card: #ffffff;
-    --text: #1b1b1f;
-    --muted: #5e5e68;
-    --real: #22804f;
-    --doctored: #b8322a;
-    --alarm: #b57d10;
-    --con: #6d3fd8;
-    --focus: #1f5fd1;
-    --on-accent: #ffffff;
-    --lamp: rgba(255, 255, 255, 0.6);
-    --salt: #ffffff;
-    --salt-ink: #1b1b1f;
-    --salt-edge: #6b6457;
-  }
+  /* semantic (kept names) */
+  --bg: var(--newsprint);
+  --surface: var(--sheet);
+  --surface-2: #f6efe0;
+  --line: var(--ink);
+  --paper: var(--manila);
+  --paper-ink: var(--ink);
+  --feed-card: #ffffff;
+  --text: var(--ink);
+  --muted: #5a544b;
+  --real: var(--ink);
+  --doctored: var(--press);
+  --alarm: var(--ochre);
+  --con: var(--press);
+  --focus: #1f5fd1;
+  --on-accent: #ffffff;
+  /* "caught" is salt: a paper square with an ink crystal */
+  --salt: var(--sheet);
+  --salt-ink: var(--ink);
+  --salt-edge: var(--ink);
+
+  /* one hard shadow everywhere */
+  --hard: 4px 4px 0 var(--ink);
+  --hard-sm: 2px 2px 0 var(--ink);
 }
 
 @theme inline {
@@ -57,6 +51,7 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-line: var(--line);
+  --color-line-soft: var(--rule-soft);
   --color-paper: var(--paper);
   --color-paper-ink: var(--paper-ink);
   --color-feed-card: var(--feed-card);
@@ -71,12 +66,49 @@
   --color-salt: var(--salt);
   --color-salt-ink: var(--salt-ink);
   --color-salt-edge: var(--salt-edge);
+  --color-ink: var(--ink);
+  --color-newsprint: var(--newsprint);
+  --color-sheet: var(--sheet);
+  --color-manila: var(--manila);
+  --color-press: var(--press);
+  --color-press-dark: var(--press-dark);
+  --color-press-soft: var(--press-soft);
+  --color-ochre: var(--ochre);
+  --color-chart-blue: var(--chart-blue);
+  --color-highlight: var(--highlight);
 
-  --font-display: "Fredoka", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif;
-  --font-con: "Special Elite", "Courier New", ui-monospace, monospace;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --font-feed: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Bodoni Moda: nameplates and titles. Oswald: condensed caps, buttons, stamps.
+     Old Standard TT: copy, datelines, tables (the Con speaks in its italic).
+     Gloock: the "Grain of Salt" logotype. Inter: only inside feed / post cards. */
+  --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --font-head: "Oswald", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --font-sans: "Old Standard TT", Georgia, "Times New Roman", serif;
+  --font-serif: "Old Standard TT", Georgia, "Times New Roman", serif;
+  --font-con: "Old Standard TT", Georgia, "Times New Roman", serif;
+  --font-mono: "Old Standard TT", Georgia, "Times New Roman", serif;
+  --font-logo: "Gloock", "Bodoni Moda", Georgia, serif;
+  --font-feed: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-code: ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  /* Square corners in the chrome (feed cards set their own radius). */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  /* One hard shadow (no blur) instead of soft drop shadows. */
+  --shadow-2xs: 2px 2px 0 var(--ink);
+  --shadow-xs: 2px 2px 0 var(--ink);
+  --shadow-sm: 2px 2px 0 var(--ink);
+  --shadow: 4px 4px 0 var(--ink);
+  --shadow-md: 4px 4px 0 var(--ink);
+  --shadow-lg: 4px 4px 0 var(--ink);
+  --shadow-xl: 4px 4px 0 var(--ink);
+  --shadow-2xl: 4px 4px 0 var(--ink);
 }
 
 /* ------------------------------------------------------------------
@@ -98,10 +130,8 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--font-sans);
+  font-size: 16px;
   overflow-x: hidden;
-  /* desk-lamp glow over the ink */
-  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, var(--lamp), transparent 70%);
-  background-attachment: fixed;
 }
 
 #root {
@@ -113,7 +143,6 @@ body {
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 6px;
 }
 
 button {
@@ -121,6 +150,10 @@ button {
 }
 button:disabled {
   cursor: not-allowed;
+}
+
+kbd {
+  font-family: var(--font-feed);
 }
 }
 
@@ -463,43 +496,108 @@ button:disabled {
 /* ------------------------------------------------------------------
    Shared pieces
    ------------------------------------------------------------------ */
-/* Stats, scores and percentages: Inter with tabular, non-slashed numerals (not the mono's slashed zero). */
+/* In the components layer so Tailwind utilities on the same element win. */
+@layer components {
+/* Stats, scores and percentages: Oswald with tabular numerals. */
 .num {
-  font-family: var(--font-sans);
+  font-family: var(--font-head);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1, "zero" 0;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.01em;
+}
+
+/* The "Grain of Salt" logotype. */
+.logotype {
+  font-family: var(--font-logo);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Condensed caps: headlines, buttons, labels. */
+.caps {
+  font-family: var(--font-head);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Datelines and small print. */
+.dateline {
+  font-family: var(--font-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* A panel: paper sheet, 2px ink rule, the one hard shadow. */
+.panel {
+  background: var(--sheet);
+  border: 2px solid var(--ink);
+  box-shadow: var(--hard);
+}
+.hard-shadow {
+  box-shadow: var(--hard);
+}
+
+/* The double rule under nameplates and headers. */
+.double-rule {
+  border: 0;
+  height: 7px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) top / 100% 4px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom / 100% 1px no-repeat;
+}
+.double-rule-thin {
+  border: 0;
+  height: 5px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) top / 100% 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom / 100% 1px no-repeat;
+}
+
+/* Press-able chrome: the hard shadow shrinks when pressed. */
+.press {
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out, background-color 120ms;
+}
+.press:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--hard-sm);
 }
 
 .stamp {
-  font-family: var(--font-con);
+  font-family: var(--font-head);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border: 2.5px solid currentColor;
-  border-radius: 6px;
-  padding: 0.1em 0.45em;
-  line-height: 1.2;
+  letter-spacing: 0.04em;
+  border: 3px solid currentColor;
+  outline: 1.5px solid currentColor;
+  outline-offset: 2px;
+  padding: 0.02em 0.4em;
+  line-height: 1.15;
   white-space: nowrap;
 }
 
+/* The Con's speech bubble: ink sheet, press-red left rule, Old Standard italic. */
 .con-bubble {
-  background: #181a24;
-  color: #ece6ff;
-  border-left: 4px solid var(--con);
+  background: var(--ink);
+  color: var(--sheet);
+  border-left: 6px solid var(--press);
   font-family: var(--font-con);
-}
-@media (prefers-color-scheme: light) {
-  .con-bubble {
-    background: #1f1b2e;
-    color: #f1ecff;
-  }
+  font-style: italic;
+  box-shadow: var(--hard);
 }
 
+/* Case-file manila (no grain: flat manila with an ink rule). */
 .paper-texture {
-  background-color: var(--paper);
-  color: var(--paper-ink);
-  background-image:
-    repeating-linear-gradient(0deg, rgba(120, 95, 50, 0.035) 0 1px, transparent 1px 4px),
-    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.45), transparent 60%);
+  background-color: var(--manila);
+  color: var(--ink);
+}
+
+/* Halftone dots, for the newspaper photo frame. */
+.halftone {
+  background-image: radial-gradient(circle, #b9ae99 32%, transparent 36%);
+  background-size: 7px 7px;
 }
 
 .feed-font {
@@ -507,13 +605,12 @@ button:disabled {
 }
 
 .watermark-strip {
-  font-family: var(--font-mono);
-  letter-spacing: 0.14em;
+  font-family: var(--font-feed);
+  letter-spacing: 0.08em;
 }
 
 .redacted {
   background: currentColor;
-  border-radius: 2px;
   color: inherit;
   user-select: none;
 }
@@ -521,5 +618,6 @@ button:disabled {
 /* Thin scrollbars inside panels */
 .thin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
+  scrollbar-color: var(--muted) transparent;
+}
 }
