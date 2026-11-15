@@ -28,6 +28,10 @@ PHONE = "+15555550100"
     ("?", "help", None), ("stats", "stats", None), ("STOP", "mute", None), ("remind", "unmute", None),
     ("what is this", "unknown", None), ("real quick question about the chart", "unknown", None),
     ("fake news is everywhere lol", "unknown", None), ("fake, not sure which", "fake", None),
+    # Command words start a command only in short texts; longer ones are chat for the partner.
+    ("How come it's giving me a different source than the news report", "unknown", None),
+    ("how to play", "help", None), ("new game", "reset", None), ("new phone who dis", "unknown", None),
+    ("check this out lol", "unknown", None),
 ])
 def test_parse(text, kind, trick):
     i = parse(text, OPTS)
@@ -39,6 +43,27 @@ def test_parse_not_sure_and_tool():
     assert parse("not sure", OPTS).not_sure
     assert parse("check source", OPTS).tool == "source"
     assert parse("c data", OPTS).tool == "data"
+    assert parse("check the source please", OPTS).tool == "source"  # long, but it names a tool
+
+
+def test_send_names_a_second_bot(tmp_path):
+    """Photon's 'Idempotency-Key was reused' means another copy of the bot already answered this text."""
+    from backend.imessage.photon_io import AnsweredElsewhere, PhotonIO
+    from backend.imessage.render import Out
+
+    def io_raising(message):
+        class Projects:
+            def send_message(self, _):
+                raise RuntimeError(message)
+
+        io = PhotonIO("key", "project", None, tmp_path / "cursor.json")
+        io.client = type("Client", (), {"projects": Projects()})()
+        return io
+
+    with pytest.raises(AnsweredElsewhere):
+        io_raising("Idempotency-Key was reused for a different request").send("sp", "ag", [Out.t("hi")], "m1")
+    with pytest.raises(RuntimeError, match="network down"):  # any other failure is left alone
+        io_raising("network down").send("sp", "ag", [Out.t("hi")], "m1")
 
 
 @pytest.mark.parametrize("text,kind", [
