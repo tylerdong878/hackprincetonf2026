@@ -1,0 +1,44 @@
+{"t": 1.56, "type": "subagent_started", "name": "researcher", "task": "Research real sources for topic sports news. Feeds to use: https://feeds.npr.org/1055/rss.xml (query: \"record season fans league marathon game\"). Save 6-7 short passages, including at least one exact headline, using the researcher agent tool."}
+{"t": 1.56, "type": "plan_updated", "todos": [{"content": "Research real sources", "status": "in_progress"}, {"content": "Forge the case", "status": "pending"}, {"content": "Blind-solve the case", "status": "pending"}, {"content": "Send to the editor for approval", "status": "pending"}]}
+{"t": 6.84, "type": "tool_called", "agent": "researcher", "tool": "fetch_rss", "summary": "Read 30 items from https://feeds.npr.org/1055/rss.xml (3 page(s)); 6 match 'record season fans league marathon game'. Full text is cached for save_source."}
+{"t": 9.47, "type": "tool_called", "agent": "researcher", "tool": "fetch_article", "summary": "(from this run's cache, via rss)"}
+{"t": 9.47, "type": "tool_called", "agent": "researcher", "tool": "fetch_article", "summary": "(from this run's cache, via rss)"}
+{"t": 14.3, "type": "tool_called", "agent": "researcher", "tool": "fetch_rss", "summary": "Read 30 items from https://feeds.npr.org/1055/rss.xml (3 page(s)); 6 match 'sports'. Full text is cached for save_source."}
+{"t": 17.75, "type": "tool_called", "agent": "researcher", "tool": "fetch_article", "summary": "(from this run's cache, via rss)"}
+{"t": 22.33, "type": "tool_called", "agent": "researcher", "tool": "fetch_rss", "summary": "Read 30 items from https://feeds.npr.org/1055/rss.xml (3 page(s)); 3 match 'golf'. Full text is cached for save_source."}
+{"t": 26.48, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.48, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s1 · NPR · 2026-11-14 · HEADLINE: “Saturday Sports: NFL regular season action; college football playoff format expansion”"}
+{"t": 26.48, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.5, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s2 · NPR · 2026-11-14: “NPR's Scott Simon and sports writer Howard Bryant discuss the NFL regular season's halfway point and the expansion of college football's pl…”"}
+{"t": 26.5, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.5, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s3 · NPR · 2026-11-14 · HEADLINE: “FAA ground stop disrupts college football”"}
+{"t": 26.5, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.5, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s4 · NPR · 2026-11-14: “Some college football games were delayed a few hours on Saturday or postponed to Sunday.”"}
+{"t": 26.5, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.5, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s5 · NPR · 2026-11-07 · HEADLINE: “Saturday Sports: LIV Golf shuts down; Russian hockey teams banned from World Juniors”"}
+{"t": 26.5, "type": "file_written", "agent": "researcher", "path": "/cases/daily-2026-11-17/sources.json"}
+{"t": 26.51, "type": "tool_called", "agent": "researcher", "tool": "save_source", "summary": "Saved s6 · NPR · 2026-11-07: “LIV Golf is shutting down after four years and billions of dollars of Saudi investment.”"}
+{"t": 30.2, "type": "subagent_finished", "name": "researcher", "summary": "s1 | NPR | 2026-11-14 | | Saturday Sports: NFL regular season action; college football playoff format s2 | NPR | 2026-11-14 | | NPR's Scott Simon and sports writer Howard Bryant discuss the s3 | NPR | 2026-11-14 | | FAA ground stop disrupts college football s4 | NPR | 2026-11-14 | | Some college fo…"}
+{"t": 42.86, "type": "plan_updated", "todos": [{"content": "Research real sources", "status": "completed"}, {"content": "Forge the case", "status": "in_progress"}, {"content": "Blind-solve the case", "status": "pending"}, {"content": "Send to the editor for approval", "status": "pending"}]}
+{"t": 42.86, "type": "subagent_started", "name": "forger", "task": "Build case daily-2026-11-17. Topic: sports news. Case shape: Daily Grain for 2026-11-17 (theme: Game Day). Exactly 5 posts: 1 doctored (trick: out-of-context-quote), at least one real post that sounds absurd but is true (real_suspicious), the rest plainly real. Source IDs: s1, s2, s3, s4, s5, s6. U…", "spoiler": true}
+{"t": 46.5, "type": "tool_called", "agent": "forger", "tool": "read_file", "summary": "read_file /skills/out-of-context-quote/SKILL.md", "spoiler": true}
+{"t": 50.2, "type": "tool_called", "agent": "forger", "tool": "read_file", "summary": "read_file /skills/cherry-picked-stat/SKILL.md", "spoiler": true}
+{"t": 55.0, "type": "tool_called", "agent": "forger", "tool": "crop_quote", "summary": "Made f1 (out-of-context-quote) from s1, a headline with no speaker, so it is posted as the account's own text (not a quote card).", "spoiler": true}
+{"t": 58.75, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-17/case.json"}
+{"t": 58.75, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-17/evidence.json"}
+{"t": 58.76, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-17/answer_key.json"}
+{"t": 58.76, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-17/meta.json"}
+{"t": 58.76, "type": "tool_called", "agent": "forger", "tool": "write_case", "summary": "Wrote case daily-2026-11-17 (#21, revision 1): 5 posts.", "spoiler": true}
+{"t": 62.25, "type": "subagent_finished", "name": "forger", "summary": "daily-2026-11-17 · p1 is doctored (out-of-context-quote), p2–p5 are real.", "spoiler": true}
+{"t": 66.38, "type": "plan_updated", "todos": [{"content": "Research real sources", "status": "completed"}, {"content": "Forge the case", "status": "completed"}, {"content": "Blind-solve the case", "status": "in_progress"}, {"content": "Send to the editor for approval", "status": "pending"}]}
+{"t": 66.38, "type": "subagent_started", "name": "blind-solver", "task": "Solve case daily-2026-11-17."}
+{"t": 70.3, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 1/3 (p2/source).", "spoiler": true}
+{"t": 70.31, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 2/3 (p1/source).", "spoiler": true}
+{"t": 70.31, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 3/3 (p5/source).", "spoiler": true}
+{"t": 74.16, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Out of clue tokens (3/3 used). Decide with what you have and call submit_verdict.", "spoiler": true}
+{"t": 78.92, "type": "tool_called", "agent": "blind-solver", "tool": "submit_verdict", "summary": "Verdict recorded.", "spoiler": true}
+{"t": 78.94, "type": "solver_result", "pass": true, "tools_used": ["source"], "difficulty": "hard", "attempt": 1}
+{"t": 78.94, "type": "file_written", "agent": "blind-solver", "path": "/cases/daily-2026-11-17/solver_log.md"}
+{"t": 78.94, "type": "subagent_finished", "name": "blind-solver", "summary": "Blind solver attempt 1/2: PASS (difficulty hard). It flagged p1 as edited-detail after opening p2/source, p1/source, p5/source (trick name was off; still a pass). Next: submit_for_review.", "spoiler": true}
+{"t": 82.61, "type": "awaiting_approval"}
+{"t": 82.62, "type": "case_status", "status": "awaiting_approval"}

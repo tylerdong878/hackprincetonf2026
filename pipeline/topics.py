@@ -119,7 +119,28 @@ def story_urls(hints: dict[str, list[str]]) -> list[str]:
     return [m.group(0) for s in hints.get("known_stories") or [] for m in re.finditer(r"https?://\S+", s)]
 
 
-def hints_text(topic: str) -> str:
+def used_story_urls(cases_dir: Path | None = None, limit: int = 40) -> list[str]:
+    """Source URLs already used by approved or pending puzzles, newest first, so a new build picks fresh stories."""
+    from pipeline.config import DATA_DIR
+
+    root = cases_dir or (DATA_DIR / "cases")
+    seen: dict[str, float] = {}
+    for f in root.glob("*/sources.json"):
+        try:
+            meta = json.loads((f.parent / "meta.json").read_text(encoding="utf-8"))
+            if meta.get("status") == "rejected":
+                continue
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for s in data if isinstance(data, list) else data.get("sources", []):
+            url = (s or {}).get("url")
+            if url:
+                seen[url] = max(seen.get(url, 0.0), f.stat().st_mtime)
+    return [u for u, _ in sorted(seen.items(), key=lambda kv: -kv[1])][:limit]
+
+
+def hints_text(topic: str, used: list[str] | None = None) -> str:
     h = hints_for(topic)
     lines = []
     if h.get("feeds"):
@@ -133,6 +154,9 @@ def hints_text(topic: str) -> str:
     else:
         lines.append("- data: none for this topic (no EIA tool; any stat comes from a saved source's own numbers)")
     lines.append("- only these feeds, the stories they link to and the pages listed here can be fetched")
+    used = used_story_urls() if used is None else used
+    if used:
+        lines.append("- already used in other puzzles, so pick DIFFERENT stories (never these URLs): " + ", ".join(used))
     return "\n".join(lines)
 
 
