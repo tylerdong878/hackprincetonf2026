@@ -49,15 +49,22 @@ def default_chat() -> ChatFn | None:
         log.exception("partner: model setup unavailable")
         return None
     timeout = float(os.environ.get("GOS_PARTNER_TIMEOUT_S", "15"))
-    models = []
+    available = {}
     if os.environ.get("OPENROUTER_API_KEY", "").strip():
-        models.append(("openrouter", lambda: make_openrouter(
-            os.environ.get("GOS_PARTNER_MODEL", DEFAULT_FALLBACK_MODEL), timeout_ms=int(timeout * 1000))))
+        available["openrouter"] = lambda: make_openrouter(
+            os.environ.get("GOS_PARTNER_MODEL", DEFAULT_FALLBACK_MODEL), timeout_ms=int(timeout * 1000))
     if (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip():
-        models.append(("gemini", lambda: make_gemini(os.environ.get("GEMINI_MODEL", DEFAULT_GEMINI_MODEL),
-                                                     timeout_s=timeout)))
+        available["gemini"] = lambda: make_gemini(
+            os.environ.get("GOS_PARTNER_GEMINI_MODEL") or os.environ.get("GEMINI_MODEL", DEFAULT_GEMINI_MODEL),
+            timeout_s=timeout)
+    # GOS_PARTNER_ORDER: which model to try first (default Gemini: faster replies feel like texting a person).
+    order = [n.strip() for n in os.environ.get("GOS_PARTNER_ORDER", "gemini,openrouter").split(",")]
+    models = [(n, available[n]) for n in order if n in available]
+    models += [(n, m) for n, m in available.items() if n not in order]
     if not models:
         return None
+    log.info("partner models, in order: %s", ", ".join(n for n, _ in models))
+    cache: dict[str, object] = {}
     pool = concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
     def chat(system: str, turns: list[tuple[str, str]]) -> str:
@@ -65,7 +72,8 @@ def default_chat() -> ChatFn | None:
         msgs = [SystemMessage(system)] + [HumanMessage(t) if r == "user" else AIMessage(t) for r, t in turns]
         for name, make in models:
             try:  # a hard wall-clock deadline: a slow free model must not stall the whole bot
-                reply = pool.submit(lambda: make().invoke(msgs)).result(timeout=timeout)
+                model = cache.get(name) or cache.setdefault(name, make())
+                reply = pool.submit(model.invoke, msgs).result(timeout=timeout)
                 text = reply.content if isinstance(reply.content, str) else " ".join(
                     p.get("text", "") for p in reply.content if isinstance(p, dict))
                 if text.strip():
