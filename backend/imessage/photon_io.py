@@ -19,6 +19,18 @@ from .render import Out
 
 log = logging.getLogger("gos.imessage")
 
+SPLIT_WARNING = ("ANOTHER BOT ANSWERED FIRST (%s). A second copy of Grain of Salt is running on this Photon "
+                 "project with its own game state, so players get a mix of two games. Run only one bot per project.")
+
+
+class AnsweredElsewhere(Exception):
+    """Photon already holds a different reply under this send's idempotency key: another copy of this bot, on the
+    same Photon project, answered first. Only the other copy's reply reached the player."""
+
+
+def reused_key(e: Exception) -> bool:
+    return "idempotency-key was reused" in str(e).lower()
+
 
 @dataclass(frozen=True)
 class Incoming:
@@ -130,10 +142,15 @@ class PhotonIO:
                 content = SendTextContent(type="text", format="plain", text=out.text)
             else:
                 continue
-            sent = self.client.projects.send_message(SendMessageInput(
-                path=SendMessagePath(id=self.project),
-                headers=SendMessageHeader.model_validate({"idempotency-key": idem}),
-                body=SendMessageRequest(spaceId=space_id, senderId=agent_id, content=content)))
+            try:
+                sent = self.client.projects.send_message(SendMessageInput(
+                    path=SendMessagePath(id=self.project),
+                    headers=SendMessageHeader.model_validate({"idempotency-key": idem}),
+                    body=SendMessageRequest(spaceId=space_id, senderId=agent_id, content=content)))
+            except Exception as e:
+                if reused_key(e):
+                    raise AnsweredElsewhere(key) from e
+                raise
             if i < len(outs) - 1:
                 self.wait_delivered(getattr(getattr(sent, "root", sent), "id", None))
 

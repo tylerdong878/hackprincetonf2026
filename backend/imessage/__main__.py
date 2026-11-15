@@ -32,7 +32,7 @@ from backend.app.store import Store  # noqa: E402
 
 from .engine import Engine, GameAPI, Sessions  # noqa: E402
 from .partner import Partner, default_chat  # noqa: E402
-from .photon_io import PhotonIO, nudge_key  # noqa: E402
+from .photon_io import SPLIT_WARNING, AnsweredElsewhere, PhotonIO, nudge_key  # noqa: E402
 from .render import Out  # noqa: E402
 
 log = logging.getLogger("gos.imessage")
@@ -44,6 +44,13 @@ def et_hour() -> int:
         return datetime.now(ZoneInfo("America/New_York")).hour
     except Exception:
         return datetime.utcnow().hour - 5
+
+
+def remind(io: PhotonIO, s, outs: list[Out], today) -> None:
+    try:
+        io.send(s.space_id, s.agent_id, outs, nudge_key(s.handle, today.isoformat()))
+    except AnsweredElsewhere:  # the other copy already reminded them today: count it as sent, don't retry
+        log.warning(SPLIT_WARNING, s.handle[-4:])
 
 
 def main() -> int:
@@ -88,13 +95,16 @@ def main() -> int:
                         outs = [Out.t("I can only read text for now. Reply REAL or FAKE, or HELP.")]
                     else:
                         outs = engine.handle(msg.handle, msg.text, space_id=msg.space_id, agent_id=msg.agent_id)
-                    io.send(msg.space_id, msg.agent_id, outs, msg.id)
+                    try:
+                        io.send(msg.space_id, msg.agent_id, outs, msg.id)
+                    except AnsweredElsewhere:
+                        log.warning(SPLIT_WARNING, msg.handle[-4:])
+                        continue
                     log.info("-> %s: %d message(s)", msg.handle[-4:], len(outs))
                 if nudge_hour >= 0 and time.monotonic() >= next_nudge_check and et_hour() >= nudge_hour:
                     next_nudge_check = time.monotonic() + 60
                     today = today_et()
-                    engine.send_reminders(today, lambda s, outs: io.send(
-                        s.space_id, s.agent_id, outs, nudge_key(s.handle, today.isoformat())))
+                    engine.send_reminders(today, lambda s, outs: remind(io, s, outs, today))
             except KeyboardInterrupt:
                 raise
             except Exception:  # one bad poll (network, API hiccup) must not kill the bot

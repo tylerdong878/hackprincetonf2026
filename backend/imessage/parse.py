@@ -80,12 +80,16 @@ def parse(text: str, trick_options: list[str] | None = None) -> Intent:
         trick, choice, not_sure = trick_from(rest, options)
         if len(tokens) <= 3 or trick or choice is not None or not_sure:
             return Intent("fake", trick=trick, choice=choice, not_sure=not_sure)
+    # Command words only count in short texts, like REAL: "how come the source is different" is a question for
+    # the partner (not HELP), "new phone who dis" isn't a RESET, and "check this out" doesn't spend a 🔍.
+    short = len(tokens) <= 3
     if head in CHECK:
         tool = next((t for t, keys in TOOLS.items() for w in rest if w in keys), None)
-        return Intent("check", tool=tool)
+        if short or tool:
+            return Intent("check", tool=tool)
     if head in HINT or joined in ("help me", "give me a hint", "any hints", "im stuck", "i'm stuck"):
         return Intent("hint")
-    if head in RESET:
+    if head in RESET and short:
         return Intent("reset")
     if head in MUTE:
         return Intent("mute")
@@ -93,7 +97,7 @@ def parse(text: str, trick_options: list[str] | None = None) -> Intent:
         return Intent("unmute")
     if head in STATS:
         return Intent("stats")
-    if head in HELP and head != "?" or joined == "?":
+    if head in HELP and head != "?" and short or joined == "?":
         return Intent("help")
     if head in PLAY:
         return Intent("play")
