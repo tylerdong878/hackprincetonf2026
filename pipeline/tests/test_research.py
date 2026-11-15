@@ -178,3 +178,24 @@ def test_save_source_dedupes(ctx):
     fetch_article_impl(ctx, fx.PRESS_URL)
     save_source_impl(ctx, fx.PRESS_URL, fx.BPU_20)
     assert save_source_impl(ctx, fx.PRESS_URL, fx.BPU_20).startswith("Already saved as s1")
+
+
+def _case_using(cases_dir, case_id: str, url: str, status: str) -> None:
+    d = cases_dir / case_id
+    d.mkdir(parents=True)
+    (d / "meta.json").write_text(json.dumps({"status": status}), encoding="utf-8")
+    (d / "sources.json").write_text(json.dumps({"case_id": case_id, "sources": [{"id": "s1", "url": url}]}),
+                                    encoding="utf-8")
+
+
+def test_save_source_refuses_a_story_another_puzzle_uses(ctx):
+    _case_using(ctx.cases_dir, "daily-2026-11-01", fx.PRESS_URL, "approved")
+    fetch_article_impl(ctx, fx.PRESS_URL)
+    assert save_source_impl(ctx, fx.PRESS_URL, fx.BPU_20).startswith("Rejected: another puzzle already uses")
+
+
+def test_rejected_puzzles_and_the_runs_own_folder_do_not_block_a_story(ctx):
+    _case_using(ctx.cases_dir, "daily-2026-11-01", fx.PRESS_URL, "rejected")
+    _case_using(ctx.cases_dir, ctx.case_id, fx.PRESS_URL, "draft")
+    fetch_article_impl(ctx, fx.PRESS_URL)
+    assert save_source_impl(ctx, fx.PRESS_URL, fx.BPU_20).startswith("Saved s1")

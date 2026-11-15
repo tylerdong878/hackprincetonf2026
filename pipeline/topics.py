@@ -119,13 +119,18 @@ def story_urls(hints: dict[str, list[str]]) -> list[str]:
     return [m.group(0) for s in hints.get("known_stories") or [] for m in re.finditer(r"https?://\S+", s)]
 
 
-def used_story_urls(cases_dir: Path | None = None, limit: int = 40) -> list[str]:
-    """Source URLs already used by approved or pending puzzles, newest first, so a new build picks fresh stories."""
+def used_story_urls(cases_dir: Path | None = None, limit: int | None = 40, exclude: str | None = None) -> list[str]:
+    """Source URLs already used by approved or pending puzzles, newest first, so a new build picks fresh stories.
+
+    `exclude` skips one case folder (the build's own); `limit=None` returns every URL.
+    """
     from pipeline.config import DATA_DIR
 
     root = cases_dir or (DATA_DIR / "cases")
     seen: dict[str, float] = {}
     for f in root.glob("*/sources.json"):
+        if exclude and f.parent.name == exclude:
+            continue
         try:
             meta = json.loads((f.parent / "meta.json").read_text(encoding="utf-8"))
             if meta.get("status") == "rejected":
@@ -137,7 +142,8 @@ def used_story_urls(cases_dir: Path | None = None, limit: int = 40) -> list[str]
             url = (s or {}).get("url")
             if url:
                 seen[url] = max(seen.get(url, 0.0), f.stat().st_mtime)
-    return [u for u, _ in sorted(seen.items(), key=lambda kv: -kv[1])][:limit]
+    ordered = [u for u, _ in sorted(seen.items(), key=lambda kv: -kv[1])]
+    return ordered if limit is None else ordered[:limit]
 
 
 def hints_text(topic: str, used: list[str] | None = None) -> str:
