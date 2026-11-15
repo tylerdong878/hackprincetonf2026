@@ -136,7 +136,7 @@ export function FeedCard({
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
             <span
               className="stamp stamp-thunk text-[min(3rem,11cqw)] mix-blend-multiply"
-              style={{ color: CARD_DOCTORED, borderWidth: 5, opacity: 0.88, ['--stamp-rot' as string]: '-14deg', ['--stamp-rot-from' as string]: '-24deg' }}
+              style={{ color: CARD_DOCTORED, borderWidth: 5, opacity: 0.72, ['--stamp-rot' as string]: '-14deg', ['--stamp-rot-from' as string]: '-24deg' }}
             >
               Doctored
             </span>

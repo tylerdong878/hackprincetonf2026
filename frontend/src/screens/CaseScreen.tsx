@@ -58,7 +58,7 @@ function CaseTopBar({
     >
       <div className="min-w-0 leading-tight">
         <p className="caps truncate text-[11.5px] font-semibold tracking-[0.08em] text-muted">Case {caseNo(game.number)}</p>
-        <p className="truncate text-[17px] italic">{game.title}</p>
+        <p className="truncate text-[17px] italic sm:text-[19px]">{game.title}</p>
       </div>
     </BarHeader>
   )

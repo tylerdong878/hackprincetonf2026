@@ -36,7 +36,9 @@ export function CaseFiles() {
               case in the Workshop replay.
             </p>
           </div>
-          <ConMascot size={200} shape="circle" className="hidden md:inline-block" />
+          <div className="hidden shrink-0 md:block">
+            <ConMascot size={200} shape="circle" />
+          </div>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-4">

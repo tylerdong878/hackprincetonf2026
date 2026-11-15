@@ -1,9 +1,24 @@
 import { SiteHeader } from '../components/Header'
+import { PostChart } from '../components/PostChart'
 import { IconArrow, IconArrowLeft, IconBook, IconLens, IconWarn } from '../components/Icon'
 import { TrickIcon } from '../components/TrickPicker'
 import { LinkButton, SectionLabel } from '../components/ui'
 import { CASEBOOK } from '../lib/content'
 import { href } from '../lib/router'
+import type { ChartSpec } from '../lib/types'
+
+/** The worked example's own numbers, drawn the way the post drew them (Figma "Trick page"). */
+const EXAMPLE_CHART: Record<string, ChartSpec> = {
+  'misleading-chart': {
+    type: 'bar',
+    unit: '¢/kWh',
+    y_min: 19,
+    points: [
+      { label: 'Apr 2025', value: 19.91 },
+      { label: 'Jul 2026', value: 25.19 },
+    ],
+  },
+}
 
 /** The Casebook copy carries an emoji in front of each tool line; the UI shows icons, so drop it here. */
 const noEmoji = (s: string) => s.replace(/^[\p{Extended_Pictographic}️‍]+\s*/u, '')
@@ -14,7 +29,7 @@ export function Casebook({ trickId }: { trickId?: string }) {
   return (
     <>
       <SiteHeader active="casebook" />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16 sm:pt-10">
+      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
         {page ? (
           <article className="mx-auto max-w-4xl">
             <a
@@ -34,7 +49,14 @@ export function Casebook({ trickId }: { trickId?: string }) {
             <div className="mt-10 grid gap-8">
               <section className="panel p-6">
                 <SectionLabel className="!text-ink">Worked example (real material)</SectionLabel>
-                <p className="mt-3 max-w-2xl text-[17px] leading-relaxed">{page.example}</p>
+                <div className={EXAMPLE_CHART[page.id] ? 'mt-3 grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' : 'mt-3'}>
+                  <p className="max-w-2xl text-[17px] leading-relaxed">{page.example}</p>
+                  {EXAMPLE_CHART[page.id] && (
+                    <div className="border-[1.5px] border-ink bg-white p-3 text-[#1B1B1F]" aria-hidden="true">
+                      <PostChart spec={EXAMPLE_CHART[page.id]} height={220} showTitle={false} marks={{ floor: true, tone: 'trick' }} />
+                    </div>
+                  )}
+                </div>
               </section>
               <section className="relative border-l-[6px] border-press py-2 pr-10 pl-6">
                 <IconWarn size={24} className="absolute top-2 right-2 text-press" />

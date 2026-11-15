@@ -135,12 +135,14 @@ function DossierBody({ profile, cases }: { profile: Profile; cases: CaseSummary[
             const counts = profile.tricks?.[id]
             return (
               <div key={id} className="panel flex flex-col p-4">
-                <div className="mb-4 flex items-center justify-between gap-2">
+                <div className="mb-4 flex items-start justify-between gap-2">
                   <a href={`#/casebook/${id}`} className="flex min-w-0 items-center gap-2 hover:underline hover:decoration-2 hover:underline-offset-4">
                     <TrickIcon trick={id} size={20} className="text-press" />
-                    <span className="caps truncate text-[19px] font-semibold tracking-[0.01em]">{trickLabel(id)}</span>
+                    <span className="font-head text-[21px] leading-tight font-semibold">{trickLabel(id)}</span>
                   </a>
-                  <MasteryPips value={t.mastery} />
+                  <span className="mt-1.5">
+                    <MasteryPips value={t.mastery} />
+                  </span>
                 </div>
                 <div className="flex flex-col gap-3">
                   <RateBar label="Fooled rate" rate={t.miss_rate} color="var(--press)" />
@@ -256,7 +258,7 @@ export function Dossier() {
   return (
     <>
       <SiteHeader active="dossier" />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16 sm:pt-10">
+      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
           <div className="min-w-0">
             {fileNo && (

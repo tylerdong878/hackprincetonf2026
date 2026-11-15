@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { FeedCard } from '../components/PostCard'
 import { DiffView } from '../components/Reveal'
 import { SiteHeader } from '../components/Header'
-import { IconArrowLeft, IconCheck, IconLock, IconX } from '../components/Icon'
+import { IconArrowLeft, IconCheck, IconGear, IconLock, IconX } from '../components/Icon'
 import { Workshop } from '../components/Workshop'
 import { Button, Chip, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
 import { api, ApiError, getEditorToken, setEditorToken } from '../lib/api'
@@ -22,6 +22,18 @@ const STATUS: Record<string, { label: string; color: string }> = {
 export function StatusBadge({ status }: { status?: string | null }) {
   const s = STATUS[status ?? ''] ?? { label: status ?? 'unknown', color: 'var(--muted)' }
   return <Chip color={s.color}>{s.label}</Chip>
+}
+
+/** Section title: Bodoni over the thin double rule (same as "All approved cases" on Case Files). */
+function DeskSection({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <div className="mb-5">
+      <h2 id={id} className="font-display text-3xl font-bold">
+        {children}
+      </h2>
+      <div className="double-rule-thin mt-1.5" aria-hidden="true" />
+    </div>
+  )
 }
 
 const metaOf = (item: QueueItem): CaseMeta => ({ ...item, ...(item.meta ?? {}) }) as CaseMeta
@@ -91,10 +103,10 @@ export function EditorQueue() {
   return (
     <>
       <SiteHeader active="editor" />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16 sm:pt-10">
+      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-8 pb-16 sm:px-6 sm:pt-10">
         <h1 className="caps text-5xl leading-[0.95] font-bold sm:text-7xl">Editor’s Desk</h1>
-        <div className="double-rule mt-2 max-w-3xl" aria-hidden="true" />
-        <p className="mt-3 max-w-3xl text-[17px] italic">
+        <div className="double-rule mt-2 max-w-[860px]" aria-hidden="true" />
+        <p className="mt-3 max-w-[860px] text-[17px] leading-relaxed italic">
           A human puzzle editor approves every puzzle before it goes live. Open one to play-test it, check the answer key, the diffs
           and the blind-solver log, then approve or reject it.
         </p>
@@ -110,15 +122,15 @@ export function EditorQueue() {
               <p className="border-[1.5px] border-dashed border-[#B9AE99] p-6 text-center text-[15px] text-muted">No cases on file yet.</p>
             ) : (
               <div className="overflow-x-auto border-2 border-ink bg-sheet shadow-[var(--hard)] thin-scroll">
-                <table className="w-full min-w-[720px] border-collapse text-[15px]">
+                <table className="w-full min-w-[900px] border-collapse text-[15px]">
                   <thead className="caps bg-ink text-left text-[12.5px] tracking-[0.08em] text-sheet">
                     <tr>
-                      <th scope="col" className="px-4 py-3 font-semibold">Case</th>
-                      <th scope="col" className="px-4 py-3 font-semibold">Topic</th>
-                      <th scope="col" className="px-4 py-3 font-semibold">Date</th>
-                      <th scope="col" className="px-4 py-3 font-semibold">Tricks used</th>
-                      <th scope="col" className="px-4 py-3 font-semibold">Blind solver</th>
-                      <th scope="col" className="px-4 py-3 font-semibold">Status</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Case</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Topic</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Date</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Tricks used</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Blind solver</th>
+                      <th scope="col" className="px-4 py-3 font-semibold whitespace-nowrap">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -126,9 +138,9 @@ export function EditorQueue() {
                       const m = metaOf(item)
                       const solver = item.solver
                       return (
-                        <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet hover:bg-[#F4ECDB]">
+                        <tr key={item.id} className="border-t border-[#CFC6B4] bg-sheet even:bg-[#F4ECDB] hover:bg-[#EFE5CF]">
                           <td className="px-4 py-3">
-                            <a href={href(`/editor/${item.id}`)} className="font-bold underline-offset-4 hover:underline hover:decoration-2">
+                            <a href={href(`/editor/${item.id}`)} className="text-[16px] font-bold underline-offset-4 hover:underline hover:decoration-2">
                               {item.number != null && <span className="num mr-1.5 text-[13px] font-semibold text-muted">{caseNo(item.number)}</span>}
                               {item.title ?? item.id}
                             </a>
@@ -145,7 +157,7 @@ export function EditorQueue() {
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-[13px]">
+                          <td className="min-w-[160px] px-4 py-3 text-[13.5px]">
                             {solver?.pass != null ? (
                               <span
                                 style={{ color: solver.pass ? 'var(--real)' : 'var(--doctored)' }}
@@ -166,7 +178,7 @@ export function EditorQueue() {
                             )}
                             {item.has_pipeline_log && <span className="block font-bold text-press">agent run logged</span>}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <StatusBadge status={m.status} />
                           </td>
                         </tr>
@@ -237,13 +249,22 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
 
   return (
     <>
-      <div className="flex flex-wrap items-start gap-3">
+      <div className="relative pt-8">
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-6 flex h-9 w-56 items-center justify-center border-[1.5px] border-b-0 border-[#C9AE73] bg-manila text-[15px] italic sm:left-10"
+          style={{ clipPath: 'polygon(9% 0, 91% 0, 100% 100%, 0 100%)' }}
+        >
+          Case file
+        </div>
+        <div className="border-[1.5px] border-[#C9AE73] bg-manila p-3 sm:p-6">
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-2 border-ink bg-sheet p-5 shadow-[var(--hard)] sm:p-7">
         <div className="min-w-0 flex-1">
-          <p className="dateline">
+          <p className="caps text-[12px] font-semibold tracking-[0.08em] text-ink">
             Case {caseNo(game.number)} · {game.id}
           </p>
-          <h1 className="mt-1 font-display text-4xl leading-tight font-bold">{game.title}</h1>
-          <div className="double-rule-thin mt-2 max-w-2xl" aria-hidden="true" />
+          <div className="double-rule-thin mt-1.5" aria-hidden="true" />
+          <h1 className="mt-3 font-display text-4xl leading-[1.05] font-bold sm:text-5xl">{game.title}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[15px] text-muted">
             <StatusBadge status={meta.status} />
             <span>{meta.origin === 'pipeline' ? 'Built by the pipeline' : meta.origin === 'seed' ? 'Hand-built by the team' : meta.origin}</span>
@@ -257,8 +278,9 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
           )}
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button variant="con" size="sm" onClick={() => setWorkshop(true)}>
-            Agent run ▸
+          <Button onClick={() => setWorkshop(true)}>
+            <IconGear size={17} />
+            Agent run
           </Button>
           <Button variant="real" onClick={() => act('approve')} disabled={busy != null || meta.status === 'approved'}>
             {busy !== 'approve' && <IconCheck size={18} strokeWidth={2.6} />}
@@ -268,6 +290,8 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
             <IconX size={18} strokeWidth={2.6} />
             Reject…
           </Button>
+        </div>
+      </div>
         </div>
       </div>
 
@@ -303,11 +327,9 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
       )}
       {err != null && <ErrorState error={err} className="mt-4" title="That didn’t go through." />}
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-2">
+      <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <section aria-labelledby="preview-h" className="min-w-0">
-          <SectionLabel className="mb-3">
-            <span id="preview-h">Player preview</span>
-          </SectionLabel>
+          <DeskSection id="preview-h">Player preview</DeskSection>
           <div className="con-bubble mb-5 px-4 py-3">
             <p className="text-[17px] leading-snug">{game.briefing}</p>
             <p className="mt-2 text-[12.5px] text-[#C9C2B5] not-italic">
@@ -325,9 +347,7 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
         </section>
 
         <section aria-labelledby="key-h" className="min-w-0">
-          <SectionLabel className="mb-3">
-            <span id="key-h">Answer key</span>
-          </SectionLabel>
+          <DeskSection id="key-h">Answer key</DeskSection>
           <div className="flex flex-col gap-4">
             {data.answer_key.clean_case && (
               <div className="border-2 border-press bg-sheet p-4 text-[15px] shadow-[var(--hard)]">
@@ -428,7 +448,11 @@ function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) 
               {data.solver_log ? (
                 <pre className="max-h-96 overflow-auto border-[1.5px] border-[#CFC6B4] bg-white p-3 font-code text-xs leading-relaxed whitespace-pre-wrap thin-scroll">{data.solver_log}</pre>
               ) : (
-                <p className="text-[15px] text-muted">No solver log: this case was hand-built by the team, not run through the pipeline.</p>
+                <p className="text-[15px] text-muted">
+                  {meta.origin === 'pipeline'
+                    ? 'No solver log: the blind solver never ran on this build, so its fairness was not checked.'
+                    : 'No solver log: this case was hand-built by the team, not run through the pipeline.'}
+                </p>
               )}
             </section>
           </div>
@@ -446,8 +470,8 @@ export function EditorCaseScreen({ caseId }: { caseId: string }) {
   return (
     <>
       <SiteHeader active="editor" />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-6 pb-16">
-        <LinkButton to="/editor" size="sm" variant="ghost" className="mb-5 -ml-3">
+      <main className="mx-auto w-full max-w-[1368px] flex-1 px-4 pt-6 pb-16 sm:px-6">
+        <LinkButton to="/editor" size="sm" variant="ghost" className="mb-6 -ml-3">
           <IconArrowLeft size={16} />
           Puzzle queue
         </LinkButton>

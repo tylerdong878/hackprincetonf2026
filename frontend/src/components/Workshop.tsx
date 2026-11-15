@@ -262,7 +262,7 @@ export function Workshop({
               The Con’s Workshop
             </h2>
             {load.status === 'ok' && (
-              <span className="ml-1 hidden shrink-0 items-center gap-1 text-[13px] text-muted italic sm:inline-flex">
+              <span className={`ml-1 hidden shrink-0 items-center gap-1 text-[13px] text-muted italic ${full ? 'sm:inline-flex' : ''}`}>
                 <IconReplay size={13} /> replay of run {mmss(end)}
               </span>
             )}
