@@ -21,7 +21,7 @@ import { MiniDiff, OutcomeBadge } from '../components/Reveal'
 import { TrickPicker } from '../components/TrickPicker'
 import { btnClass, Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, BACKEND_START_CMD } from '../lib/api'
-import { CON_QUIPS, pick } from '../lib/content'
+import { CON_LINES, CON_QUIPS, pick } from '../lib/content'
 import { outcomeStyle, shortDate, trickLabel } from '../lib/format'
 import { useAsync, useElementHeight, useReducedMotion, useTween } from '../lib/hooks'
 import { withPlayer } from '../lib/player'
@@ -123,6 +123,33 @@ export function ProgressDots({ posts, cards, current }: { posts: Post[]; cards: 
                 {rec?.skipped ? '·' : i + 1}
               </span>
             )}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/** Laptop: one tab per card with its status (Figma "Case — Investigation" jump strip). Phones use ProgressDots. */
+function CardTabs({ posts, cards, current, className = '' }: { posts: Post[]; cards: Record<string, CardRecord>; current: number; className?: string }) {
+  return (
+    <ol className={`grid-cols-5 gap-2 ${className}`} aria-label="Today’s cards">
+      {posts.map((p, i) => {
+        const rec = cards[p.id]
+        const outcome = rec?.reveal?.result.outcome
+        const on = i === current
+        const word = outcome ? outcomeStyle(outcome).word : rec?.skipped ? 'answered' : on ? 'inspecting' : 'not played'
+        const bad = outcome === 'fooled' || outcome === 'false_alarm'
+        return (
+          <li
+            key={p.id}
+            aria-current={on ? 'step' : undefined}
+            className={`caps flex flex-col items-center border-2 px-2 py-1.5 leading-tight ${
+              on ? 'border-ink bg-ink text-sheet' : outcome ? 'border-ink bg-sheet text-ink' : 'border-[#CFC6B4] bg-sheet text-ink'
+            }`}
+          >
+            <span className="text-[15px] font-bold">Card {i + 1}</span>
+            <span className={`text-[11px] font-semibold tracking-[0.06em] ${on ? 'text-press-soft' : bad ? 'text-press' : 'text-muted'}`}>{word}</span>
           </li>
         )
       })}
@@ -425,6 +452,7 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   const [finishing, setFinishing] = useState(false)
   const [finishErr, setFinishErr] = useState<unknown>(null)
   const nextBtn = useRef<HTMLButtonElement>(null)
+  const nextBtnDesk = useRef<HTMLButtonElement>(null)
   // The sticky action bar changes height (Next / Real+Doctored / trick picker): pad the page by exactly that much.
   const [barRef, barH] = useElementHeight<HTMLDivElement>()
 
@@ -454,8 +482,14 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   }, [idx])
 
   useEffect(() => {
-    if (answered && !flip) nextBtn.current?.focus({ preventScroll: true })
-  }, [answered, flip])
+    if (!answered || flip) return
+    const desk = nextBtnDesk.current
+    if (desk && desk.offsetParent !== null) {
+      // Laptop: the button sits under the revealed card; bring it above the Con dock.
+      desk.focus({ preventScroll: true })
+      desk.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' })
+    } else nextBtn.current?.focus({ preventScroll: true })
+  }, [answered, flip, reduced])
 
   const answer = useCallback(
     async (doctored: boolean, trick: string | null) => {
@@ -574,117 +608,203 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
 
   const flipClass = flip === 'out' ? 'flip-out' : flip === 'in' ? 'flip-in' : ''
 
+  const answeredCount = posts.filter((p) => prog.cards[p.id]).length
+  const anyOpened = TOOLS.some((t) => opened[t.id])
+  // The Con's line on the laptop dock follows what you're doing (Figma "Case — Investigation").
+  const conLine = answered
+    ? isLast
+      ? CON_LINES.submitting[0]
+      : CON_LINES.idle[idx % CON_LINES.idle.length]
+    : picker
+      ? CON_LINES.markDoctored[0]
+      : prog.cluesLeft <= 0
+        ? CON_LINES.outOfClues[0]
+        : anyOpened
+          ? CON_LINES.evidence[idx % CON_LINES.evidence.length]
+          : CON_LINES.idle[idx % CON_LINES.idle.length]
+
+  const nextLabel = finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'
+
   return (
     <main
-      className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3 lg:grid lg:max-w-[1160px] lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-10 lg:px-6 lg:pt-6"
+      className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 pt-3 lg:grid lg:max-w-[1360px] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-8 lg:px-6 lg:pt-6"
       style={{ paddingBottom: Math.max(barH, 96) + 20 }}
     >
-      {/* Laptop: the card on the left, the Evidence Kit beside it (Figma "Case — Investigation"). */}
-      <div className="min-w-0">
-        <ProgressDots posts={posts} cards={prog.cards} current={idx} />
-        <p className="dateline mt-2 text-center">
-          Card {idx + 1} of {posts.length} · {DAILY_RANGE}
-        </p>
-
-        {idx === 0 && !answered && !tipSeen && (
-          <aside
-            className="mt-3 border-2 border-ink bg-sheet px-4 py-3 text-[14.5px] leading-relaxed shadow-[var(--hard)]"
-            aria-label="How to spot the Con"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <p>
-                <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
-                big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
-                short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
-              </p>
-              <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
-                ×
-              </button>
-            </div>
-          </aside>
-        )}
-
-        <div key={post.id} className="card-in mt-4">
-          <div className={flipClass} style={{ transformOrigin: 'center' }}>
-            {answered ? (
-              <CardBack post={post} rec={rec} caseNumber={game.number} />
-            ) : (
-              <div className="flex flex-col gap-3">
-                <FeedCard post={post} caseNumber={game.number} size="daily" />
-
-                {/* Check: one evidence view, inline (phones; laptops use the Evidence Kit panel) */}
-                <div className="flex flex-col gap-3 lg:hidden">
-                  <div className="mt-1 flex flex-wrap items-center gap-3">
-                    <button
-                      type="button"
-                      aria-expanded={checkOpen}
-                      onClick={() => setCheckOpen((o) => !o)}
-                      className={`press inline-flex items-center gap-2.5 border-2 border-ink px-3.5 py-2 shadow-[var(--hard)] ${
-                        checkOpen ? 'bg-sheet text-ink' : 'bg-ink text-sheet hover:bg-[#2a2a2a]'
-                      }`}
-                    >
-                      <IconLens size={18} />
-                      <span className="caps text-[16px] font-bold">Check</span>
-                      <span className={`num caps text-[12.5px] font-semibold ${checkOpen ? 'text-press' : 'text-press-soft'}`}>{prog.cluesLeft} left</span>
-                    </button>
-                    <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
-                  </div>
-                  {checkOpen && (
-                    <div className="rise-in flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
-                      {TOOLS.map((t) => {
-                        const has = post.tools?.includes(t.id)
-                        const isOpen = !!opened[t.id]
-                        const out = prog.cluesLeft <= 0 && !isOpen
-                        return (
-                          <ToolRow
-                            key={t.id}
-                            icon={t.icon}
-                            label={t.label}
-                            sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
-                            state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
-                            busy={busyTool === t.id}
-                            disabled={!has || out || busyTool != null}
-                            onClick={() => check(t.id)}
-                            title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
-                            compact
-                          />
-                        )
-                      })}
-                    </div>
-                  )}
-                  {notice && (
-                    <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
-                      {notice}
-                    </p>
-                  )}
-                  {TOOLS.filter((t) => opened[t.id]).map((t) => (
-                    <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
-                  ))}
-                </div>
-                {err != null && <ErrorState error={err} onRetry={() => setErr(null)} title="That answer didn’t go through." />}
-              </div>
-            )}
+      {/* Laptop (Figma "Case — Investigation"): tabs, the card and its answer buttons on the left, the Evidence Kit
+          on the right, the Con on an ink dock. Phones: dots, the card, inline Check and the sticky bar. */}
+      <section className="min-w-0" aria-label="Today’s card">
+        <div className="lg:mx-auto lg:max-w-[680px]">
+          <div className="lg:hidden">
+            <ProgressDots posts={posts} cards={prog.cards} current={idx} />
+            <p className="dateline mt-2 text-center">
+              Card {idx + 1} of {posts.length} · {DAILY_RANGE}
+            </p>
           </div>
-        </div>
-        {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
-      </div>
+          <CardTabs posts={posts} cards={prog.cards} current={idx} className="hidden lg:grid" />
+          <p className="mt-3 hidden border-[1.5px] border-dashed border-press px-3 py-2.5 text-center text-[17px] text-press italic lg:block">
+            {DAILY_RANGE}. Maybe none.
+          </p>
 
-      <aside className="hidden lg:sticky lg:top-[96px] lg:flex lg:flex-col lg:gap-4" aria-label="Evidence Kit">
-        <section className="border-2 border-ink bg-sheet p-4 shadow-[var(--hard)]">
+          {idx === 0 && !answered && !tipSeen && (
+            <aside
+              className="mt-3 border-2 border-ink bg-sheet px-4 py-3 text-[14.5px] leading-relaxed shadow-[var(--hard)]"
+              aria-label="How to spot the Con"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p>
+                  <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
+                  big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
+                  short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
+                </p>
+                <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
+                  ×
+                </button>
+              </div>
+            </aside>
+          )}
+
+          <div key={post.id} className="card-in mt-4">
+            <div className={flipClass} style={{ transformOrigin: 'center' }}>
+              {answered ? (
+                <CardBack post={post} rec={rec} caseNumber={game.number} />
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <FeedCard post={post} caseNumber={game.number} size="daily" />
+
+                  {/* Check: one evidence view, inline (phones; laptops use the Evidence Kit panel) */}
+                  <div className="flex flex-col gap-3 lg:hidden">
+                    <div className="mt-1 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        aria-expanded={checkOpen}
+                        onClick={() => setCheckOpen((o) => !o)}
+                        className={`press inline-flex items-center gap-2.5 border-2 border-ink px-3.5 py-2 shadow-[var(--hard)] ${
+                          checkOpen ? 'bg-sheet text-ink' : 'bg-ink text-sheet hover:bg-[#2a2a2a]'
+                        }`}
+                      >
+                        <IconLens size={18} />
+                        <span className="caps text-[16px] font-bold">Check</span>
+                        <span className={`num caps text-[12.5px] font-semibold ${checkOpen ? 'text-press' : 'text-press-soft'}`}>{prog.cluesLeft} left</span>
+                      </button>
+                      <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
+                    </div>
+                    {checkOpen && (
+                      <div className="rise-in flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
+                        {TOOLS.map((t) => {
+                          const has = post.tools?.includes(t.id)
+                          const isOpen = !!opened[t.id]
+                          const out = prog.cluesLeft <= 0 && !isOpen
+                          return (
+                            <ToolRow
+                              key={t.id}
+                              icon={t.icon}
+                              label={t.label}
+                              sub={!has ? 'Nothing to check here' : out ? 'Out of magnifiers today' : t.blurb}
+                              state={isOpen ? 'open' : !has ? 'na' : out ? 'out' : 'ready'}
+                              busy={busyTool === t.id}
+                              disabled={!has || out || busyTool != null}
+                              onClick={() => check(t.id)}
+                              title={!has ? 'Nothing to check with this tool here' : out ? 'Out of magnifiers today' : isOpen ? 'Already open (free)' : 'Costs one magnifier'}
+                              compact
+                            />
+                          )
+                        })}
+                      </div>
+                    )}
+                    {notice && (
+                      <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+                        {notice}
+                      </p>
+                    )}
+                    {TOOLS.filter((t) => opened[t.id]).map((t) => (
+                      <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
+                    ))}
+                  </div>
+                  {err != null && <ErrorState error={err} onRetry={() => setErr(null)} title="That answer didn’t go through." />}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Laptop: answer right under the card (phones use the sticky bar below) */}
+          <div className="mt-5 hidden lg:block">
+            {answered ? (
+              <>
+                {finishErr != null && (
+                  <div className="mb-2">
+                    <ErrorState error={finishErr} onRetry={finish} title="Couldn’t close today’s Grain." />
+                  </div>
+                )}
+                <button
+                  ref={nextBtnDesk}
+                  type="button"
+                  onClick={next}
+                  disabled={finishing}
+                  className={`${btnClass('primary', 'lg')} w-full scroll-mb-[132px] py-4 text-xl`}
+                >
+                  {!finishing && <IconArrow size={22} />}
+                  {nextLabel}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => answer(false, null)}
+                    className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-3.5 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
+                  >
+                    <IconCheck size={24} strokeWidth={2.6} /> Real
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    aria-pressed={picker}
+                    onClick={() => setPicker((o) => !o)}
+                    className={`press caps flex items-center justify-center gap-2 border-2 border-press py-3.5 text-[22px] font-bold shadow-[var(--hard)] disabled:opacity-60 ${
+                      picker ? 'bg-press text-white' : 'bg-sheet text-press hover:bg-press/[0.06]'
+                    }`}
+                  >
+                    <IconX size={24} strokeWidth={2.6} /> Doctored
+                  </button>
+                </div>
+                {picker && (
+                  <TrickPicker
+                    options={choices}
+                    onPick={(t) => answer(true, t)}
+                    disabled={pending}
+                    columns={2}
+                    notSureLabel="Just doctored, not sure how"
+                    className="rise-in mt-4"
+                  />
+                )}
+              </>
+            )}
+            <p className="dateline mt-3 text-center !text-[11px]" aria-live="polite">
+              {pending ? 'Checking with the case file…' : 'Keys: R real · D doctored · 1–4 trick · C check · Enter next'}
+            </p>
+          </div>
+          {game.notice && <p className="dateline mt-5 text-center normal-case">{game.notice}</p>}
+        </div>
+      </section>
+
+      <aside className="hidden min-w-0 border-l border-ink pl-6 lg:block" aria-label="Evidence Kit">
+        <div className="panel thin-scroll sticky top-[88px] flex max-h-[calc(100vh-88px-112px)] flex-col gap-4 overflow-y-auto p-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-head text-[28px] leading-none font-bold">Evidence Kit</h2>
+            <h2 className="font-head text-[30px] leading-none font-bold">Evidence Kit</h2>
             <span className="flex items-center gap-2">
               <Magnifiers left={prog.cluesLeft} total={game.clue_budget} />
               <span className="num caps text-[12.5px] font-semibold text-press">{prog.cluesLeft} left</span>
             </span>
           </div>
-          <p className="mt-2 text-[14px] leading-snug text-muted">
-            {answered
-              ? 'This card is answered. Anything you opened stays here.'
-              : `Each tool costs one magnifier (${game.clue_budget} a day). Reopening one is free.`}
+          <p className="caps -mt-1 text-[12.5px] font-semibold tracking-[0.06em] text-press">
+            Card {idx + 1} {answered ? '· answered' : 'selected'}
           </p>
-          {!answered && (
-            <div className="mt-3 flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
+          {answered ? (
+            <p className="text-[14px] leading-snug text-muted">This card is answered. Anything you opened stays below.</p>
+          ) : (
+            <div className="flex flex-col gap-2.5" role="group" aria-label="Pick one evidence tool">
               {TOOLS.map((t) => {
                 const has = post.tools?.includes(t.id)
                 const isOpen = !!opened[t.id]
@@ -706,99 +826,95 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
             </div>
           )}
           {notice && (
-            <p role="alert" className="mt-3 border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
+            <p role="alert" className="border-2 border-ochre bg-[#F3E3C2] px-3 py-2 text-sm">
               {notice}
             </p>
           )}
-        </section>
-        {TOOLS.filter((t) => opened[t.id]).map((t) => (
-          <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
-        ))}
+          {TOOLS.filter((t) => opened[t.id]).map((t) => (
+            <EvidenceInline key={t.id} tool={t.id} ev={opened[t.id]!} />
+          ))}
+          <p className="text-[13px] leading-snug text-muted italic">
+            Opened evidence stays here for this card, free to re-read. Checks you don’t use earn a bonus at the end.
+          </p>
+        </div>
       </aside>
 
-      {/* The trick picker opens as a bottom sheet over the card. */}
+      {/* Phones: the trick picker opens as a bottom sheet over the card. */}
       {picker && !answered && (
-        <button type="button" aria-label="Close the trick picker" className="fade-in fixed inset-0 z-10 bg-ink/45" onClick={() => setPicker(false)} />
+        <button type="button" aria-label="Close the trick picker" className="fade-in fixed inset-0 z-10 bg-ink/45 lg:hidden" onClick={() => setPicker(false)} />
       )}
 
-      {/* Sticky action bar */}
+      {/* Phones: sticky action bar */}
       <div
         ref={barRef}
-        className={`fixed inset-x-0 bottom-0 z-20 bg-sheet px-4 pb-[max(12px,env(safe-area-inset-bottom))] lg:px-6 ${
+        className={`fixed inset-x-0 bottom-0 z-20 bg-sheet px-4 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden ${
           picker && !answered ? 'border-t-[3px] border-press pt-2' : 'border-t-[3px] border-ink pt-3'
         }`}
       >
-        {/* Laptop: the buttons sit under the card column; the right cell lines up with the Evidence Kit. */}
-        <div className="mx-auto max-w-lg lg:grid lg:max-w-[1112px] lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:gap-x-10">
-        <div className="min-w-0">
-            {answered ? (
-              <>
-                {finishErr != null && (
-                  <div className="mb-2">
-                    <ErrorState error={finishErr} onRetry={finish} title="Couldn’t close today’s Grain." />
-                  </div>
-                )}
-                <button
-                  ref={nextBtn}
-                  type="button"
-                  onClick={next}
-                  disabled={finishing}
-                  className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
-                >
-                  {!finishing && <IconArrow size={22} />}
-                  {finishing ? 'Tallying…' : isLast ? 'See your results' : 'Next card'}
-                </button>
-              </>
-            ) : picker ? (
-              <div className="sheet-up">
-                <div className="flex justify-center pb-2" aria-hidden="true">
-                  <span className="h-1.5 w-12 bg-[#B9AE99]" />
+        <div className="mx-auto max-w-lg">
+          {answered ? (
+            <>
+              {finishErr != null && (
+                <div className="mb-2">
+                  <ErrorState error={finishErr} onRetry={finish} title="Couldn’t close today’s Grain." />
                 </div>
-                <button
-                  type="button"
-                  className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline"
-                  onClick={() => setPicker(false)}
-                >
-                  <IconArrowLeft size={15} /> Back
-                </button>
-                <TrickPicker
-                  options={choices}
-                  onPick={(t) => answer(true, t)}
-                  disabled={pending}
-                  notSureLabel="Just doctored, not sure how"
-                  className="pb-2"
-                />
+              )}
+              <button ref={nextBtn} type="button" onClick={next} disabled={finishing} className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}>
+                {!finishing && <IconArrow size={22} />}
+                {nextLabel}
+              </button>
+            </>
+          ) : picker ? (
+            <div className="sheet-up">
+              <div className="flex justify-center pb-2" aria-hidden="true">
+                <span className="h-1.5 w-12 bg-[#B9AE99]" />
               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => answer(false, null)}
-                  className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-4 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
-                >
-                  <IconCheck size={24} strokeWidth={2.6} /> Real
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => setPicker(true)}
-                  className="press caps flex items-center justify-center gap-2 border-2 border-press bg-sheet py-4 text-[22px] font-bold text-press shadow-[var(--hard)] hover:bg-press/[0.06] disabled:opacity-60"
-                >
-                  <IconX size={24} strokeWidth={2.6} /> Doctored
-                </button>
-                <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
-                  {pending ? 'Checking with the case file…' : <span className="hidden md:inline lg:hidden">Keys: R real · D doctored · C check</span>}
-                </p>
-              </div>
-            )}
+              <button type="button" className="caps mb-2 inline-flex items-center gap-1 text-[13px] font-bold text-ink hover:underline" onClick={() => setPicker(false)}>
+                <IconArrowLeft size={15} /> Back
+              </button>
+              <TrickPicker options={choices} onPick={(t) => answer(true, t)} disabled={pending} notSureLabel="Just doctored, not sure how" className="pb-2" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => answer(false, null)}
+                className="press caps flex items-center justify-center gap-2 border-2 border-ink bg-sheet py-4 text-[22px] font-bold text-ink shadow-[var(--hard)] hover:bg-surface-2 disabled:opacity-60"
+              >
+                <IconCheck size={24} strokeWidth={2.6} /> Real
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => setPicker(true)}
+                className="press caps flex items-center justify-center gap-2 border-2 border-press bg-sheet py-4 text-[22px] font-bold text-press shadow-[var(--hard)] hover:bg-press/[0.06] disabled:opacity-60"
+              >
+                <IconX size={24} strokeWidth={2.6} /> Doctored
+              </button>
+              <p className="dateline col-span-2 -mt-0.5 text-center !text-[11px]" aria-live="polite">
+                {pending ? 'Checking with the case file…' : <span className="hidden md:inline">Keys: R real · D doctored · C check</span>}
+              </p>
+            </div>
+          )}
         </div>
-        <div className="hidden lg:block" aria-hidden="true">
-          <p className="dateline !text-ink">
-            Card {idx + 1} of {posts.length} · {DAILY_RANGE}
-          </p>
-          <p className="dateline mt-1 !text-[11px]">Keys: R real · D doctored · C check · Enter next</p>
-        </div>
+      </div>
+
+      {/* Laptop dock: the Con on an ink bar (Figma) */}
+      <div className="fixed inset-x-0 bottom-0 z-20 hidden border-t-4 border-press bg-ink text-sheet lg:block">
+        <div className="mx-auto flex max-w-[1360px] items-center gap-4 px-6 py-3">
+          <ConMascot size={56} className="shrink-0 border-sheet" />
+          <ConBubble key={conLine} text={conLine} size="md" speed={18} className="min-w-0 flex-1 !border-l-0 !px-0 !shadow-none md:max-w-2xl" />
+          <div className="ml-auto flex shrink-0 flex-col items-start gap-1.5" aria-live="polite">
+            <p className="caps text-[12.5px] font-semibold tracking-[0.06em]">
+              <span className="num">{answeredCount}</span> of {posts.length} answered
+            </p>
+            <span className="flex gap-1" aria-hidden="true">
+              {posts.map((p) => (
+                <span key={p.id} className={`h-2 w-5 border border-sheet ${prog.cards[p.id] ? 'bg-sheet' : ''}`} />
+              ))}
+            </span>
+          </div>
         </div>
       </div>
     </main>
@@ -808,14 +924,22 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
 function DailyTopBar({ daily }: { daily: DailyResponse | null }) {
   return (
     <header className="sticky top-0 z-30 bg-sheet">
-      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2 lg:max-w-[1160px] lg:px-6">
-        <div className="min-w-0 flex-1">
+      <div className="mx-auto flex min-h-[64px] max-w-lg items-center gap-3 px-4 py-2 lg:max-w-[1360px] lg:px-6">
+        <div className="min-w-0 flex-1 lg:flex lg:flex-none lg:items-center lg:gap-4">
           <Brand size={27} />
-          <p className="dateline mt-0.5 truncate !text-[12px]">
+          <p className="dateline mt-0.5 truncate !text-[12px] lg:hidden">
             {daily ? <>No. {daily.daily_number}</> : 'The Daily Grain'}
             {daily?.theme && <> · {daily.theme}</>}
           </p>
+          <div className="hidden min-w-0 border-l-2 border-ink pl-4 lg:block">
+            <p className="dateline !text-[12px]">
+              {daily ? <>No. {daily.daily_number}</> : 'The Daily Grain'}
+              {daily?.theme && <> · {daily.theme}</>}
+            </p>
+            {daily && <p className="truncate font-head text-[17px] leading-tight font-bold italic">{daily.case.title}</p>}
+          </div>
         </div>
+        <span className="hidden flex-1 lg:block" />
         <a href="#/" className="caps px-1.5 py-1 text-[13px] font-bold text-ink hover:underline">
           Home
         </a>
