@@ -6,6 +6,7 @@ answer keys stay in the game server; the bot only remembers where each phone is 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import threading
 from dataclasses import asdict, dataclass, field
@@ -19,6 +20,9 @@ from .partner import Partner
 from .render import Out
 
 TOOL_ORDER = ("data", "source", "account")  # what CHECK opens when no tool is named
+MAX_NUDGE_TRIES = 5  # failed reminder sends per player per day before giving up until tomorrow
+
+log = logging.getLogger("gos.imessage")
 
 
 class HttpClient(Protocol):  # httpx.Client and fastapi's TestClient both fit
@@ -117,6 +121,7 @@ class Engine:
         locally so the partner's hints point the right way; it is never shown to the player."""
         self.api, self.sessions = api, sessions
         self.partner, self.answer_key = partner, answer_key
+        self.nudge_failures: dict[tuple[str, str], int] = {}  # (handle, ISO day) -> failed reminder sends
 
     # ---- entry point ---------------------------------------------------------------
 
@@ -293,23 +298,46 @@ class Engine:
     # ---- reminders -----------------------------------------------------------------
 
     def due_nudges(self, today: date) -> list[tuple[Session, list[Out]]]:
-        """Players to remind today: they have a conversation, aren't muted, haven't played or been nudged."""
+        """Players to remind today: they have a conversation, aren't muted, haven't played or been reminded, and
+        haven't hit MAX_NUDGE_TRIES. Read-only: send_reminders() marks a player only once their text is sent."""
+        day = today.isoformat()
         due = []
         for s in self.sessions.all():
-            if s.muted or not s.space_id or s.last_nudge == today.isoformat():
+            if s.muted or not s.space_id or s.last_nudge == day:
+                continue
+            if self.nudge_failures.get((s.handle, day), 0) >= MAX_NUDGE_TRIES:
                 continue
             try:
                 daily = self.api.daily(s.player_id)
             except ApiError:
                 continue
-            if daily.get("already_played") or daily.get("date") != today.isoformat():
+            if daily.get("already_played") or daily.get("date") != day:
                 continue
             theme = f": {daily['theme']}" if daily.get("theme") else ""
             msg = f"🧂 Daily #{daily.get('daily_number')} is up{theme}. 5 posts, 0–3 doctored. Text PLAY."
-            s.last_nudge = today.isoformat()
-            self.sessions.put(s)
             due.append((s, [Out.t(msg)]))
         return due
+
+    def send_reminders(self, today: date, send: Callable[[Session, list[Out]], None]) -> int:
+        """Text today's reminder to everyone due; returns how many were sent. A player is marked reminded only
+        after `send` returns, so a failed send is retried at the next check instead of lost, and one failure
+        doesn't stop the rest. `send` should use one idempotency key per player per day (photon_io.nudge_key), so
+        retrying a send that did land doesn't text them twice."""
+        day = today.isoformat()
+        sent = 0
+        for s, outs in self.due_nudges(today):
+            try:
+                send(s, outs)
+            except Exception as e:
+                tries = self.nudge_failures[(s.handle, day)] = self.nudge_failures.get((s.handle, day), 0) + 1
+                log.warning("reminder to %s failed (%s), try %d of %d", s.handle[-4:], type(e).__name__, tries,
+                            MAX_NUDGE_TRIES)
+                continue
+            s.last_nudge = day
+            self.sessions.put(s)
+            sent += 1
+            log.info("-> %s: daily reminder", s.handle[-4:])
+        return sent
 
     @staticmethod
     def api_trouble(e: ApiError) -> str:
