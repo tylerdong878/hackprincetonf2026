@@ -23,6 +23,8 @@ def make_ctx(tmp_path, **kw) -> RunContext:
         now=datetime(2026, 11, 14, 15, 0, tzinfo=UTC),
         # the research scope (normally the topic's TOPIC_HINTS): the fixture feeds and pages
         feeds=[fx.FEED_URL, fx.FEED2_URL], articles=[fx.PRESS_URL, fx.BLOCKED_URL],
+        # fixture cases put the fake at a fixed id; the random-position check has its own tests
+        doctored_at=[],
     )
     defaults.update(kw)
     return RunContext(**defaults)

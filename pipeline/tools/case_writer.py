@@ -349,6 +349,10 @@ def build_case_bundle(ctx: RunContext, title: str, briefing: str, posts: list[Po
     expected = ctx.expected_doctored
     if len(doctored) != expected:
         errors.append(f"this case needs exactly {expected} doctored post(s) (got {len(doctored)})")
+    slots, got = ctx.doctored_slots, sorted(p.id for p in doctored)
+    if len(doctored) == expected and slots and got != slots:
+        errors.append(f"the doctored post(s) must be {', '.join(slots)}, this case's random positions (got "
+                      f"{', '.join(got)}); renumber the posts so the fakes sit there")
     if not any(p.role == "real_suspicious" for p in specs):
         errors.append("include at least one real_suspicious post (real, but looks fake)")
     if errors:
