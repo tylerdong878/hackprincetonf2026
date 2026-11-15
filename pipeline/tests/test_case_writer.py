@@ -47,7 +47,7 @@ def test_write_case_writes_valid_contract_files(researched):
     assert p1["author"]["kind"] == "outlet" and p1["quote"]["text"].startswith("Taken together")
     assert p2["author"] == {"name": "Jersey Bill Watch", "handle": "@jerseybills", "kind": "person",
                             "verified": False, "avatar_color": p2["author"]["avatar_color"]}
-    assert p2["tools"] == ["data", "account"] and p2["source_label"] is None
+    assert p2["tools"] == ["data", "account"] and p2["source_label"] == "Data: U.S. EIA"  # doctored posts cite too
     p3 = case["posts"][2]
     assert p3["author"]["name"] == "NJ Board of Public Utilities" and p3["body"].startswith("…New Jersey")
     assert p3["source_label"] == "NJBPU press release · Aug 13, 2026"
@@ -64,8 +64,8 @@ def test_clean_case(tmp_path):
     make_chart_impl(ctx, months=["2025-07", "2026-07"], honest=True)
     posts = [
         {"id": "p1", "role": "real", "source_id": ids["net"]},
-        {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Priya (watt nerd)",
-         "author_handle": "@wattnerd", "body": "July vs July: 25.11¢ → 25.19¢ per kWh (EIA)."},
+        {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Calm Down Daily",
+         "author_handle": "@calmdowndaily", "body": "July vs July: 25.11¢ → 25.19¢ per kWh (EIA)."},
         {"id": "p3", "role": "real", "source_id": ids["bpu20"]},
         {"id": "p4", "role": "real", "source_id": ids["ace"]},
     ]
@@ -155,7 +155,7 @@ def test_fictional_author_problems_unit():
     ("Candidates promise lower bills", "elections near voting day"),
     ("The shooting left two victims", "ongoing tragedies"),
     ("Measles outbreak in the county", "public-health emergencies"),
-    ("Students and their teachers protest bills", "minors as subjects"),
+    ("Students and their parents protest bills", "minors as subjects"),
 ])
 def test_blocklist_categories(text, category):
     assert category in {c for c, _ in blocklist_hits([text])}

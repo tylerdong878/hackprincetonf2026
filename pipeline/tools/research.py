@@ -17,9 +17,16 @@ from typing import Any
 from langchain_core.tools import BaseTool, tool
 
 from pipeline.config import EIA_TITLE, EIA_UNIT, EIA_URL
-from pipeline.context import FetchedDoc, RunContext, SavedSource
+from pipeline.context import FetchedDoc, RunContext, SavedSource, canonical_url
 from pipeline.outlets import outlet_for
-from pipeline.safety import blocklist_hits, person_name_part
+from pipeline.safety import (
+    RealEntity,
+    blocklist_hits,
+    known_entities,
+    outlet_speaker_problem,
+    person_name_part,
+    story_level_hits,
+)
 from pipeline.textutil import (
     clip,
     find_verbatim,
@@ -67,6 +74,8 @@ def pct_change(a: float, b: float) -> float:
 
 
 def get_eia_series_impl(ctx: RunContext, start: str = "2023-01", end: str | None = None) -> str:
+    if not ctx.has_data:
+        return "Refused: this topic has no data series (its hints list no data). Save passages with numbers instead."
     prices = load_eia(ctx.eia_path)
     if not re.fullmatch(r"\d{4}-\d{2}", start) or (end and not re.fullmatch(r"\d{4}-\d{2}", end)):
         return "Error: use YYYY-MM for start and end."
@@ -174,9 +183,22 @@ def _feed_page_url(feed_url: str, page: int) -> str:
     return f"{feed_url}{'&' if '?' in feed_url else '?'}paged={page}"
 
 
+def _feed_key(url: str) -> str:
+    return canonical_url(re.sub(r"[?&]paged=\d+$", "", (url or "").strip()))
+
+
+def _allowed_list(ctx: RunContext) -> str:
+    feeds = ", ".join(ctx.feeds or []) or "none"
+    pages = ", ".join(ctx.articles or [])
+    return f"feeds: {feeds}" + (f"; pages: {pages}" if pages else "")
+
+
 def fetch_rss_impl(ctx: RunContext, feed_url: str, query: str = "", pages: int = 1, max_items: int = 4) -> str:
     import feedparser
 
+    if _feed_key(feed_url) not in {_feed_key(f) for f in ctx.feeds or []}:
+        return (f"Refused: {feed_url} is not one of this topic's feeds. Research stays on the topic's own sources "
+                f"({_allowed_list(ctx)}). Don't guess other feeds.")
     pages = max(1, min(int(pages), MAX_FEED_PAGES))
     max_items = max(1, min(int(max_items), 6))
     fetched: list[FetchedDoc] = []
@@ -225,6 +247,10 @@ def fetch_article_impl(ctx: RunContext, url: str) -> str:
     cached = ctx.doc_for(url)
     if cached is not None and cached.via != "data":
         return f"(from this run's cache, via {cached.via})\n" + _show_doc(cached, MAX_ARTICLE_CHARS)
+    if canonical_url(url) not in {canonical_url(a) for a in ctx.articles or []}:
+        return (f"Refused: {url} is not linked from this topic's feeds or listed in its hints. Read the topic's "
+                f"feeds with fetch_rss (each story's text is cached for save_source), or a listed page "
+                f"({_allowed_list(ctx)}).")
     try:
         status, body, ctype = ctx.fetch(url)
     except Exception as exc:  # noqa: BLE001
@@ -306,6 +332,11 @@ def _closest_paragraph(doc: FetchedDoc, passage: str) -> str:
     return clip(best, 450) if best_score >= 0.3 else ""
 
 
+def _cats(texts: list[str], *, story: bool = False) -> str:
+    hits = story_level_hits(texts) if story else blocklist_hits(texts)
+    return "; ".join(sorted({f"{c}: '{p.lower()}'" for c, p in hits}))
+
+
 def _drop_blocked_sentences(text: str) -> str:
     """Remove context sentences that hit the topic blocklist (players see this text)."""
     spans = sentence_spans(text)
@@ -338,15 +369,23 @@ def save_source_impl(ctx: RunContext, url: str, text: str, speaker: str | None =
         end += 1
     original = doc.text[start:end]
     if blocklist_hits([original]):
-        cats = sorted({c for c, _ in blocklist_hits([original])})
-        return f"Rejected: passage touches a blocked topic ({', '.join(cats)}; SPEC §8). Pick a different passage."
+        return f"Rejected: passage touches a blocked topic ({_cats([original])}; SPEC §8). Pick a different passage."
+    if doc.title and blocklist_hits([doc.title]):
+        return (f"Rejected: the story's headline touches a blocked topic ({_cats([doc.title])}; SPEC §8). "
+                "Pick a different story.")
+    outlet = outlet_for(doc.url)
     if speaker:
         name = person_name_part(speaker)
         surname = name.split()[-1] if name.split() else name
         if surname and normalize(surname).lower() not in normalize(doc.text).lower():
             return f"Rejected: speaker '{name}' does not appear in {doc.url}; attribute quotes only to people named there."
+        if prob := outlet_speaker_problem(speaker, known_entities([RealEntity(outlet.name, outlet.handle)])):
+            return (f"Rejected: {prob}. A quote's speaker is the named person who said it; save a plain sentence "
+                    "with no speaker instead.")
     before, highlight, after, mid = passage_context(doc, start, end)
-    outlet = outlet_for(doc.url)
+    if story_level_hits([before, highlight, after]):
+        return (f"Rejected: the story around this passage is about a blocked topic "
+                f"({_cats([before, highlight, after], story=True)}; SPEC §8). Pick a different story.")
     with ctx.lock:
         for s in ctx.sources:
             if s.url == doc.url and normalize(s.text) == normalize(original):
@@ -363,9 +402,12 @@ def _save_headline(ctx: RunContext, doc: FetchedDoc) -> str:
     """The article's exact title as a source (headline cards; edited-detail forgeries start from these)."""
     title = doc.title.strip()
     if blocklist_hits([title]):
-        return "Rejected: headline touches a blocked topic (SPEC §8). Pick a different story."
+        return f"Rejected: headline touches a blocked topic ({_cats([title])}; SPEC §8). Pick a different story."
     spans = _doc_sentences(doc)
     after = _join_spans(doc.text, _take(spans[:2], doc.text, 450)) if spans else ""
+    if story_level_hits([after]):
+        return (f"Rejected: the story under this headline is about a blocked topic ({_cats([after], story=True)}; "
+                "SPEC §8). Pick a different story.")
     outlet = outlet_for(doc.url)
     with ctx.lock:
         for s in ctx.sources:
@@ -400,7 +442,8 @@ def _new_source(ctx: RunContext, doc: FetchedDoc, outlet, original: str, speaker
 def research_tools(ctx: RunContext) -> list[BaseTool]:
     @tool
     def fetch_rss(feed_url: str, query: str = "", pages: int = 1, max_items: int = 4) -> str:
-        """Read a news RSS feed. Returns the items that best match `query` with their full text.
+        """Read one of the topic's news RSS feeds (listed in the hints; other feeds are refused). Returns the
+        items that best match `query` with their full text.
 
         pages: 1-4 (page 2+ reaches older stories via the feed's `?paged=N`). Every item's text is
         cached so save_source can verify passages from it.
@@ -409,7 +452,8 @@ def research_tools(ctx: RunContext) -> list[BaseTool]:
 
     @tool
     def fetch_article(url: str) -> str:
-        """Fetch one web page (or return it from this run's feed cache) as plain text paragraphs."""
+        """Fetch a page listed in the hints, or a story linked from the topic's feeds (returned from this run's
+        feed cache), as plain text paragraphs. Other sites are refused."""
         return fetch_article_impl(ctx, url)
 
     @tool
@@ -427,4 +471,6 @@ def research_tools(ctx: RunContext) -> list[BaseTool]:
         """
         return save_source_impl(ctx, url, text, speaker or None)
 
-    return [fetch_rss, fetch_article, get_eia_series, save_source]
+    # The EIA electricity series is only offered on topics whose hints list data (TOPIC_HINTS "data"), so a food
+    # or sports day never gets NJ power prices forged into it.
+    return [fetch_rss, fetch_article, *([get_eia_series] if ctx.has_data else []), save_source]

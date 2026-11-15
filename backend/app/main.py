@@ -4,9 +4,10 @@ Run:  uv run uvicorn backend.app.main:app --reload --port 8000
 Data: data/ by default; override with the GOS_DATA_DIR env var (or create_app(data_dir=...)).
 
 Env (all optional):
-  GOS_PUBLIC=1            public mode (§8.6): no /docs /redoc /openapi.json, teacher routes need X-Teacher-Token,
+  GOS_PUBLIC=1            public mode (§8.6): no /docs /redoc /openapi.json, Editor's Desk routes need X-Editor-Token,
                           per-IP limit on /cases/*/answer (ANSWER_RATE_PER_MIN, default 60)
-  TEACHER_TOKEN           the X-Teacher-Token value in public mode (unset -> teacher routes are off, 404)
+  EDITOR_TOKEN            the X-Editor-Token value in public mode (unset -> editor routes are off, 404).
+                          Back-compat: TEACHER_TOKEN is read if EDITOR_TOKEN is unset, and X-Teacher-Token is accepted.
   CON_LIVE_DAILY_CAP      live (uncached) Con judge calls per ET day, everyone together (default 30)
   CON_LIVE_PER_PLAYER     live Con judge rounds per player per ET day (default 3)
   DEMO_TOKEN              requests with X-Demo-Token equal to it skip both Con caps (the demo laptop)
@@ -142,15 +143,18 @@ def answer_rate_limit(request: Request) -> None:
         raise HTTPException(429, "Too many answers from this address. Try again in a minute.")
 
 
-def teacher_guard(request: Request) -> None:
-    """Public mode only (§8.6): every /teacher/* route needs X-Teacher-Token; no TEACHER_TOKEN -> routes off."""
+EDITOR_TOKEN_HEADERS = ("x-editor-token", "x-teacher-token")  # x-teacher-token: old name, kept as an alias
+
+
+def editor_guard(request: Request) -> None:
+    """Public mode only (§8.6): every /editor/* route needs X-Editor-Token; no EDITOR_TOKEN -> routes off."""
     state = request.app.state
     if not state.public:
         return
-    if not state.teacher_token:
+    if not state.editor_token:
         raise HTTPException(404, "Not found")
-    if not token_matches(request.headers.get("x-teacher-token"), state.teacher_token):
-        raise HTTPException(401, "Teacher token required")
+    if not any(token_matches(request.headers.get(h), state.editor_token) for h in EDITOR_TOKEN_HEADERS):
+        raise HTTPException(401, "Editor token required")
 
 
 # ---- health & players --------------------------------------------------------
@@ -423,13 +427,14 @@ def fool_judge(body: FoolJudgeRequest, request: Request, store: StoreDep, today:
     }
 
 
-# ---- teacher (all statuses; open locally, token-locked in public mode §8.6) ----------
+# ---- Editor's Desk (all statuses; open locally, token-locked in public mode §8.6) ----------
+# Mounted at /api/editor, plus /api/teacher as a hidden alias so old links keep working (see create_app).
 
-teacher = APIRouter(prefix="/api/teacher", dependencies=[Depends(teacher_guard)])
+editor = APIRouter(dependencies=[Depends(editor_guard)])
 
 
-@teacher.get("/queue")
-def teacher_queue(store: StoreDep):
+@editor.get("/queue")
+def editor_queue(store: StoreDep):
     return [
         {"id": r.id, "number": r.case.get("number"), "title": r.case.get("title"),
          "topic": r.case.get("topic"), "meta": r.meta,
@@ -439,14 +444,14 @@ def teacher_queue(store: StoreDep):
     ]
 
 
-@teacher.get("/cases/{case_id}")
-def teacher_case(case_id: CaseId, store: StoreDep):
+@editor.get("/cases/{case_id}")
+def editor_case(case_id: CaseId, store: StoreDep):
     rec = any_case(store, case_id)
     return {"case": rec.case, "evidence": rec.evidence(), "answer_key": rec.answer_key(),
             "meta": rec.meta, "solver_log": rec.solver_log()}
 
 
-@teacher.post("/cases/{case_id}/approve")
+@editor.post("/cases/{case_id}/approve")
 def approve_case(case_id: CaseId, store: StoreDep):
     with store.lock:
         rec = any_case(store, case_id)
@@ -455,7 +460,7 @@ def approve_case(case_id: CaseId, store: StoreDep):
     return rec.meta
 
 
-@teacher.post("/cases/{case_id}/reject")
+@editor.post("/cases/{case_id}/reject")
 def reject_case(case_id: CaseId, store: StoreDep, body: RejectRequest | None = None):
     with store.lock:
         rec = any_case(store, case_id)
@@ -505,7 +510,9 @@ def create_app(data_dir: str | Path | None = None, frontend_dist: str | Path | N
     app.state.today = today or today_et
     app.state.crowd_min = crowd_min if crowd_min is not None else int(os.environ.get("CROWD_MIN", "10"))
     app.state.public = public
-    app.state.teacher_token = os.environ.get("TEACHER_TOKEN", "").strip() or None
+    app.state.editor_token = (os.environ.get("EDITOR_TOKEN", "").strip()
+                              or os.environ.get("TEACHER_TOKEN", "").strip()  # old name, still read as a fallback
+                              or None)
     app.state.demo_token = os.environ.get("DEMO_TOKEN", "").strip() or None
     app.state.live_usage = LiveUsage(app.state.store.data_dir / "stats" / "con_live_usage.json",
                                      daily_cap=env_int("CON_LIVE_DAILY_CAP", 30),
@@ -514,7 +521,8 @@ def create_app(data_dir: str | Path | None = None, frontend_dist: str | Path | N
     app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True,
                        allow_methods=["*"], allow_headers=["*"])
     app.include_router(router)
-    app.include_router(teacher)
+    app.include_router(editor, prefix="/api/editor")
+    app.include_router(editor, prefix="/api/teacher", include_in_schema=False)  # old path, hidden alias
     app.add_api_route("/{full_path:path}", spa, methods=["GET"], include_in_schema=False)
     return app
 

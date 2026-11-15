@@ -63,7 +63,7 @@ def test_spoiler_heuristic():
     assert looks_like_spoiler("Forge a misleading chart for p2")
     assert looks_like_spoiler("crop the quote")
     assert not looks_like_spoiler("Research real sources")
-    assert not looks_like_spoiler("Send to the teacher for approval")
+    assert not looks_like_spoiler("Send to the editor for approval")
 
 
 # ---------------------------------------------------------------- model calls
@@ -85,7 +85,7 @@ def test_classify_error():
 def test_call_budget_and_throttle():
     now = [0.0]
     slept: list[float] = []
-    stats = CallStats(max_calls=2, rpm=20, sleep=lambda s: (slept.append(s), now.__setitem__(0, now[0] + s)),
+    stats = CallStats(max_calls=2, rpm=20, reserve=0, sleep=lambda s: (slept.append(s), now.__setitem__(0, now[0] + s)),
                       clock=lambda: now[0])
     stats.before_call("orchestrator")
     stats.before_call("forger")

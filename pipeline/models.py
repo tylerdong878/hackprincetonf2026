@@ -95,15 +95,24 @@ def call_with_deadline(fn: Callable[[], Any], seconds: float | None) -> Any:
 # --------------------------------------------------------------------------------------
 
 
+FINISHER = "orchestrator"  # the agent whose last calls hand the case to the editor (submit_for_review)
+FINISH_RESERVE = 2  # model calls only the orchestrator may use: submit_for_review, then its closing line
+
+
 @dataclass
 class CallStats:
-    """Shared by every agent in a run: counts requests (including failed ones) and throttles."""
+    """Shared by every agent in a run: counts requests (including failed ones) and throttles.
+
+    The last `reserve` calls belong to the orchestrator, so a sub-agent that runs long can't use up the budget
+    before the hand-off (sub-agents get CallBudgetExceeded at max_calls - reserve).
+    """
 
     max_calls: int = 45
     rpm: float = 15.0
     total: int = 0
     failed: int = 0
     retries: int = 0
+    reserve: int = FINISH_RESERVE
     by_agent: Counter = field(default_factory=Counter)
     sleep: Callable[[float], None] = time.sleep
     clock: Callable[[], float] = time.monotonic
@@ -114,6 +123,10 @@ class CallStats:
     def from_env(cls) -> CallStats:
         return cls(max_calls=int(os.environ.get("PIPELINE_MAX_CALLS", "45")),
                    rpm=float(os.environ.get("PIPELINE_RPM", "15")))
+
+    @property
+    def remaining(self) -> int:
+        return max(0, self.max_calls - self.total)
 
     def wait_time(self) -> float:
         if self._last is None or self.rpm <= 0:
@@ -126,6 +139,11 @@ class CallStats:
                 raise CallBudgetExceeded(
                     f"Model-call budget used up ({self.total}/{self.max_calls}). "
                     "Raise PIPELINE_MAX_CALLS if your account allows more requests."
+                )
+            if agent != FINISHER and self.total >= self.max_calls - self.reserve:
+                raise CallBudgetExceeded(
+                    f"Model-call budget for sub-agents used up ({self.total}/{self.max_calls}); the last "
+                    f"{self.reserve} calls are kept for the orchestrator's hand-off."
                 )
             delay = self.wait_time()
             if delay > 0:

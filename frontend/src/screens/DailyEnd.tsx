@@ -260,7 +260,7 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
 
       <div className="flex flex-wrap justify-center gap-2">
         <LinkButton to="/dossier" variant="ghost" size="sm">
-          Dossier
+          Stats
         </LinkButton>
         <LinkButton to="/casefiles" variant="ghost" size="sm">
           More cases

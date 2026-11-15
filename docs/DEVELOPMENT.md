@@ -13,7 +13,7 @@ uv run pytest backend/tests -q                             # tests
 
 **Data and serving:**
 - Cases are read from `data/cases/*/` on every request, so the pipeline can add cases live.
-- Players only see cases with `meta.status == "approved"`. The Editor's Desk routes (`/api/teacher/*`) see everything.
+- Players only see cases with `meta.status == "approved"`. The Editor's Desk routes (`/api/editor/*`) see everything.
 - Player profiles go to `data/players/<id>/profile.json`, and crowd stats to `data/stats/`. Both are git-ignored.
 - Set `GOS_DATA_DIR` to use another data folder.
 - If `frontend/dist/` exists, it's served at `/` with an SPA fallback, so the demo runs from one server.
@@ -32,8 +32,8 @@ uv run pytest backend/tests -q                             # tests
 
 | Variable | Effect |
 |---|---|
-| `GOS_PUBLIC=1` | Public mode: no `/docs`, `/redoc` or `/openapi.json`; editor routes need `X-Teacher-Token`; a per-IP limit on answers (`ANSWER_RATE_PER_MIN`, default 60) |
-| `TEACHER_TOKEN` | The `X-Teacher-Token` value in public mode. If unset, editor routes are off. |
+| `GOS_PUBLIC=1` | Public mode: no `/docs`, `/redoc` or `/openapi.json`; editor routes need `X-Editor-Token`; a per-IP limit on answers (`ANSWER_RATE_PER_MIN`, default 60) |
+| `EDITOR_TOKEN` | The `X-Editor-Token` value in public mode. If unset, editor routes are off. The old names still work as aliases: `TEACHER_TOKEN` (read if `EDITOR_TOKEN` is unset), the `X-Teacher-Token` header, `/api/teacher/*`, `#/teacher` and `--hold-for-teacher`. |
 | `CON_LIVE_DAILY_CAP` | Live (uncached) Con calls per ET day, everyone together (default 30) |
 | `CON_LIVE_PER_PLAYER` | Live Con rounds per player per ET day (default 3) |
 | `DEMO_TOKEN` | Requests with a matching `X-Demo-Token` skip both Con caps (the demo laptop: open the site with `?demo=<token>`) |
@@ -71,7 +71,7 @@ The Deep Agents case builder in `pipeline/`. It runs offline; the game only play
 ```
 uv run python -m pipeline.build_case --topic "NJ electricity prices"                 # interactive editor review
 uv run python -m pipeline.build_case --topic "NJ electricity prices" --auto-approve
-uv run python -m pipeline.build_case --clean --hold-for-teacher   # approve later in the web Editor's Desk
+uv run python -m pipeline.build_case --clean --hold-for-editor    # approve later in the web Editor's Desk
 uv run python -m pipeline.build_case --trick misleading-chart     # or --player <id> to target a weak spot
 uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20   # a 5-card Daily Grain
 uv run python -m pipeline.build_case --dry-run                    # build the graph, no model calls

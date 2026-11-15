@@ -4,11 +4,11 @@ import { DiffView } from '../components/Reveal'
 import { SiteHeader } from '../components/Header'
 import { Workshop } from '../components/Workshop'
 import { Button, Chip, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
-import { api, ApiError, getTeacherToken, setTeacherToken } from '../lib/api'
+import { api, ApiError, getEditorToken, setEditorToken } from '../lib/api'
 import { caseNo, shortDate, trickLabel } from '../lib/format'
 import { useAsync } from '../lib/hooks'
 import { href } from '../lib/router'
-import type { CaseMeta, QueueItem, TeacherCase } from '../lib/types'
+import type { CaseMeta, EditorCase, QueueItem } from '../lib/types'
 
 const STATUS: Record<string, { label: string; color: string }> = {
   draft: { label: 'Draft', color: 'var(--muted)' },
@@ -34,21 +34,21 @@ function normalizeQueue(res: QueueItem[] | { cases: QueueItem[] }): QueueItem[] 
 }
 
 /**
- * Public mode (CONTRACT §8.6): the desk's routes answer 401 without X-Teacher-Token. Ask once, keep it in
+ * Public mode (CONTRACT §8.6): the desk's routes answer 401 without X-Editor-Token. Ask once, keep it in
  * sessionStorage, and retry. A 404 from the queue in public mode means the desk is switched off.
  */
 function DeskGate({ error, onToken, children }: { error: unknown; onToken: () => void; children: ReactNode }) {
   const [token, setToken] = useState('')
   const status = error instanceof ApiError ? error.status : 0
   if (status !== 401) return <>{children}</>
-  const hadToken = !!getTeacherToken()
+  const hadToken = !!getEditorToken()
   return (
     <form
       className="mx-auto mt-4 flex w-full max-w-md flex-col gap-3 rounded-2xl border border-line bg-surface p-6"
       onSubmit={(e) => {
         e.preventDefault()
         if (!token.trim()) return
-        setTeacherToken(token.trim())
+        setEditorToken(token.trim())
         onToken()
       }}
     >
@@ -83,11 +83,11 @@ function deskTitle(e: unknown, fallback: string) {
   return fallback
 }
 
-export function TeacherQueue() {
-  const q = useAsync(() => api.teacherQueue().then(normalizeQueue), [])
+export function EditorQueue() {
+  const q = useAsync(() => api.editorQueue().then(normalizeQueue), [])
   return (
     <>
-      <SiteHeader active="teacher" />
+      <SiteHeader active="editor" />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
         <h1 className="font-display text-3xl font-bold">Editor’s Desk</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
@@ -124,7 +124,7 @@ export function TeacherQueue() {
                       return (
                         <tr key={item.id} className="border-t border-line bg-surface hover:bg-surface-2">
                           <td className="px-4 py-3">
-                            <a href={href(`/teacher/${item.id}`)} className="font-semibold underline-offset-2 hover:underline">
+                            <a href={href(`/editor/${item.id}`)} className="font-semibold underline-offset-2 hover:underline">
                               {item.number != null && <span className="mr-1.5 font-mono text-xs text-muted">{caseNo(item.number)}</span>}
                               {item.title ?? item.id}
                             </a>
@@ -174,7 +174,7 @@ export function TeacherQueue() {
   )
 }
 
-function safetyChecks(d: TeacherCase): { ok: boolean; label: string }[] {
+function safetyChecks(d: EditorCase): { ok: boolean; label: string }[] {
   const posts = d.case.posts
   const key = d.answer_key.posts ?? {}
   const doctored = posts.filter((p) => key[p.id]?.doctored)
@@ -203,7 +203,7 @@ function safetyChecks(d: TeacherCase): { ok: boolean; label: string }[] {
   ]
 }
 
-function CaseReview({ data, onMeta }: { data: TeacherCase; onMeta: (m: CaseMeta) => void }) {
+function CaseReview({ data, onMeta }: { data: EditorCase; onMeta: (m: CaseMeta) => void }) {
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState<'approve' | 'reject' | null>(null)
   const [err, setErr] = useState<unknown>(null)
@@ -421,14 +421,14 @@ function CaseReview({ data, onMeta }: { data: TeacherCase; onMeta: (m: CaseMeta)
   )
 }
 
-export function TeacherCaseScreen({ caseId }: { caseId: string }) {
-  const d = useAsync(() => api.teacherCase(caseId), [caseId])
+export function EditorCaseScreen({ caseId }: { caseId: string }) {
+  const d = useAsync(() => api.editorCase(caseId), [caseId])
   const [meta, setMeta] = useState<CaseMeta | null>(null)
   return (
     <>
-      <SiteHeader active="teacher" />
+      <SiteHeader active="editor" />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
-        <LinkButton to="/teacher" size="sm" variant="ghost" className="mb-4 -ml-2">
+        <LinkButton to="/editor" size="sm" variant="ghost" className="mb-4 -ml-2">
           ← Puzzle queue
         </LinkButton>
         {d.status === 'loading' && <Loading label="Opening the puzzle for review…" />}

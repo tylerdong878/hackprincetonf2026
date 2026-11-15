@@ -309,7 +309,7 @@ export interface Profile {
   per_trick?: Record<string, PerTrick>
 }
 
-// ---- Teacher ----
+// ---- Editor's Desk ----
 export interface CaseMeta {
   status?: string
   origin?: string
@@ -358,7 +358,7 @@ export interface AnswerKey {
   con_line_clean?: string | null
 }
 
-export interface TeacherCase {
+export interface EditorCase {
   case: GameCase
   evidence?: Record<string, Partial<Record<ToolId, AnyEvidence>>>
   answer_key: AnswerKey

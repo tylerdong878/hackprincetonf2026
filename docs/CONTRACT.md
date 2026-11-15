@@ -28,7 +28,7 @@ data/
 | `case.json` | Browser (via the API) | Player view. **No answers.** |
 | `evidence.json` | Server only | Released one tool at a time via `POST /evidence` |
 | `answer_key.json` | Server only | **Never sent before the verdict** |
-| `meta.json` | Server, teacher UI | Status, origin, sources |
+| `meta.json` | Server, Editor's Desk | Status, origin, sources |
 | `pipeline_log.jsonl` | Workshop panel | Only exists for pipeline-built cases. **Never fabricate one.** |
 
 **Trick ids:** `out-of-context-quote`, `misleading-chart`, `cherry-picked-stat`.
@@ -201,10 +201,10 @@ rating   = clamp(round(50 + 50 * (hit_rate - fa_rate)), 0, 100)
 | `POST /cases/{id}/evidence` | `{ player_id, post_id, tool }` | `{ evidence: {...}, clues_left }`. Re-opening a tool is free. **409** when out of clues. |
 | `POST /cases/{id}/verdict` | `{ player_id, verdicts: { "p1": { "doctored": bool, "trick": id \| null, "confidence": 0.5-1.0 \| null } } }` | see below |
 | `GET /cases/{id}/pipeline-log` | | `[event, ...]` or **404** if none |
-| `GET /teacher/queue` | | all cases with `meta` (any status) |
-| `GET /teacher/cases/{id}` | | `{ case, evidence, answer_key, meta, solver_log }` |
-| `POST /teacher/cases/{id}/approve` | `{}` | `meta` |
-| `POST /teacher/cases/{id}/reject` | `{ reason }` | `meta` |
+| `GET /editor/queue` | | all cases with `meta` (any status) |
+| `GET /editor/cases/{id}` | | `{ case, evidence, answer_key, meta, solver_log }` |
+| `POST /editor/cases/{id}/approve` | `{}` | `meta` |
+| `POST /editor/cases/{id}/reject` | `{ reason }` | `meta` |
 
 **Verdict response:**
 ```jsonc
@@ -390,6 +390,13 @@ Stamp colors in the UI match: green, salt/white, amber, red.
 | `con_false_alarm` | **FALSE ALARM** |
 | `con_trusted` | **TRUSTED** |
 
+### 8.2b Labels and accounts never give the answer away
+- Every post carries a `source_label`. A doctored post cites the outlet it misquotes (or "Data: U.S. EIA"). The exception is New Jersey Monitor material (CC BY-NC-ND), which is never doctored on a daily.
+- Every daily includes at least one REAL post shared by a made-up account, so an unknown account doesn't mean "fake".
+- Made-up accounts use invented, handle-style personas (pipeline: `PERSONAS` in `pipeline/tools/case_writer.py`), never realistic personal names.
+- A doctored quote is never credited to an outlet as its speaker.
+- Enforced by `scripts/build_daily_cases.py` for hand-built content and by `write_case` in the pipeline.
+
 ### 8.3 One made-up account per deck item
 - `GET /fool/deck` items add `"edited_author"`: the made-up account a changed post will show.
 - `apply_edit` must use **exactly** that author. It's deterministic per deck item, from a fixed persona list, using invented handles, never realistic personal names.
@@ -412,8 +419,9 @@ Stamp colors in the UI match: green, salt/white, amber, red.
 
 ### 8.6 Public mode (`GOS_PUBLIC=1`)
 - **Hide the docs pages:** `/docs`, `/redoc` and `/openapi.json` return 404.
-- **Lock the teacher routes:** **all** `/teacher/*` routes require the header `X-Teacher-Token == TEACHER_TOKEN`, otherwise 401. If `GOS_PUBLIC=1` and no `TEACHER_TOKEN` is set, the teacher routes are disabled (404).
-- **The frontend Teacher screen** asks for the token once and keeps it in sessionStorage.
+- **Lock the Editor's Desk routes:** **all** `/editor/*` routes require the header `X-Editor-Token == EDITOR_TOKEN`, otherwise 401. If `GOS_PUBLIC=1` and no `EDITOR_TOKEN` is set, the editor routes are disabled (404).
+- **The frontend Editor's Desk** asks for the token once and keeps it in sessionStorage.
+- **Old names (back-compat aliases):** `/teacher/*` still answers (hidden from the API schema), the `X-Teacher-Token` header is accepted, and `TEACHER_TOKEN` is read when `EDITOR_TOKEN` is unset.
 - **Rate limit:** `/cases/*/answer` is limited per client IP (loose, about 60 a minute).
 - **Without `GOS_PUBLIC`** (local dev and the demo laptop), everything works as it does today.
 
@@ -430,7 +438,7 @@ Stamp colors in the UI match: green, salt/white, amber, red.
 - **Never fake numbers:** below `CROWD_MIN` the bonus is null.
 
 **UI wording:**
-- "Teacher" becomes **"Editor's Desk"** ("a human puzzle editor approves every puzzle before it goes live").
-- "Case Files (for classrooms)" becomes **"Case Files"** (an archive of extra cases).
+- The human approval step is the **"Editor's Desk"** ("a human puzzle editor approves every puzzle before it goes live").
+- **"Case Files"** is an archive of extra cases.
 - Lead every screen with the game. Media literacy is the payoff, not the pitch.
-- Routes and API paths stay the same (`/teacher/*`). Only the labels change.
+- The desk lives at `#/editor` and `/api/editor/*`. Old `#/teacher` links redirect there (see §8.6 for the API aliases).

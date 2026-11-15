@@ -1,0 +1,34 @@
+{
+  "clean_case": false,
+  "posts": {
+    "p1": {
+      "doctored": true,
+      "trick": "out-of-context-quote",
+      "tell": "The original said \"some think\" — the crop turns speculation into certainty.",
+      "explanation": "The NPR piece reported that some researchers believe they may have found evidence of dinosaur blood, not that they definitively have. Removing \"some think\" presents a tentative finding as a confirmed discovery.",
+      "con_line_fooled": "I didn't change a single word. I just stopped quoting early.",
+      "con_line_caught": "You read the whole sentence. How thorough. How annoying.",
+      "diff": {
+        "type": "quote",
+        "shown": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, they've found their strongest evidence yet of dinosaur blood.",
+        "original": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood.",
+        "removed": [
+          "some think"
+        ]
+      }
+    },
+    "p2": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "Real and word for word, from NPR (Nov 13, 2026).",
+      "con_line_false_alarm": "Surprising isn't the same as fake. A grain of salt, not the whole shaker."
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Real and word for word, from NPR (Nov 9, 2026).",
+      "con_line_false_alarm": "That one was real. I didn't even have to lie. You did the work for me."
+    }
+  },
+  "con_line_clean": null
+}

@@ -321,7 +321,7 @@ def test_next_only_serves_approved(client, player, data_dir):
     assert client.get(f"/api/cases/next?player_id={player}").json()["id"] == DEMO
 
 
-# ---- teacher & pipeline log -----------------------------------------------------------
+# ---- Editor's Desk & pipeline log ---------------------------------------------------------
 
 def test_non_approved_cases_hidden_from_players(client, player, data_dir):
     meta = load(data_dir, CLEAN, "meta.json")
@@ -330,33 +330,47 @@ def test_non_approved_cases_hidden_from_players(client, player, data_dir):
     assert [c["id"] for c in client.get("/api/cases").json()] == [DEMO]
     assert client.post(f"/api/cases/{CLEAN}/evidence", json={"player_id": player, "post_id": "p1", "tool": "source"}).status_code == 404
     assert submit(client, player, CLEAN, verdicts(real=["p1", "p2", "p3", "p4"])).status_code == 404
-    queue = client.get("/api/teacher/queue").json()
+    queue = client.get("/api/editor/queue").json()
     assert {q["id"]: q["meta"]["status"] for q in queue} == {DEMO: "approved", CLEAN: "draft"}
-    assert client.get(f"/api/teacher/cases/{CLEAN}").status_code == 200
+    assert client.get(f"/api/editor/cases/{CLEAN}").status_code == 200
 
 
-def test_teacher_reject_and_approve(client, data_dir):
-    r = client.post(f"/api/teacher/cases/{DEMO}/reject", json={"reason": "Axis note unclear"})
+def test_editor_reject_and_approve(client, data_dir):
+    r = client.post(f"/api/editor/cases/{DEMO}/reject", json={"reason": "Axis note unclear"})
     assert r.status_code == 200
     assert r.json()["status"] == "rejected" and r.json()["rejection_reason"] == "Axis note unclear"
     assert load(data_dir, DEMO, "meta.json")["rejection_reason"] == "Axis note unclear"
     assert client.get(f"/api/cases/{DEMO}").status_code == 404
     assert client.get("/api/cases/today").json()["id"] == CLEAN  # no daily left -> first approved
 
-    r = client.post(f"/api/teacher/cases/{DEMO}/approve", json={})
+    r = client.post(f"/api/editor/cases/{DEMO}/approve", json={})
     assert r.json()["status"] == "approved" and r.json()["rejection_reason"] is None
     assert load(data_dir, DEMO, "meta.json")["status"] == "approved"
     assert client.get(f"/api/cases/{DEMO}").status_code == 200
-    assert client.post("/api/teacher/cases/nope/approve", json={}).status_code == 404
+    assert client.post("/api/editor/cases/nope/approve", json={}).status_code == 404
 
 
-def test_teacher_case_detail_and_solver_log(client, data_dir):
-    body = client.get(f"/api/teacher/cases/{DEMO}").json()
+def test_editor_case_detail_and_solver_log(client, data_dir):
+    body = client.get(f"/api/editor/cases/{DEMO}").json()
     assert set(body) == {"case", "evidence", "answer_key", "meta", "solver_log"}
     assert body["answer_key"]["posts"]["p2"]["doctored"] is True
     assert body["solver_log"] is None
     (data_dir / "cases" / DEMO / "solver_log.md").write_text("# Solver\nPASS using data", encoding="utf-8")
-    assert client.get(f"/api/teacher/cases/{DEMO}").json()["solver_log"].startswith("# Solver")
+    assert client.get(f"/api/editor/cases/{DEMO}").json()["solver_log"].startswith("# Solver")
+
+
+def test_old_teacher_paths_still_work_but_stay_out_of_the_schema(client, data_dir):
+    """/api/teacher/* is a hidden back-compat alias of /api/editor/* (same handlers, not in OpenAPI)."""
+    assert client.get("/api/teacher/queue").json() == client.get("/api/editor/queue").json()
+    assert client.get(f"/api/teacher/cases/{DEMO}").json() == client.get(f"/api/editor/cases/{DEMO}").json()
+    r = client.post(f"/api/teacher/cases/{DEMO}/reject", json={"reason": "old link"})
+    assert r.status_code == 200 and load(data_dir, DEMO, "meta.json")["rejection_reason"] == "old link"
+    assert client.post(f"/api/teacher/cases/{DEMO}/approve", json={}).json()["status"] == "approved"
+    assert client.post("/api/teacher/cases/nope/approve", json={}).status_code == 404
+    paths = client.get("/openapi.json").json()["paths"]
+    assert {"/api/editor/queue", "/api/editor/cases/{case_id}", "/api/editor/cases/{case_id}/approve",
+            "/api/editor/cases/{case_id}/reject"} <= set(paths)
+    assert not [p for p in paths if p.startswith("/api/teacher")]
 
 
 def test_pipeline_log(client, data_dir):
@@ -373,7 +387,7 @@ def test_path_traversal_rejected(client, player, data_dir, tmp_path):
     (tmp_path / "secret.txt").write_text("TOP SECRET", encoding="utf-8")
     before = {p for p in tmp_path.rglob("*")}
     for url in ["/api/players/..%2F..%2Fsecret", "/api/players/bad.id", "/api/players/..",
-                "/api/cases/..%2F..%2Fsecret", "/api/cases/..%5C..%5Csecret", "/api/teacher/cases/..%2Fx",
+                "/api/cases/..%2F..%2Fsecret", "/api/cases/..%5C..%5Csecret", "/api/editor/cases/..%2Fx",
                 "/api/cases/next?player_id=..%2F..%2Fx"]:
         r = client.get(url)
         assert r.status_code in (400, 404, 422), url
@@ -382,7 +396,7 @@ def test_path_traversal_rejected(client, player, data_dir, tmp_path):
         r = client.post(f"/api/cases/{DEMO}/evidence", json={"player_id": bad, "post_id": "p1", "tool": "source"})
         assert r.status_code == 422, bad
         assert submit(client, bad, DEMO, PERFECT_DEMO).status_code == 422, bad
-    assert client.post("/api/teacher/cases/..%2F..%2Fx/approve", json={}).status_code in (404, 405, 422)
+    assert client.post("/api/editor/cases/..%2F..%2Fx/approve", json={}).status_code in (404, 405, 422)
     assert {p for p in tmp_path.rglob("*")} == before  # nothing written anywhere
 
 

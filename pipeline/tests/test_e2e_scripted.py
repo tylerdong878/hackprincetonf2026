@@ -20,7 +20,7 @@ from pipeline.tests import fixtures as fx
 from pipeline.tests.conftest import make_ctx
 
 CASE_ID = "2026-11-14-test-case"
-TODOS = ["Research real sources", "Forge the case", "Blind-solve the case", "Send to the teacher for approval"]
+TODOS = ["Research real sources", "Forge the case", "Blind-solve the case", "Send to the editor for approval"]
 
 
 def todos(active: int) -> list[dict]:
@@ -167,7 +167,7 @@ def test_researcher_rejected_paraphrase_is_not_saved(e2e):
     assert not any("90 percent" in s["text"] for s in sources)
 
 
-def test_hold_for_teacher_leaves_awaiting_approval(tmp_path):
+def test_hold_for_editor_leaves_awaiting_approval(tmp_path):
     ctx = make_ctx(tmp_path, case_id=CASE_ID)
     bundle = build_agent(ctx, scripted_models(SOLVER_PASS))
     status = run(bundle.agent, ctx, "Build case.", "hold")
@@ -180,14 +180,14 @@ def test_hold_for_teacher_leaves_awaiting_approval(tmp_path):
 
 
 def test_reject_with_feedback_then_approve(tmp_path):
-    """Teacher rejects once; the orchestrator re-runs the forger flow, then resubmits and gets approved."""
+    """The editor rejects once; the orchestrator re-runs the forger flow, then resubmits and gets approved."""
     ctx = make_ctx(tmp_path, case_id=CASE_ID)
     extra = [ai("", tool_call("submit_for_review", {"case_id": CASE_ID, "summary": "Revised per feedback."}))]
     bundle = build_agent(ctx, scripted_models(SOLVER_PASS, orchestrator_extra=extra))
     answers = iter(["r", "Make the briefing less spoilery.", "a"])
     status = run(bundle.agent, ctx, "Build case.", "interactive", read=lambda _prompt: next(answers))
     assert status == "approved"
-    assert ctx.teacher_feedback == ["Teacher feedback: Make the briefing less spoilery."]
+    assert ctx.editor_feedback == ["Editor feedback: Make the briefing less spoilery."]
     statuses = [e["status"] for e in read_log(ctx.case_dir / "pipeline_log.jsonl") if e["type"] == "case_status"]
     assert statuses == ["awaiting_approval", "draft", "awaiting_approval", "approved"]
 
@@ -231,7 +231,7 @@ def test_filesystem_permissions_block_answer_key_and_case_writes(tmp_path):
     assert "Hacked" not in (ctx.skills_dir / "misleading-chart" / "SKILL.md").read_text(encoding="utf-8")
 
 
-def test_teacher_edit_in_terminal_then_approve(tmp_path):
+def test_editor_edit_in_terminal_then_approve(tmp_path):
     ctx = make_ctx(tmp_path, case_id=CASE_ID)
     bundle = build_agent(ctx, scripted_models(SOLVER_PASS))
     answers = iter(["e", "title Is your power bill frozen?", "body p1 This is not allowed", "remove p4", "done"])
@@ -243,5 +243,5 @@ def test_teacher_edit_in_terminal_then_approve(tmp_path):
     assert [p["id"] for p in case["posts"]] == ["p1", "p2", "p3"] and set(key["posts"]) == {"p1", "p2", "p3"}
     assert case["posts"][0]["body"] != "This is not allowed"  # real outlet posts stay verbatim
     events = read_log(ctx.case_dir / "pipeline_log.jsonl")
-    assert any(e["type"] == "file_written" and e["agent"] == "teacher" for e in events)
+    assert any(e["type"] == "file_written" and e["agent"] == "editor" for e in events)
     assert [e["status"] for e in events if e["type"] == "case_status"][-1] == "approved"

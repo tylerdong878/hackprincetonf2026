@@ -46,7 +46,7 @@ export function CaseFiles() {
           <Button size="lg" onClick={next.open} disabled={next.loading}>
             {next.loading ? 'Finding…' : 'A case picked for me'}
           </Button>
-          <LinkButton to="/teacher" size="lg" variant="ghost">
+          <LinkButton to="/editor" size="lg" variant="ghost">
             Editor’s Desk →
           </LinkButton>
         </div>

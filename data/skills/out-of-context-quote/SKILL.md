@@ -19,15 +19,17 @@ sentence).
 
 ## Forging recipe (allowed operations on real material only)
 Call `crop_quote(source_id, keep_text)` once.
-1. Choose a saved quote (`s#` with a speaker).
+1. Choose a saved quote (`s#` with a speaker). A saved sentence or headline with no speaker also works: its crop
+   is posted as the account's own text, not as a quote card, and is never credited to the outlet.
 2. `keep_text` = the words you keep, in the quote's own order. You may skip words: at most 2 cuts inside the
    quote, each at most 8 words, and you may trim the start and end. You cannot add, reorder or change words.
 3. Keep at least 4 words, and make sure the cut changes the meaning (a cut that changes nothing will be caught
    by the blind solver as unfair, or worse, isn't a trick).
 4. The tool returns a forgery id (`f#`), the shown quote and the removed words. In `write_case`, the doctored
-   post gets `forgery_id`, a made-up `author_name`/`author_handle`, and an optional short body that reacts to
-   the cropped quote (e.g. "BPU just promised NO rate increase. Screenshot this."). The body may not add numbers
-   that aren't in the real quote.
+   post gets `forgery_id`, a made-up persona (or leave `author_name` empty), and an optional short body that
+   reacts to the cropped quote (e.g. "NO rate increase?! Screenshot this."). The body may not add numbers that
+   aren't in the real quote, may not add claims the quote doesn't make ("that's a total ban on every sport"),
+   and may not credit the words to an outlet ("NPR: ...", "NPR says ..."): the source label already cites it.
 5. Do not also use the same source as a real post in the case.
 
 ## The tell
@@ -49,7 +51,8 @@ in by the tool.
 ## Safety limits
 - Only crops of quotes saved verbatim this run; never invent or paraphrase a quote and attribute it to a real
   person.
-- The post comes from a made-up account (`kind: "person"`), never from the outlet that published the quote or
-  from the speaker; the quote is attributed to its real speaker only because the words are theirs.
+- The post comes from a made-up persona (`kind: "person"`), never from the outlet that published the quote or
+  from the speaker; the quote is attributed to its real speaker only because the words are theirs. A quote is
+  never credited to an outlet (speaker "NPR" is refused).
 - NJ Monitor is CC BY-NC-ND: short excerpts only, with attribution and link in the evidence.
 - No crops that make a real person appear to say something defamatory, hateful or about blocked topics.

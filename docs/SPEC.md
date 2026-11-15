@@ -28,8 +28,8 @@
 - The pitch line: *"Earlier games taught people to doubt everything. Ours teaches them to check."*
 
 **Who it's for.**
-- **Primary:** NJ high school students (ages 14–18) and their teachers. Teachers need classroom-ready information-literacy activities.
-- **Secondary:** anyone who scrolls a feed. The daily case works like Wordle.
+- **Primary:** anyone who scrolls a feed. The daily case works like Wordle.
+- **Also:** New Jersey teens (ages 14–18), the age group the state law above is aimed at.
 
 ---
 
@@ -157,7 +157,7 @@ Outcomes always use **color + icon + word**, never color alone.
 5. **Dossier** (player profile)
 6. **Casebook** (trick library)
 7. **The Con's Workshop** (a side panel on Investigation and Reveal, plus a full-screen view)
-8. **Teacher mode:** case queue, case review, class dashboard (stretch)
+8. **Editor's Desk:** case queue and case review
 
 ### 3.3 Title / Home
 - The main logo, with the tagline *"Don't believe everything. Don't doubt everything."* The Con stands in a doorway of light.
@@ -169,7 +169,7 @@ Outcomes always use **color + icon + word**, never color alone.
   - Files: `frontend/public/` (web) and the team's Illustrator folder, outside this repo (Illustrator source and generator).
   - Variants: the main logo (name on the body), an icon (wavy salt line instead of the name: favicon, spinner, empty states), and a horizontal wordmark (top bar, Devpost).
 - Primary button: **"Open today's case"**, labeled with the case number: *Case #0412 · NJ power bills*.
-- Secondary buttons: **Casebook**, **Dossier**, **Teacher mode**.
+- Secondary buttons: **Casebook**, **Dossier**, **Editor's Desk**.
 - Streak flame and Detective rating badge in the top right (stretch: streaks).
 - A "How it works" strip with three icons: *Investigate → Decide → See the trick*.
 
@@ -310,7 +310,7 @@ Slides in from the right on Investigation and Reveal. There's also a full-screen
 │  ✓ Choose tricks for this player: misleading chart (weak spot)              │
 │  ◐ Forge post 2                                                             │
 │  ○ Blind-solve the case                                                     │
-│  ○ Send to teacher for approval                                             │
+│  ○ Send to the editor for approval                                          │
 │ SUB-AGENTS                                                                  │
 │  Researcher ✓   Forger ● working   Blind solver ○   (lanes with short logs) │
 │ FILES                                                                       │
@@ -324,16 +324,12 @@ Slides in from the right on Investigation and Reveal. There's also a full-screen
 - **Replay mode** plays back a saved run log (`pipeline_log.jsonl`) at 2–4x speed. The demo uses this to avoid rate limits.
 - **During a player's round**, the panel shows *how this case was built*, but **hides the answer key**: the forger's lane says "Forged post ██" until after the reveal.
 
-### 3.11 Teacher mode
+### 3.11 Editor's Desk
 - **Case queue:** a table of draft cases with columns topic, date, tricks used, blind-solver result (pass/fail and difficulty), and status (`draft` / `awaiting approval` / `approved` / `rejected`).
 - **Case review:**
-  - On the left, a student preview.
+  - On the left, a player preview.
   - On the right, the answer key, the diffs, the solver log and the safety checks.
   - Buttons **Approve**, **Edit** (adjust text or remove a post) and **Reject** (with a reason).
-- **Class dashboard (stretch):**
-  - Which tricks the class falls for most.
-  - A false-alarm leaderboard ("most skeptical tricks").
-  - Join code for students.
 - **Topic blocklist settings:** see §8.
 
 ### 3.12 Accessibility
@@ -361,7 +357,7 @@ Slides in from the right on Investigation and Reveal. There's also a full-screen
 
 **Real-but-suspicious posts** (the anti-blanket-suspicion ingredient): every case should include at least one real post that *looks* fake, such as a startling but true statistic or a genuine quote that sounds made up. The source confirms it.
 
-**Stretch tricks:** fake expert (made-up account only), emotional framing, impersonation (made-up account copying a real outlet's style, with no logos), and an AI-written post. The taxonomy follows the six *Bad News* techniques (impersonation, emotion, polarization, conspiracy, discrediting, trolling) and the Civic Online Reasoning / lateral-reading curriculum, so teachers recognize it.
+**Stretch tricks:** fake expert (made-up account only), emotional framing, impersonation (made-up account copying a real outlet's style, with no logos), and an AI-written post. The taxonomy follows the six *Bad News* techniques (impersonation, emotion, polarization, conspiracy, discrediting, trolling) and the Civic Online Reasoning / lateral-reading curriculum, so it matches the published research.
 
 ---
 
@@ -419,14 +415,14 @@ OFFLINE PIPELINE (Deep Agents, batch)                     ONLINE GAME (FastAPI)
 │   ├─ Blind solver sub-agent (no key)       │             │  - writes the Con's lines │
 │   │    → solver_log.md (pass/fail, diff.)  │             │  - updates profile.json   │
 │   ├─ Safety check (blocklist, rules)       │             └──────────────────────────┘
-│   └─ Teacher approval (human-in-the-loop)  │
+│   └─ Editor approval (human-in-the-loop)   │
 └───────────────────────────────────────────┘
 ```
 
 Why the split:
 - Low latency in play.
 - The same daily case for everyone.
-- Teachers review cases before students see them.
+- An editor reviews every case before players see it.
 - Free-tier rate limits only affect the offline pipeline. **The demo plays pre-built cases.**
 
 ### 7.2 The pipeline (Deep Agents features in use)
@@ -441,9 +437,9 @@ Why the split:
     - Use the vision model so it can look at the rendered chart PNG.
 - **File system:** everything is written as files under `cases/`, `skills/` and `players/` (see 7.4). A `CompositeBackend` routes those paths to `FilesystemBackend(root_dir=<absolute path>, virtual_mode=True)`, and scratch files stay in state.
 - **Skills:** one `SKILL.md` per trick, loaded on demand.
-- **Human-in-the-loop:** the pipeline pauses for teacher approval before a case goes live.
+- **Human-in-the-loop:** the pipeline pauses for the editor's approval before a case goes live.
   - A **checkpointer is required** for interrupts (LangGraph; SQLite or in-memory).
-  - The pause is created by gating a custom `submit_for_review` tool with `interrupt_on`. The teacher's decision resumes the run with approve, edit or reject.
+  - The pause is created by gating a custom `submit_for_review` tool with `interrupt_on`. The editor's decision resumes the run with approve, edit or reject.
   - For the MVP, approval is a single Approve button.
 - **Memory:** player profiles persist and drive which tricks the forger chooses.
 
@@ -511,10 +507,10 @@ players/<id>/profile.json   # per-trick shown/miss/false-alarm counts, history, 
 | POST | `/api/cases/{id}/evidence` | Spend a clue token and get evidence for a post and tool |
 | POST | `/api/cases/{id}/verdict` | Submit verdicts → reveal payload, score, updated profile |
 | GET | `/api/players/{id}` | Profile / dossier |
-| POST | `/api/pipeline/run` | Start building a case (teacher/admin) |
+| POST | `/api/pipeline/run` | Start building a case (editor/admin) |
 | GET | `/api/pipeline/runs/{id}/events` | Server-sent event stream (live) or replay of `pipeline_log.jsonl` |
-| GET | `/api/teacher/queue` | Draft cases |
-| POST | `/api/teacher/cases/{id}/approve` · `/reject` · `/edit` | Human-in-the-loop decisions |
+| GET | `/api/editor/queue` | Draft cases |
+| POST | `/api/editor/cases/{id}/approve` · `/reject` · `/edit` | Human-in-the-loop decisions |
 
 **Workshop event types:**
 - `plan_updated {todos}`
@@ -558,7 +554,7 @@ players/<id>/profile.json   # per-trick shown/miss/false-alarm counts, history, 
 
 ---
 
-## 8. Safety rules (judges and teachers will ask)
+## 8. Safety rules (judges will ask)
 1. **Manipulate real material whenever possible.** Most tricks need no fabrication. The deception is in the framing.
 2. **Fully fabricated posts only come from made-up accounts.** Never invent a quote and attribute it to a real person.
    - **Every doctored post comes from a made-up account**, even a crop of a real quote. Never present a doctored version as coming from a real outlet or official.
@@ -568,7 +564,7 @@ players/<id>/profile.json   # per-trick shown/miss/false-alarm counts, history, 
 4. **Every post carries the in-game watermark**, and doctored posts get a DOCTORED stamp after the reveal. Share cards never include fake content.
 5. **Topic blocklist:** elections close to voting day, ongoing tragedies, active public-health emergencies, and minors as subjects. The safety check enforces it.
 6. **Real posts must be verbatim**, with a link to the source. If the researcher can't verify something, it can't be used.
-7. **Teachers approve before students see a case.**
+7. **A human editor approves every case before players see it.**
 
 ---
 
@@ -586,7 +582,7 @@ players/<id>/profile.json   # per-trick shown/miss/false-alarm counts, history, 
 
 **Stretch (in order):**
 1. Daily case and an emoji share grid
-2. Teacher review screen (full Edit/Reject) and the class dashboard
+2. Editor's Desk review screen (full Edit/Reject)
 3. Confidence slider and calibration
 4. More tricks
 5. Photon: play over iMessage
@@ -606,8 +602,8 @@ players/<id>/profile.json   # per-trick shown/miss/false-alarm counts, history, 
 | 0:00–0:10 | A | "Misinformation runs on a handful of tricks. Our AI con artist uses them on you. Want to try?" Hand over the laptop. |
 | 0:10–0:50 | Judge plays, B narrates | B, pointing at the Workshop: "A researcher pulled real sources. The forger picked a misleading chart. A blind solver checked the case is catchable." |
 | 0:50–1:15 | Reveal | The axis animates down to zero. If they accused the real post: "That one was real. Earlier games train you to doubt everything. Ours trains you to check." |
-| 1:15–1:40 | C | Why it matters: the NJ K-12 law; earlier games increased suspicion without improving discernment; teacher approval. |
-| 1:40–2:00 | D | Future: daily case, class dashboard, more tricks. "Built on Deep Agents with $0 of AI spend." |
+| 1:15–1:40 | C | Why it matters: the NJ K-12 law; earlier games increased suspicion without improving discernment; a human editor approves every case. |
+| 1:40–2:00 | D | Future: daily case, more tricks. "Built on Deep Agents with $0 of AI spend." |
 
 **Sponsor add-ons, about 30 seconds each:**
 - **LangChain:** open the case folder, a `SKILL.md`, the solver log, and the approval step.

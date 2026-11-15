@@ -1,9 +1,9 @@
 """`submit_for_review`: the human-in-the-loop gate.
 
 The orchestrator calls it when a case is ready. `interrupt_on={"submit_for_review": ...}` pauses the
-graph BEFORE the tool runs; the teacher's decision resumes it:
+graph BEFORE the tool runs; the editor's decision resumes it:
   approve -> this tool runs and flips meta.status to "approved"
-  edit    -> the teacher edited the case files; this tool runs with the edited summary
+  edit    -> the editor edited the case files; this tool runs with the edited summary
   reject  -> the tool never runs; the feedback goes back to the orchestrator, which revises
 """
 
@@ -36,13 +36,13 @@ def submit_for_review_impl(ctx: RunContext, case_id: str, summary: str) -> str:
         return "Error: no case files yet. Run the forger (write_case) and the blind solver first."
     set_meta_status(ctx, "approved")
     ctx.events.emit("case_status", status="approved")
-    return f"Approved by the teacher. Case {case_id} is now in the case bank. Reply with one line and stop."
+    return f"Approved by the editor. Case {case_id} is now in the case bank. Reply with one line and stop."
 
 
 def review_tools(ctx: RunContext) -> list[BaseTool]:
     @tool
     def submit_for_review(case_id: str, summary: str) -> str:
-        """Send the finished case to a teacher for approval (pauses for a human decision).
+        """Send the finished case to the editor for approval (pauses for a human decision).
         summary: 2-3 lines covering the posts, the trick, the blind-solver result and difficulty."""
         return submit_for_review_impl(ctx, case_id, summary)
 

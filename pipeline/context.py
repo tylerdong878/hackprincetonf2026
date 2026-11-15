@@ -106,13 +106,30 @@ class RunContext:
     artifacts: dict[str, dict[str, Any]] = field(default_factory=dict)
     solver: SolverSession = field(default_factory=SolverSession)
     solver_history: list[dict[str, Any]] = field(default_factory=list)
-    solver_round_base: int = 0  # attempts before the latest teacher rejection (retry limit is per round)
+    solver_round_base: int = 0  # attempts before the latest editor rejection (retry limit is per round)
     write_count: int = 0
     safety_notes: list[str] = field(default_factory=list)
-    teacher_feedback: list[str] = field(default_factory=list)
+    editor_feedback: list[str] = field(default_factory=list)
+    # Where the researcher may read, and whether the topic has a chart data series (EIA). Default: the topic's
+    # TOPIC_HINTS (pipeline/topics.py). fetch_rss only reads `feeds`; fetch_article only reads `articles` and
+    # stories linked from those feeds.
+    feeds: list[str] | None = None
+    articles: list[str] | None = None
+    has_data: bool | None = None
     _counters: dict[str, int] = field(default_factory=dict)
     # Parallel tool calls in one model turn run in threads: guard ids, lists and file writes.
     lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
+
+    def __post_init__(self) -> None:
+        from pipeline.topics import hints_for, story_urls
+
+        hints = hints_for(self.topic)
+        if self.feeds is None:
+            self.feeds = list(hints.get("feeds") or [])
+        if self.articles is None:
+            self.articles = [*(hints.get("articles") or []), *story_urls(hints)]
+        if self.has_data is None:
+            self.has_data = bool(hints.get("data"))
 
     # -- case shape (casefile vs daily)
     @property

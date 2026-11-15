@@ -271,8 +271,8 @@ DOCS = ("/docs", "/redoc", "/openapi.json")
 def test_local_mode_unchanged(client):
     for path in DOCS:
         assert client.get(path).status_code == 200, path
-    assert client.get("/api/teacher/queue").status_code == 200
-    assert client.get("/api/teacher/queue", headers={"X-Teacher-Token": "nope"}).status_code == 200
+    assert client.get("/api/editor/queue").status_code == 200
+    assert client.get("/api/editor/queue", headers={"X-Editor-Token": "nope"}).status_code == 200
 
 
 def test_public_mode_hides_docs(data_dir, tmp_path, monkeypatch):
@@ -287,28 +287,66 @@ def test_public_mode_hides_docs(data_dir, tmp_path, monkeypatch):
     assert client.get("/api/health").json() == {"ok": True}
 
 
-def test_public_mode_without_teacher_token_disables_teacher_routes(data_dir, tmp_path, monkeypatch):
+def test_public_mode_without_editor_token_disables_editor_routes(data_dir, tmp_path, monkeypatch):
     monkeypatch.setenv("GOS_PUBLIC", "1")
     client = make_client(data_dir, tmp_path)
-    assert client.get("/api/teacher/queue").status_code == 404
-    assert client.get(f"/api/teacher/cases/{DEMO}", headers={"X-Teacher-Token": ""}).status_code == 404
-    assert client.post(f"/api/teacher/cases/{DEMO}/approve", json={}).status_code == 404
+    for prefix in ("/api/editor", "/api/teacher"):  # /api/teacher: hidden back-compat alias
+        assert client.get(f"{prefix}/queue").status_code == 404
+        assert client.get(f"{prefix}/cases/{DEMO}", headers={"X-Editor-Token": ""}).status_code == 404
+        assert client.post(f"{prefix}/cases/{DEMO}/approve", json={}).status_code == 404
 
 
-def test_public_mode_teacher_token(data_dir, tmp_path, monkeypatch):
+def editor_calls(prefix):
+    return [("get", f"{prefix}/queue", None), ("get", f"{prefix}/cases/{DEMO}", None),
+            ("post", f"{prefix}/cases/{DEMO}/reject", {"reason": "x"}),
+            ("post", f"{prefix}/cases/{DEMO}/approve", {})]
+
+
+def test_public_mode_editor_token(data_dir, tmp_path, monkeypatch):
     monkeypatch.setenv("GOS_PUBLIC", "1")
-    monkeypatch.setenv("TEACHER_TOKEN", "editor-desk-42")
+    monkeypatch.setenv("EDITOR_TOKEN", "editor-desk-42")
     client = make_client(data_dir, tmp_path)
-    good = {"X-Teacher-Token": "editor-desk-42"}
-    for method, path, body in [("get", "/api/teacher/queue", None), ("get", f"/api/teacher/cases/{DEMO}", None),
-                               ("post", f"/api/teacher/cases/{DEMO}/reject", {"reason": "x"}),
-                               ("post", f"/api/teacher/cases/{DEMO}/approve", {})]:
+    good = {"X-Editor-Token": "editor-desk-42"}
+    for method, path, body in editor_calls("/api/editor"):
         call = getattr(client, method)
         kw = {"json": body} if body is not None else {}
         assert call(path, **kw).status_code == 401, path
-        assert call(path, headers={"X-Teacher-Token": "editor-desk-4"}, **kw).status_code == 401, path
+        assert call(path, headers={"X-Editor-Token": "editor-desk-4"}, **kw).status_code == 401, path
         assert call(path, headers=good, **kw).status_code == 200, path
-    assert client.get("/api/teacher/cases/..%2Fx").status_code in (401, 404)
+    assert client.get("/api/editor/cases/..%2Fx").status_code in (401, 404)
+
+
+# Back-compat: TEACHER_TOKEN / X-Teacher-Token / /api/teacher/* are the old names and still work.
+
+@pytest.mark.parametrize("prefix", ["/api/editor", "/api/teacher"])
+@pytest.mark.parametrize("header", ["X-Editor-Token", "X-Teacher-Token"])
+def test_public_mode_accepts_old_token_header_and_old_paths(data_dir, tmp_path, monkeypatch, prefix, header):
+    monkeypatch.setenv("GOS_PUBLIC", "1")
+    monkeypatch.setenv("EDITOR_TOKEN", "editor-desk-42")
+    client = make_client(data_dir, tmp_path)
+    for method, path, body in editor_calls(prefix):
+        call = getattr(client, method)
+        kw = {"json": body} if body is not None else {}
+        assert call(path, **kw).status_code == 401, path
+        assert call(path, headers={header: "editor-desk-4"}, **kw).status_code == 401, path
+        assert call(path, headers={header: "editor-desk-42"}, **kw).status_code == 200, path
+
+
+def test_old_teacher_token_env_is_a_fallback(data_dir, tmp_path, monkeypatch):
+    monkeypatch.setenv("GOS_PUBLIC", "1")
+    monkeypatch.setenv("TEACHER_TOKEN", "old-name-7")
+    client = make_client(data_dir, tmp_path)
+    assert client.get("/api/editor/queue").status_code == 401
+    assert client.get("/api/editor/queue", headers={"X-Editor-Token": "old-name-7"}).status_code == 200
+
+
+def test_editor_token_env_wins_over_the_old_name(data_dir, tmp_path, monkeypatch):
+    monkeypatch.setenv("GOS_PUBLIC", "1")
+    monkeypatch.setenv("EDITOR_TOKEN", "new-name-9")
+    monkeypatch.setenv("TEACHER_TOKEN", "old-name-7")
+    client = make_client(data_dir, tmp_path)
+    assert client.get("/api/editor/queue", headers={"X-Editor-Token": "new-name-9"}).status_code == 200
+    assert client.get("/api/editor/queue", headers={"X-Editor-Token": "old-name-7"}).status_code == 401
 
 
 def test_public_mode_rate_limits_answers_per_ip(data_dir, tmp_path, monkeypatch):

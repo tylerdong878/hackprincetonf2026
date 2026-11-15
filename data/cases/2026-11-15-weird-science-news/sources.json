@@ -1,0 +1,54 @@
+{
+  "case_id": "2026-11-15-weird-science-news",
+  "topic": "weird science news",
+  "sources": [
+    {
+      "id": "s1",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6026704/scientists-think-theyve-found-ancient-remnants-of-dinosaur-blood",
+      "outlet": "NPR",
+      "kind": "outlet",
+      "date": "2026-11-09",
+      "published_at": "2026-11-09T22:00:49Z",
+      "title": "Scientists think they've found ancient remnants of dinosaur blood",
+      "text": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood.",
+      "speaker": null,
+      "before": "",
+      "highlight": "Scientists have studied plenty of dinosaur bones, eggs and footprints. Now, some think they've found their strongest evidence yet of dinosaur blood.",
+      "after": "",
+      "starts_mid_sentence": false,
+      "headline": false
+    },
+    {
+      "id": "s2",
+      "url": "https://www.npr.org/2026/11/09/nx-s1-6027938/mice-can-learn-to-fight-by-watching-tiny-rodent-cage-matches-study-finds",
+      "outlet": "NPR",
+      "kind": "outlet",
+      "date": "2026-11-09",
+      "published_at": "2026-11-09T21:39:35Z",
+      "title": "Mice can learn to fight by watching tiny rodent cage matches, study finds",
+      "text": "Brain scientists set up \"gladiator style\" cage matches for mice — and found that simply observing fighting matches can rewire a mouse's brain to resemble those who actually fought.",
+      "speaker": null,
+      "before": "",
+      "highlight": "Brain scientists set up \"gladiator style\" cage matches for mice — and found that simply observing fighting matches can rewire a mouse's brain to resemble those who actually fought.",
+      "after": "",
+      "starts_mid_sentence": false,
+      "headline": false
+    },
+    {
+      "id": "s3",
+      "url": "https://www.npr.org/2026/11/13/nx-s1-6039312/spacex-nasa-starship-iss-dragon-falcon-musk",
+      "outlet": "NPR",
+      "kind": "outlet",
+      "date": "2026-11-13",
+      "published_at": "2026-11-13T10:00:00Z",
+      "title": "SpaceX's giant rocket may leave NASA in the dust",
+      "text": "As it races to develop its new massive rocket, the space launch company is preparing to retire NASA's main ride to the International Space Station.",
+      "speaker": null,
+      "before": "",
+      "highlight": "As it races to develop its new massive rocket, the space launch company is preparing to retire NASA's main ride to the International Space Station.",
+      "after": "(Image credit: Eric Gay)",
+      "starts_mid_sentence": false,
+      "headline": false
+    }
+  ]
+}

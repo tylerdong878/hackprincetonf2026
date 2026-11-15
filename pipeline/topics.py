@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -22,21 +23,61 @@ TOPIC_HINTS: dict[str, dict[str, list[str]]] = {
         "data": ["get_eia_series (NJ residential price, monthly, through 2026-08)"],
         "theme": ["Your Bills"],
     },
+    # Fun daily themes (entertainment first). No chart data source for these, so no misleading-chart trick.
+    "weird science news": {
+        "feeds": ["https://feeds.npr.org/1007/rss.xml"],
+        "articles": [], "known_stories": [],
+        "query": ["scientists discovered study found animals space fossils"],
+        "data": [], "theme": ["Science Says"],
+        "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+    },
+    "food news": {
+        "feeds": ["https://feeds.npr.org/1053/rss.xml"],
+        "articles": [], "known_stories": [],
+        "query": ["food prices restaurant recipe snack coffee"],
+        "data": [], "theme": ["Food Fight"],
+        "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+    },
+    "sports news": {
+        "feeds": ["https://feeds.npr.org/1055/rss.xml"],
+        "articles": [], "known_stories": [],
+        "query": ["record season fans league marathon game"],
+        "data": [], "theme": ["Game Day"],
+        "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+    },
+    "tech and internet news": {
+        "feeds": ["https://feeds.npr.org/1019/rss.xml"],
+        "articles": [], "known_stories": [],
+        "query": ["app online internet robot video game phone"],
+        "data": [], "theme": ["Logged On"],
+        "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+    },
+    "new jersey weird news": {
+        "feeds": ["https://nj1015.com/feed/", "https://whyy.org/feed/"],
+        "articles": [], "known_stories": [],
+        "query": ["New Jersey weird strange record diner boardwalk"],
+        "data": [], "theme": ["Jersey Weird"],
+        "tricks": ["out-of-context-quote", "cherry-picked-stat", "edited-detail"],
+    },
 }
 
 # Doctored posts per weekday, like NYT puzzles (Monday easy ... Saturday hard). Mon=0.
 DAILY_DOCTORED_BY_WEEKDAY = {0: (0, 1), 1: (1, 1), 2: (1, 2), 3: (1, 2), 4: (2, 2), 5: (2, 3), 6: (0, 2)}
 
 
-def plan_daily(daily_date: str, n_doctored: int | None = None) -> tuple[list[str], str]:
-    """(tricks, reason) for a Daily Grain: 0-3 doctored posts, seeded by the date so a re-run plans the same day."""
+def plan_daily(daily_date: str, n_doctored: int | None = None,
+               allowed: list[str] | None = None) -> tuple[list[str], str]:
+    """(tricks, reason) for a Daily Grain: 0-3 doctored posts, seeded by the date so a re-run plans the same day.
+
+    `allowed` limits the tricks (e.g. no misleading-chart for a topic with no chart data)."""
     day = datetime.strptime(daily_date, "%Y-%m-%d")
     rng = random.Random(f"grain-of-salt-daily-{daily_date}")
     lo, hi = DAILY_DOCTORED_BY_WEEKDAY[day.weekday()]
     n = rng.randint(lo, hi) if n_doctored is None else n_doctored
     if not 0 <= n <= 3:
         raise ValueError("a daily has 0-3 doctored posts")
-    tricks = rng.sample(list(TRICKS), k=n)
+    pool = [t for t in TRICKS if allowed is None or t in allowed]
+    tricks = rng.sample(pool, k=min(n, len(pool)))
     reason = f"{day:%A}: {n} doctored" + (" (set by the operator)" if n_doctored is not None else "")
     return tricks, reason
 
@@ -54,6 +95,11 @@ def hints_for(topic: str) -> dict[str, list[str]]:
             "articles": [], "known_stories": [], "query": [topic], "data": []}
 
 
+def story_urls(hints: dict[str, list[str]]) -> list[str]:
+    """The URLs inside `known_stories` entries ('https://... (in the NJ Monitor feed, page 2)')."""
+    return [m.group(0) for s in hints.get("known_stories") or [] for m in re.finditer(r"https?://\S+", s)]
+
+
 def hints_text(topic: str) -> str:
     h = hints_for(topic)
     lines = []
@@ -65,6 +111,9 @@ def hints_text(topic: str) -> str:
         lines.append("- known stories: " + "; ".join(h["known_stories"]))
     if h.get("data"):
         lines.append("- data: " + "; ".join(h["data"]))
+    else:
+        lines.append("- data: none for this topic (no EIA tool; any stat comes from a saved source's own numbers)")
+    lines.append("- only these feeds, the stories they link to and the pages listed here can be fetched")
     return "\n".join(lines)
 
 

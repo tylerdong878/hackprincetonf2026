@@ -81,8 +81,8 @@ uv run uvicorn backend.app.main:app --port 8000
 The Daily Grain and Case Files play from the saved case bank and need no API keys. Con the Con's live judge and the puzzle pipeline need a free [OpenRouter](https://openrouter.ai/keys) key: copy `.env.example` to `.env` and fill it in. LangSmith tracing is optional.
 
 ```bash
-uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20 --hold-for-teacher   # build a puzzle
-uv run python -m pipeline.build_case --dry-run                                                 # no model calls
+uv run python -m pipeline.build_case --mode daily --daily-date 2026-11-20 --hold-for-editor   # build a puzzle
+uv run python -m pipeline.build_case --dry-run                                                # no model calls
 ```
 
 For a public deployment, set `GOS_PUBLIC=1`. That hides the API docs, puts a token on the Editor's Desk, rate-limits answers and caps live Con calls. Details are in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).

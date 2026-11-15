@@ -1,6 +1,6 @@
 ---
 name: cherry-picked-stat
-description: Forge a cherry-picked statistic - a true number stated without its offset, baseline or denominator, or a hand-picked time window. Use when the case's trick is cherry-picked-stat. The code tool make_stat_claim verifies every number against real sources or EIA data.
+description: Forge a cherry-picked statistic - a true number from a saved source stated without its offset, baseline, denominator or time window (EIA data mode only on topics whose hints list data). Use when the case's trick is cherry-picked-stat. The code tool make_stat_claim verifies every number and word against the source.
 ---
 
 # Cherry-picked stat
@@ -12,24 +12,34 @@ or the window (last year's summer jump presented as today's trend).
 
 ## When to use
 - The case's trick is `cherry-picked-stat`.
-- Source mode: a saved passage reports a number next to the number that cancels or qualifies it. Example
-  (NJ Monitor, Sept 24, 2026): Atlantic City Electric bills "will rise by $4.09 ..." but "will fall by $4.14 ...,
-  leaving the average monthly bill 5 cents cheaper".
-- Data mode: EIA monthly prices, picking a window whose % change is far from the latest year-over-year change
-  (e.g. Jun 2024 -> Jun 2025, +23.9%, while Aug 2025 -> Aug 2026 is -0.4%).
+- Source mode (the default, and the ONLY mode on every topic without a data series: food, sports, science,
+  tech, weird news...): a saved passage reports a number next to the number, base or time window that qualifies
+  it. Examples: candy prices "have risen 7.7% in one year and are up more than 18% in two years" (keep the 18%,
+  drop the 7.7% and "in two years"); Atlantic City Electric bills "will rise by $4.09 ..." but "will fall by
+  $4.14 ...".
+- Data mode: ONLY when the topic's research hints list EIA data (NJ electricity prices). Pick a window whose %
+  change is far from the latest year-over-year change (e.g. Jun 2024 -> Jun 2025, +23.9%, while Aug 2025 ->
+  Aug 2026 is -0.4%). On any other topic the tool refuses data mode: never put NJ power prices into a food,
+  sports or science day.
 
 ## Forging recipe (allowed operations on real material only)
-Call `make_stat_claim` once, in one of two modes.
+Call `make_stat_claim` once.
 - Source mode: `source_id`, `kept_fact` (verbatim, contains the number you keep), `omitted_fact` (verbatim, the
-  offset/denominator you leave out; it must be visible in the source evidence), and `claim` (your post text,
-  using only numbers from `kept_fact`), e.g. claim "Atlantic City Electric bills are going UP $4.09 a month."
-- Data mode: `start_month`, `end_month` (YYYY-MM) and optionally `claim`. The tool refuses windows whose change is
-  within 5 points of the honest latest year-over-year change (that wouldn't mislead).
-The tool returns a forgery id (`f#`); the claim becomes the post body. In `write_case` add a made-up
-`author_name`/`author_handle`, a one-sentence `tell` and an explanation.
+  offset/denominator/time window you leave out; it must be visible in the source evidence), and `claim` (your
+  post text). The claim restates `kept_fact` in the source's own words with only its numbers, e.g. "Candy and
+  gum prices are up more than 18%." or "Atlantic City Electric bills are going UP $4.09 a month."
+- Data mode (data topics only): `start_month`, `end_month` (YYYY-MM) and optionally `claim`. The tool refuses
+  windows whose change is within 5 points of the honest latest year-over-year change (that wouldn't mislead).
+The tool returns a forgery id (`f#`); the claim becomes the post body. In `write_case` the post gets a made-up
+persona (or leave `author_name` empty), a one-sentence `tell` and an explanation.
 
-Not allowed: changing a number, rounding it into a different claim, inventing a denominator, or using a number
-that isn't in the source/data.
+The claim only DROPS context. It never ADDS anything the source doesn't say: no conclusion ("the data proves the
+grid is collapsing"), no authority ("Science says", "experts confirm"), no widening ("every store", "a total
+ban"). The tool rejects claims with words or conclusions that aren't in the source (or, in data mode, aren't
+about the price series), and write_case rejects the same in any extra words around the claim.
+
+Not allowed: changing a number, rounding it into a different claim, inventing a denominator, adding a
+conclusion, or using a number that isn't in the source/data.
 
 ## The tell
 The same source (or the data table) shows the missing piece: the offsetting drop, the base the percentage is of,
@@ -49,6 +59,7 @@ the tool.
 - Alternative fooled: "A number without its denominator is my favorite kind of number."
 
 ## Safety limits
-- Numbers only from sources saved verbatim this run or from the EIA file.
-- Posted by a made-up account (`kind: "person"`), never presented as the outlet, the BPU or EIA.
-- Keep it about bills and prices; no campaign framing, no blocked topics.
+- Numbers only from sources saved verbatim this run, or (data topics only) from the EIA file.
+- Posted by a made-up persona (`kind: "person"`), never presented as the outlet, the BPU or EIA: no "NPR says"
+  or "according to EIA" in the post text (the source label already cites the source).
+- Stay on the day's topic; no campaign framing, no blocked topics.

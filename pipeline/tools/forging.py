@@ -15,6 +15,13 @@ from langchain_core.tools import BaseTool, tool
 
 from pipeline.config import EIA_TITLE, EIA_UNIT, EIA_URL
 from pipeline.context import RunContext, SavedSource
+from pipeline.safety import (
+    RealEntity,
+    known_entities,
+    outlet_speaker_problem,
+    overclaim_hits,
+    unsupported_words,
+)
 from pipeline.textutil import clip, month_label, normalize, numbers_in, sentence_spans
 from pipeline.tools.research import load_eia, pct_change, shift_month
 
@@ -151,21 +158,30 @@ def crop_quote_impl(ctx: RunContext, source_id: str, keep_text: str) -> str:
     shown, removed = crop_tokens(orig_tokens, matched, end_punct)
     if not removed:
         return "Rejected: keep_text keeps the whole quote. Remove at least one word or phrase."
-    speaker = src.speaker or src.outlet
+    # A quote card is credited to the PERSON who said it. A sentence or headline with no speaker is posted as the
+    # made-up account's own text: it is never turned into a quote "by" the outlet (no speaker "NPR").
+    speaker = src.speaker
+    if speaker and (prob := outlet_speaker_problem(speaker, known_entities([RealEntity(src.outlet)]))):
+        return f"Rejected: {prob}."
     removed_txt = " / ".join(f"“{r}”" for r in removed)
+    what = "quote" if speaker else ("headline" if src.headline else "sentence")
     art = {
         "kind": "forgery", "trick": "out-of-context-quote", "source_id": src.id, "speaker": speaker,
-        "quote": {"text": shown, "speaker": speaker},
+        "quote": {"text": shown, "speaker": speaker} if speaker else None, "shown": shown,
         "diff": {"type": "quote", "shown": shown, "original": original, "removed": removed},
         "evidence_tools": ["source"],
         "allowed_numbers": sorted(set(numbers_in(original))),
-        "default_tell": f"The post cut {removed_txt} out of the real quote. The full sentence says something else.",
+        "default_tell": f"The post cut {removed_txt} out of the real {what}. The full {what} says something else.",
         "default_explanation": (f"The words are real, from {src.outlet}, but the post stops quoting early. "
-                                f"The full quote: “{clip(original, 220)}”"),
+                                f"The full {what}: “{clip(original, 220)}”"),
     }
     fid = _store(ctx, "f", art)
-    return (f"Made {fid} (out-of-context-quote) from {src.id}.\nShown: “{shown}” — {speaker}\n"
-            f"Removed: {removed_txt}\nUse forgery_id {fid} in write_case (the quote text is filled in for you).")
+    if speaker:
+        return (f"Made {fid} (out-of-context-quote) from {src.id}.\nShown: “{shown}” — {speaker}\n"
+                f"Removed: {removed_txt}\nUse forgery_id {fid} in write_case (the quote text is filled in for you).")
+    return (f"Made {fid} (out-of-context-quote) from {src.id}, a {what} with no speaker, so it is posted as the "
+            f"account's own text (not a quote card).\nShown: “{shown}”\nRemoved: {removed_txt}\n"
+            f"Use forgery_id {fid} in write_case; the cropped text becomes the post body.")
 
 
 # --------------------------------------------------------------------------------------
@@ -201,6 +217,8 @@ def data_evidence(prices: dict[str, float], first: str, last: str, note: str) ->
 def make_chart_impl(ctx: RunContext, months: list[str] | None = None, start: str = "", end: str = "",
                     chart_type: str = "bar", y_min: float | None = None, title: str = "",
                     honest: bool = False) -> str:
+    if not ctx.has_data:
+        return "Rejected: this topic has no chart data (EIA NJ electricity prices are for the energy topic only)."
     prices = load_eia(ctx.eia_path)
     if chart_type not in ("bar", "line"):
         return "Rejected: chart_type must be 'bar' or 'line'."
@@ -315,6 +333,30 @@ def _evidence_text(src: SavedSource) -> str:
     return " ".join(x for x in (src.before, src.highlight, src.after) if x)
 
 
+# Words a data-mode claim may use: it can only describe the EIA series (NJ home electricity prices).
+EIA_CLAIM_WORDS = frozenset(
+    "electricity electric power energy price prices bill bills rate rates residential home homes household "
+    "households jersey customers kwh kilowatt hour per average".split()
+    + [m.lower() for m in ("January", "February", "March", "April", "May", "June", "July", "August", "September",
+                           "October", "November", "December")])
+
+
+def claim_overreach(claim: str, support: str, extra: frozenset[str] | set[str] = frozenset()) -> str | None:
+    """A doctored stat may only DROP context. Rejects a claim that adds words or conclusions its source lacks."""
+    added = unsupported_words(claim, support, extra)
+    loud = overclaim_hits(claim, support)
+    if not added and not loud:
+        return None
+    parts = []
+    if loud:
+        parts.append(f"it overclaims ({', '.join(loud)})")
+    if added:
+        parts.append(f"it adds words the {'source' if support else 'data'} doesn't support "
+                     f"({', '.join(added[:8])})")
+    return ("Rejected: the claim says more than its " + ("source" if support else "data") + ": "
+            + "; ".join(parts) + ". A cherry-picked stat leaves context out; it never adds a conclusion.")
+
+
 def _span_sentences(text: str, a: str, b: str) -> str:
     from pipeline.textutil import find_verbatim
 
@@ -334,6 +376,10 @@ def make_stat_claim_impl(ctx: RunContext, claim: str = "", start_month: str = ""
     from pipeline.textutil import find_verbatim
 
     if start_month or end_month:
+        if not ctx.has_data:
+            return ("Rejected: this topic has no data series, so data mode is off (EIA NJ electricity prices are "
+                    "for the energy topic only). Build the stat from a saved source's own numbers: source_id + "
+                    "kept_fact + omitted_fact + claim.")
         prices = load_eia(ctx.eia_path)
         a, b = start_month, end_month
         if a not in prices or b not in prices or a >= b:
@@ -357,6 +403,8 @@ def make_stat_claim_impl(ctx: RunContext, claim: str = "", start_month: str = ""
         if bad:
             return (f"Rejected: the claim uses numbers not in the data: {bad}. Allowed: "
                     f"{', '.join(f'{x:g}' for x in sorted(allowed))}.")
+        if why := claim_overreach(claim, "", extra=EIA_CLAIM_WORDS):
+            return why + f" E.g. “{default_claim}”"
         original = (f"EIA: {month_label(a)} {va} → {month_label(b)} {vb} ¢/kWh ({shown_pct:+.1f}%). Latest year: "
                     f"{month_label(lprev)} {prices[lprev]} → {month_label(latest)} {prices[latest]} ({latest_pct:+.1f}%).")
         missing = (f"The most recent year: {month_label(lprev)} to {month_label(latest)} prices changed "
@@ -394,6 +442,8 @@ def make_stat_claim_impl(ctx: RunContext, claim: str = "", start_month: str = ""
     bad = check_numbers(claim, kept_nums, small_ints=False)
     if bad:
         return f"Rejected: the claim's numbers {bad} are not in kept_fact (only real numbers, no new ones)."
+    if why := claim_overreach(claim, " ".join([visible, src.title or ""])):
+        return why + f" Restate kept_fact (“{clip(kept_fact, 120)}”) in the source's own words."
     claim_nums = set(numbers_in(claim))
     if not [v for v in numbers_in(omitted_fact) if not any(abs(v - c) < 0.005 for c in claim_nums)]:
         return "Rejected: omitted_fact must contain the number the claim leaves out (the denominator / offset)."
@@ -493,10 +543,12 @@ def edit_detail_impl(ctx: RunContext, source_id: str, find: str, replace: str) -
 def forging_tools(ctx: RunContext) -> list[BaseTool]:
     @tool
     def crop_quote(source_id: str, keep_text: str) -> str:
-        """out-of-context-quote: cut a saved REAL quote so it misleads.
+        """out-of-context-quote: cut a saved REAL quote (or sentence/headline) so it misleads.
 
         keep_text = the words you keep, in the quote's own order (you may skip words, e.g. drop "net", "not yet",
-        "but"). At most 2 cuts inside the quote; nothing may be added. Returns a forgery id for write_case.
+        "but"). At most 2 cuts inside the quote; nothing may be added. A source with a speaker becomes a quote
+        card credited to that person; one without a speaker is posted as the account's own text (never credited
+        to the outlet). Returns a forgery id for write_case.
         """
         return crop_quote_impl(ctx, source_id, keep_text)
 
@@ -523,6 +575,14 @@ def forging_tools(ctx: RunContext) -> list[BaseTool]:
         """
         return make_stat_claim_impl(ctx, claim, start_month, end_month, source_id, kept_fact, omitted_fact)
 
+    if not ctx.has_data:
+        make_stat_claim.description = (
+            "cherry-picked-stat: a true number from a saved source, stated without its context.\n\n"
+            "This topic has no data series: use source_id + kept_fact + omitted_fact + claim, where kept_fact and "
+            "omitted_fact are verbatim from the saved passage and omitted_fact holds the offset/denominator/time "
+            "window the claim leaves out. The claim uses only the source's own words and numbers (no new "
+            "conclusions). Returns a forgery id for write_case.")
+
     @tool
     def edit_detail(source_id: str, find: str, replace: str) -> str:
         """edited-detail: swap ONE number, date or place in a saved REAL headline or sentence (not a quote).
@@ -532,4 +592,5 @@ def forging_tools(ctx: RunContext) -> list[BaseTool]:
         """
         return edit_detail_impl(ctx, source_id, find, replace)
 
-    return [crop_quote, make_chart, make_stat_claim, edit_detail]
+    # make_chart only charts the EIA electricity series, so it exists only on topics whose hints list data.
+    return [crop_quote, *([make_chart] if ctx.has_data else []), make_stat_claim, edit_detail]

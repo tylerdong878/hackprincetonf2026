@@ -44,7 +44,7 @@ def daily_posts(ctx, ids) -> list[dict]:
         {"id": "p3", "role": "real_suspicious", "source_id": ids["bpu20"]},
         {"id": "p4", "role": "doctored", "forgery_id": "f2", "author_name": "Turnpike Tea",
          "author_handle": "@turnpiketea"},
-        {"id": "p5", "role": "real", "source_id": ids["peak"]},
+        {"id": "p5", "role": "real", "source_id": ids["peak"], "by_persona": True},  # real, by a persona
     ]
 
 
@@ -180,8 +180,8 @@ def test_daily_with_nothing_doctored(tmp_path):
     ids["head"] = headline(ctx)
     make_chart_impl(ctx, months=["2025-07", "2026-07"], honest=True)
     posts = [{"id": "p1", "role": "real", "source_id": ids["net"]},
-             {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Priya (watt nerd)",
-              "author_handle": "@wattnerd"},
+             {"id": "p2", "role": "real_suspicious", "chart_id": "c1", "author_name": "Calm Down Daily",
+              "author_handle": "@calmdowndaily"},
              {"id": "p3", "role": "real", "source_id": ids["bpu20"]},
              {"id": "p4", "role": "real", "source_id": ids["head"]},
              {"id": "p5", "role": "real", "source_id": ids["ace"]}]
@@ -244,6 +244,39 @@ def test_run_settings_daily(tmp_path):
     assert default["daily_date"] == "2026-11-15" and default["theme"] == "Your Bills"
     v1 = run_settings(_args(trick="misleading-chart"), now, tmp_path)
     assert v1["mode"] == "casefile" and v1["trick"] == "misleading-chart"
+
+
+def test_hold_for_editor_flag_and_its_hidden_old_name(capsys):
+    from pipeline.build_case import parse_args
+
+    assert parse_args(["--hold-for-editor"]).hold_for_editor is True
+    assert parse_args(["--hold-for-teacher"]).hold_for_editor is True  # old name, kept as a hidden alias
+    assert parse_args([]).hold_for_editor is False
+    for flag in ("--hold-for-editor", "--hold-for-teacher"):
+        with pytest.raises(SystemExit):
+            parse_args([flag, "--auto-approve"])  # still mutually exclusive with --auto-approve
+    capsys.readouterr()
+    with pytest.raises(SystemExit):
+        parse_args(["--help"])
+    help_text = capsys.readouterr().out
+    assert "--hold-for-editor" in help_text and "--hold-for-teacher" not in help_text
+
+
+def test_nightly_build_holds_for_the_editor(monkeypatch):
+    from datetime import date
+
+    from pipeline.build_case import parse_args
+    from scripts import nightly_build
+
+    calls = []
+    monkeypatch.setattr(nightly_build, "next_missing", lambda _days: date(2026, 11, 23))
+    monkeypatch.setattr(nightly_build.subprocess, "run",
+                        lambda cmd, cwd=None: calls.append(cmd) or argparse.Namespace(returncode=0))
+    assert nightly_build.main([]) == 0
+    (cmd,) = calls
+    assert cmd[1:3] == ["-m", "pipeline.build_case"]
+    args = parse_args(cmd[3:])
+    assert args.hold_for_editor is True and args.auto_approve is False and args.mode == "daily"
 
 
 def test_user_request_and_ctx_shape_for_daily(daily_ctx):

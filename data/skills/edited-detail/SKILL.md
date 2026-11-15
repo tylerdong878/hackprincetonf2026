@@ -24,9 +24,10 @@ Call `edit_detail(source_id, find, replace)` once.
 3. `replace` = a different detail of the same kind (number for number, date for date, place for place). The tool
    refuses anything else, and refuses to touch any other word.
 4. Make the swap matter but stay plausible: a 10x number, a different year, a neighbouring town.
-5. In `write_case`, the doctored post gets `forgery_id`, a made-up `author_name`/`author_handle`; the edited text
-   becomes the post body (you may add a few words around it, but not new numbers). Don't also use the same
-   source as a real post.
+5. In `write_case`, the doctored post gets `forgery_id` and a made-up persona (or leave `author_name` empty); the
+   edited text becomes the post body (you may add a few words of reaction around it, but no new numbers, no
+   new claims, and no "NPR:" / "NPR reports" credit: the source label already cites the outlet). Don't also use
+   the same source as a real post.
 
 Not allowed: changing more than one detail, editing quotes, inventing a headline, or posting it as the outlet.
 

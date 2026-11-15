@@ -47,9 +47,9 @@ const NAV = [
   { to: '/daily', label: 'Daily', short: 'Daily', key: 'daily' },
   { to: '/con', label: 'Con the Con', short: 'Con', key: 'con' },
   { to: '/casefiles', label: 'Case Files', short: 'Files', key: 'casefiles' },
-  { to: '/casebook', label: 'Casebook', short: 'Casebook', key: 'casebook', wide: true },
-  { to: '/dossier', label: 'Dossier', short: 'Dossier', key: 'dossier' },
-  { to: '/teacher', label: 'Editor’s Desk', short: 'Desk', key: 'teacher', wide: true },
+  { to: '/casebook', label: 'Tricks', short: 'Tricks', key: 'casebook', wide: true },
+  { to: '/dossier', label: 'Stats', short: 'Stats', key: 'dossier' },
+  { to: '/editor', label: 'Editor’s Desk', short: 'Desk', key: 'editor', wide: true },
 ]
 
 export function SiteHeader({ active, right }: { active?: string; right?: ReactNode }) {
