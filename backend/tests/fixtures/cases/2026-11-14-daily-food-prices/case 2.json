@@ -1,0 +1,138 @@
+{
+  "id": "2026-11-14-daily-food-prices",
+  "number": 4,
+  "title": "Check the Receipt",
+  "topic": "Grocery prices",
+  "briefing": "Food prices. Five posts, 0–3 doctored today. Check the receipt before you swallow anything.",
+  "notice": "Game content: the Con doctors some posts on purpose. Every doctored post is stamped at the reveal.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Cluck Report",
+        "handle": "@cluckreport",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#DB2777"
+      },
+      "posted_at": "2026-11-13T16:40:00Z",
+      "body": "Egg prices are SPIKING again 📈🥚 Stock up before it's 2025 all over again.",
+      "quote": null,
+      "chart": {
+        "type": "bar",
+        "title": "Average price, a dozen eggs",
+        "unit": "$/dozen",
+        "points": [
+          {
+            "label": "Jun 2026",
+            "value": 2.141
+          },
+          {
+            "label": "Oct 2026",
+            "value": 2.32
+          }
+        ],
+        "y_min": 2.1,
+        "y_max": 2.35
+      },
+      "source_label": "Data: BLS average prices (via FRED)",
+      "card_style": "chart",
+      "tools": [
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-10-20T09:00:00Z",
+      "body": "A pound of butter averaged $3.96 in September. That was down 17.3% since last year, bucking the trend of rising food prices.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 20, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "Spooky Budget",
+        "handle": "@spookybudget",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#7C2D12"
+      },
+      "posted_at": "2026-10-31T13:15:00Z",
+      "body": "Halloween budget check 🎃 \"Prices for candy, the most popular Halloween purchase, and gum are up more than 18%.\" Plan accordingly.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 30, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "Grill Sergeant",
+        "handle": "@grillsergeant",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#B91C1C"
+      },
+      "posted_at": "2026-10-21T00:30:00Z",
+      "body": "AN 85% JUMP. 🥩😤 \"A typical pound of ground beef last month cost $6.79, an 85% jump from a decade earlier, according to the Bureau of Labor Statistics.\"",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 20, 2026",
+      "card_style": "stat",
+      "tools": [
+        "source",
+        "data",
+        "account"
+      ]
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-10-20T09:00:00Z",
+      "body": "Why these 5 everyday items fluctuate in price at the grocery store",
+      "quote": {
+        "text": "Any inflation that happens now in the grocery store is on top of these already very high prices, and consumers are very sensitive to that.",
+        "speaker": "Ricky Volpe, Cal Poly San Luis Obispo"
+      },
+      "chart": null,
+      "source_label": "NPR · Oct 20, 2026",
+      "card_style": "quote",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}

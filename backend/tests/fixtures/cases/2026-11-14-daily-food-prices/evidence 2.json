@@ -1,0 +1,697 @@
+{
+  "p1": {
+    "data": {
+      "title": "Average price: eggs, grade A, large, per dozen, U.S. city average (BLS, via FRED)",
+      "unit": "$/dozen",
+      "url": "https://fred.stlouisfed.org/series/APU0000708111",
+      "table": [
+        {
+          "label": "2024-01",
+          "value": 2.522
+        },
+        {
+          "label": "2024-02",
+          "value": 2.996
+        },
+        {
+          "label": "2024-03",
+          "value": 2.992
+        },
+        {
+          "label": "2024-04",
+          "value": 2.864
+        },
+        {
+          "label": "2024-05",
+          "value": 2.699
+        },
+        {
+          "label": "2024-06",
+          "value": 2.715
+        },
+        {
+          "label": "2024-07",
+          "value": 3.08
+        },
+        {
+          "label": "2024-08",
+          "value": 3.204
+        },
+        {
+          "label": "2024-09",
+          "value": 3.821
+        },
+        {
+          "label": "2024-10",
+          "value": 3.37
+        },
+        {
+          "label": "2024-11",
+          "value": 3.649
+        },
+        {
+          "label": "2024-12",
+          "value": 4.146
+        },
+        {
+          "label": "2025-01",
+          "value": 4.953
+        },
+        {
+          "label": "2025-02",
+          "value": 5.897
+        },
+        {
+          "label": "2025-03",
+          "value": 6.227
+        },
+        {
+          "label": "2025-04",
+          "value": 5.122
+        },
+        {
+          "label": "2025-05",
+          "value": 4.548
+        },
+        {
+          "label": "2025-06",
+          "value": 3.775
+        },
+        {
+          "label": "2025-07",
+          "value": 3.599
+        },
+        {
+          "label": "2025-08",
+          "value": 3.587
+        },
+        {
+          "label": "2025-09",
+          "value": 3.488
+        },
+        {
+          "label": "2025-11",
+          "value": 2.86
+        },
+        {
+          "label": "2025-12",
+          "value": 2.712
+        },
+        {
+          "label": "2026-01",
+          "value": 2.577
+        },
+        {
+          "label": "2026-02",
+          "value": 2.5
+        },
+        {
+          "label": "2026-03",
+          "value": 2.348
+        },
+        {
+          "label": "2026-04",
+          "value": 2.25
+        },
+        {
+          "label": "2026-05",
+          "value": 2.191
+        },
+        {
+          "label": "2026-06",
+          "value": 2.141
+        },
+        {
+          "label": "2026-07",
+          "value": 2.189
+        },
+        {
+          "label": "2026-08",
+          "value": 2.272
+        },
+        {
+          "label": "2026-09",
+          "value": 2.272
+        },
+        {
+          "label": "2026-10",
+          "value": 2.32
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "Eggs, monthly average price (BLS)",
+        "unit": "$/dozen",
+        "points": [
+          {
+            "label": "Jan 2023",
+            "value": 4.823
+          },
+          {
+            "label": "Feb 2023",
+            "value": 4.211
+          },
+          {
+            "label": "Mar 2023",
+            "value": 3.446
+          },
+          {
+            "label": "Apr 2023",
+            "value": 3.27
+          },
+          {
+            "label": "May 2023",
+            "value": 2.666
+          },
+          {
+            "label": "Jun 2023",
+            "value": 2.219
+          },
+          {
+            "label": "Jul 2023",
+            "value": 2.094
+          },
+          {
+            "label": "Aug 2023",
+            "value": 2.043
+          },
+          {
+            "label": "Sep 2023",
+            "value": 2.065
+          },
+          {
+            "label": "Oct 2023",
+            "value": 2.072
+          },
+          {
+            "label": "Nov 2023",
+            "value": 2.138
+          },
+          {
+            "label": "Dec 2023",
+            "value": 2.507
+          },
+          {
+            "label": "Jan 2024",
+            "value": 2.522
+          },
+          {
+            "label": "Feb 2024",
+            "value": 2.996
+          },
+          {
+            "label": "Mar 2024",
+            "value": 2.992
+          },
+          {
+            "label": "Apr 2024",
+            "value": 2.864
+          },
+          {
+            "label": "May 2024",
+            "value": 2.699
+          },
+          {
+            "label": "Jun 2024",
+            "value": 2.715
+          },
+          {
+            "label": "Jul 2024",
+            "value": 3.08
+          },
+          {
+            "label": "Aug 2024",
+            "value": 3.204
+          },
+          {
+            "label": "Sep 2024",
+            "value": 3.821
+          },
+          {
+            "label": "Oct 2024",
+            "value": 3.37
+          },
+          {
+            "label": "Nov 2024",
+            "value": 3.649
+          },
+          {
+            "label": "Dec 2024",
+            "value": 4.146
+          },
+          {
+            "label": "Jan 2025",
+            "value": 4.953
+          },
+          {
+            "label": "Feb 2025",
+            "value": 5.897
+          },
+          {
+            "label": "Mar 2025",
+            "value": 6.227
+          },
+          {
+            "label": "Apr 2025",
+            "value": 5.122
+          },
+          {
+            "label": "May 2025",
+            "value": 4.548
+          },
+          {
+            "label": "Jun 2025",
+            "value": 3.775
+          },
+          {
+            "label": "Jul 2025",
+            "value": 3.599
+          },
+          {
+            "label": "Aug 2025",
+            "value": 3.587
+          },
+          {
+            "label": "Sep 2025",
+            "value": 3.488
+          },
+          {
+            "label": "Nov 2025",
+            "value": 2.86
+          },
+          {
+            "label": "Dec 2025",
+            "value": 2.712
+          },
+          {
+            "label": "Jan 2026",
+            "value": 2.577
+          },
+          {
+            "label": "Feb 2026",
+            "value": 2.5
+          },
+          {
+            "label": "Mar 2026",
+            "value": 2.348
+          },
+          {
+            "label": "Apr 2026",
+            "value": 2.25
+          },
+          {
+            "label": "May 2026",
+            "value": 2.191
+          },
+          {
+            "label": "Jun 2026",
+            "value": 2.141
+          },
+          {
+            "label": "Jul 2026",
+            "value": 2.189
+          },
+          {
+            "label": "Aug 2026",
+            "value": 2.272
+          },
+          {
+            "label": "Sep 2026",
+            "value": 2.272
+          },
+          {
+            "label": "Oct 2026",
+            "value": 2.32
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Record: $6.227 in Mar 2025. Sep 2025 to Sep 2026, a dozen fell from $3.488 to $2.272 (-34.9%). BLS published no Oct 2025 value."
+    },
+    "account": {
+      "name": "Cluck Report",
+      "handle": "@cluckreport",
+      "created": "October 2026",
+      "followers": 912,
+      "verified": false,
+      "bio": "Exposing Big Egg. 🥚",
+      "recent_posts": [
+        "They don't want you to know what's in the carton.",
+        "Share before the price goes up again!"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-20",
+      "url": "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
+      "before": "",
+      "highlight": "A pound of butter averaged $3.96 in September. That was down 17.3% since last year, bucking the trend of rising food prices.",
+      "after": "Interest in butter has spread recently, nourishing a strong demand for the dairy product."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    },
+    "data": {
+      "title": "Average price: butter, stick, per pound, U.S. city average (BLS, via FRED)",
+      "unit": "$/lb",
+      "url": "https://fred.stlouisfed.org/series/APU0000FS1101",
+      "table": [
+        {
+          "label": "2025-01",
+          "value": 4.912
+        },
+        {
+          "label": "2025-02",
+          "value": 4.869
+        },
+        {
+          "label": "2025-03",
+          "value": 4.816
+        },
+        {
+          "label": "2025-04",
+          "value": 4.78
+        },
+        {
+          "label": "2025-05",
+          "value": 4.952
+        },
+        {
+          "label": "2025-06",
+          "value": 4.872
+        },
+        {
+          "label": "2025-07",
+          "value": 4.797
+        },
+        {
+          "label": "2025-08",
+          "value": 4.828
+        },
+        {
+          "label": "2025-09",
+          "value": 4.787
+        },
+        {
+          "label": "2025-11",
+          "value": 4.31
+        },
+        {
+          "label": "2025-12",
+          "value": 4.408
+        },
+        {
+          "label": "2026-01",
+          "value": 4.383
+        },
+        {
+          "label": "2026-02",
+          "value": 4.314
+        },
+        {
+          "label": "2026-03",
+          "value": 4.258
+        },
+        {
+          "label": "2026-04",
+          "value": 4.216
+        },
+        {
+          "label": "2026-05",
+          "value": 3.929
+        },
+        {
+          "label": "2026-06",
+          "value": 3.816
+        },
+        {
+          "label": "2026-07",
+          "value": 3.922
+        },
+        {
+          "label": "2026-08",
+          "value": 4.021
+        },
+        {
+          "label": "2026-09",
+          "value": 3.959
+        },
+        {
+          "label": "2026-10",
+          "value": 3.977
+        }
+      ],
+      "honest_chart": {
+        "type": "line",
+        "title": "Butter, monthly average price (BLS)",
+        "unit": "$/lb",
+        "points": [
+          {
+            "label": "Jan 2024",
+            "value": 4.659
+          },
+          {
+            "label": "Feb 2024",
+            "value": 4.634
+          },
+          {
+            "label": "Mar 2024",
+            "value": 4.484
+          },
+          {
+            "label": "Apr 2024",
+            "value": 4.629
+          },
+          {
+            "label": "May 2024",
+            "value": 4.589
+          },
+          {
+            "label": "Jun 2024",
+            "value": 4.696
+          },
+          {
+            "label": "Jul 2024",
+            "value": 4.897
+          },
+          {
+            "label": "Aug 2024",
+            "value": 4.796
+          },
+          {
+            "label": "Sep 2024",
+            "value": 5.004
+          },
+          {
+            "label": "Oct 2024",
+            "value": 4.937
+          },
+          {
+            "label": "Nov 2024",
+            "value": 4.794
+          },
+          {
+            "label": "Dec 2024",
+            "value": 4.728
+          },
+          {
+            "label": "Jan 2025",
+            "value": 4.912
+          },
+          {
+            "label": "Feb 2025",
+            "value": 4.869
+          },
+          {
+            "label": "Mar 2025",
+            "value": 4.816
+          },
+          {
+            "label": "Apr 2025",
+            "value": 4.78
+          },
+          {
+            "label": "May 2025",
+            "value": 4.952
+          },
+          {
+            "label": "Jun 2025",
+            "value": 4.872
+          },
+          {
+            "label": "Jul 2025",
+            "value": 4.797
+          },
+          {
+            "label": "Aug 2025",
+            "value": 4.828
+          },
+          {
+            "label": "Sep 2025",
+            "value": 4.787
+          },
+          {
+            "label": "Nov 2025",
+            "value": 4.31
+          },
+          {
+            "label": "Dec 2025",
+            "value": 4.408
+          },
+          {
+            "label": "Jan 2026",
+            "value": 4.383
+          },
+          {
+            "label": "Feb 2026",
+            "value": 4.314
+          },
+          {
+            "label": "Mar 2026",
+            "value": 4.258
+          },
+          {
+            "label": "Apr 2026",
+            "value": 4.216
+          },
+          {
+            "label": "May 2026",
+            "value": 3.929
+          },
+          {
+            "label": "Jun 2026",
+            "value": 3.816
+          },
+          {
+            "label": "Jul 2026",
+            "value": 3.922
+          },
+          {
+            "label": "Aug 2026",
+            "value": 4.021
+          },
+          {
+            "label": "Sep 2026",
+            "value": 3.959
+          },
+          {
+            "label": "Oct 2026",
+            "value": 3.977
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "September to September: $4.787 to $3.959 a pound (-17.3%)."
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "For people stocking up on candy this Halloween, it's a spooky season in the grocery store — and not in a fun way.",
+      "highlight": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+      "after": "That's higher than the average rate of food inflation during that time."
+    },
+    "account": {
+      "name": "Spooky Budget",
+      "handle": "@spookybudget",
+      "created": "August 2023",
+      "followers": 6300,
+      "verified": false,
+      "bio": "Holiday shopping on a budget. Lists, deals, receipts. 🎃",
+      "recent_posts": [
+        "Costumes under $20: a thread 🧵",
+        "Buy the candy on Nov 1. Trust me."
+      ]
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-20",
+      "url": "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
+      "before": "The cost of ground beef has been on the rise for years, largely due to weather and financial pressures on producers.",
+      "highlight": "A typical pound of ground beef last month cost $6.79, an 85% jump from a decade earlier, according to the Bureau of Labor Statistics.",
+      "after": ""
+    },
+    "data": {
+      "title": "Average price: ground beef, 100% beef, per pound, U.S. city average (BLS, via FRED)",
+      "unit": "$/lb",
+      "url": "https://fred.stlouisfed.org/series/APU0000703112",
+      "table": [
+        {
+          "label": "2016-09",
+          "value": 3.665
+        },
+        {
+          "label": "2025-09",
+          "value": 6.323
+        },
+        {
+          "label": "2026-09",
+          "value": 6.792
+        }
+      ],
+      "honest_chart": {
+        "type": "bar",
+        "title": "Ground beef, Sep 2016 vs. Sep 2026",
+        "unit": "$/lb",
+        "points": [
+          {
+            "label": "Sep 2016",
+            "value": 3.665
+          },
+          {
+            "label": "Sep 2026",
+            "value": 6.792
+          }
+        ],
+        "y_min": 0,
+        "y_max": null
+      },
+      "note": "Sep 2016 to Sep 2026: $3.665 to $6.792 a pound (+85.3%). NPR's 'last month' is September 2026; it rounds the rise to 85%."
+    },
+    "account": {
+      "name": "Grill Sergeant",
+      "handle": "@grillsergeant",
+      "created": "July 2026",
+      "followers": 1150,
+      "verified": false,
+      "bio": "Burgers, briskets and loud opinions. 🔥",
+      "recent_posts": [
+        "Ketchup on a hot dog? Absolutely not.",
+        "Who's grilling this weekend? 🔥"
+      ]
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-20",
+      "url": "https://www.npr.org/2026/10/20/nx-s1-5989636/grocery-prices-eggs-coffee-inflation",
+      "before": "That period of dramatic food inflation slowed down in 2023, though prices generally haven't returned to previous levels. Instead, grocery costs have continued to rise, just at a slower rate, roughly in line with overall inflation.",
+      "highlight": "“But the damage had been done,” said Ricky Volpe, a professor of agribusiness at Cal Poly San Luis Obispo. “Any inflation that happens now in the grocery store is on top of these already very high prices, and consumers are very sensitive to that.”",
+      "after": ""
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "clean_case": true,
+  "posts": {
+    "p1": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Word for word from the BPU's Aug 13, 2026 press release.",
+      "con_line_false_alarm": "Real. A percentage with a clear 'of what' is a good sign."
+    },
+    "p2": {
+      "doctored": false,
+      "suspicious_real": true,
+      "explanation": "A random account, but the chart is honest: same month a year apart, axis from zero, and the numbers match EIA's data exactly.",
+      "con_line_false_alarm": "Unknown account, honest chart. Check the data, not the avatar."
+    },
+    "p3": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Word for word from the BPU's Aug 13, 2026 press release.",
+      "con_line_false_alarm": "Real. Not every confident sentence is a con."
+    },
+    "p4": {
+      "doctored": false,
+      "suspicious_real": false,
+      "explanation": "Word for word from New Jersey Monitor. Note that it gives both numbers: the $4.09 rise and the $4.14 drop.",
+      "con_line_false_alarm": "Real. It showed both sides of the math, which I never do."
+    }
+  },
+  "con_line_clean": "Nothing to catch today. Getting you to doubt everything is my favorite trick of all."
+}

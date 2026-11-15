@@ -260,7 +260,7 @@ export function SourceView({ ev }: { ev: SourceEvidence }) {
       </p>
       {ev.url && (
         <p className="mt-3 text-xs">
-          <ExternalLink url={ev.url}>Read the original ↗</ExternalLink>
+          <ExternalLink url={ev.url}>Read the original</ExternalLink>
         </p>
       )}
     </article>
@@ -309,7 +309,7 @@ export function DataView({ ev }: { ev: DataEvidence }) {
           <>
             {', '}
             <a href={ev.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-text">
-              data source ↗
+              data source
             </a>
           </>
         )}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ConBubble } from '../components/ConBubble'
-import { ClueToken, IconArrow } from '../components/Icon'
+import { ClueToken } from '../components/Icon'
 import { caseNo, dateRange } from '../lib/format'
 import type { GameCase } from '../lib/types'
 
@@ -96,7 +96,6 @@ export function Briefing({ game, onStart }: { game: GameCase; onStart: () => voi
                 onClick={onStart}
                 className="press caps mt-8 inline-flex min-h-16 w-full items-center justify-center gap-3 border-2 border-ink bg-press px-6 py-3 text-[22px] font-bold text-white hover:bg-press-dark"
               >
-                <IconArrow size={20} />
                 Start investigating
               </button>
             </div>

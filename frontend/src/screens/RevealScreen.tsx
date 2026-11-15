@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ConBubble } from '../components/ConBubble'
-import { IconArrow, IconBook, IconCheck, IconShare, OutcomeSquare } from '../components/Icon'
+import { IconBook, IconCheck, IconShare, OutcomeSquare } from '../components/Icon'
 import { FeedCard } from '../components/PostCard'
 import { DiffView, OutcomeBadge } from '../components/Reveal'
 import { Button, LinkButton } from '../components/ui'
@@ -221,7 +221,6 @@ export function RevealScreen({ game, result, verdicts }: { game: GameCase; resul
 
           <div className="flex flex-wrap items-center gap-4">
             <Button variant="primary" size="lg" onClick={next.open} disabled={next.loading}>
-              <IconArrow size={18} />
               {next.loading ? 'Finding the next case…' : 'Next case'}
             </Button>
             <LinkButton to={learnTrick ? `/casebook/${learnTrick}` : '/casebook'} size="lg">

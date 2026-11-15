@@ -3,7 +3,6 @@ import { BottomSheet } from '../components/BottomSheet'
 import { ConBubble } from '../components/ConBubble'
 import { ClueTokens, EvidenceKit, type KitNotice } from '../components/EvidenceKit'
 import { PostCard } from '../components/PostCard'
-import { IconArrow } from '../components/Icon'
 import { ErrorState, SectionLabel } from '../components/ui'
 import { CON_LINES, pick } from '../lib/content'
 import { useIsMobile } from '../lib/hooks'
@@ -159,7 +158,7 @@ export function Investigation({
       className="press caps inline-flex shrink-0 items-center gap-2 border-2 border-sheet bg-press px-4 py-2.5 text-[16px] font-bold text-white hover:bg-press-dark disabled:border-[#8a8a8a] disabled:bg-transparent disabled:text-[#8a8a8a]"
       title={allMarked ? 'Submit your verdicts' : 'Mark every post Real or Doctored first'}
     >
-      {submitting ? 'Closing the case…' : 'Submit verdicts'} <IconArrow size={17} />
+      {submitting ? 'Closing the case…' : 'Submit verdicts'}
     </button>
   )
 

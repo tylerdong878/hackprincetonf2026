@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ConBubble } from '../components/ConBubble'
 import { TOOLS } from '../components/EvidenceKit'
 import {
-  IconArrow,
   IconArrowLeft,
+  IconLens,
   IconAxis,
   IconCalendar,
   IconCheck,
@@ -831,7 +831,7 @@ function Verdict({
                 <p className="text-sm text-muted">{next.blurb}</p>
               </div>
               <Button variant="primary" onClick={() => onLevelUp(next.level)}>
-                Take on the {next.name} <IconArrow size={17} />
+                Take on the {next.name}
               </Button>
             </div>
           )}
@@ -863,7 +863,7 @@ function Verdict({
           </p>
           <div className="flex flex-wrap gap-5">
             <Button variant="primary" size="lg" className="min-w-[300px]" onClick={onDeck}>
-              <IconArrow size={20} /> Doctor another post
+              Doctor another post
             </Button>
             <Button size="lg" className="min-w-[280px]" onClick={onAgain}>
               <IconReplay size={20} /> Try this post again
@@ -909,7 +909,7 @@ function SavedRounds({ deck, onPlay, busy }: { deck: FoolDeckItem[]; onPlay: (r:
                   </span>
                 </span>
               </span>
-              <span className="caps text-[12.5px] font-semibold tracking-[0.06em] text-press">Replay →</span>
+              <span className="caps text-[12.5px] font-semibold tracking-[0.06em] text-press">Replay</span>
             </button>
           </li>
         )
@@ -1147,7 +1147,7 @@ export function ConTheCon() {
                     disabled={phase === 'judging'}
                     className="press caps flex min-h-16 w-full items-center justify-center gap-3 border-2 border-ink bg-press py-3 text-[21px] font-bold text-white hover:bg-press-dark disabled:opacity-70 sm:text-[25px]"
                   >
-                    {phase !== 'judging' && (edit.type === 'none' ? <IconEyeOff size={22} /> : <IconArrow size={22} />)}
+                    {phase !== 'judging' && edit.type === 'none' && <IconEyeOff size={22} />}
                     {phase === 'judging' ? 'Sending…' : edit.type === 'none' ? `Bluff the ${boss.name}` : `Send it to the ${boss.name}`}
                   </button>
                 </div>

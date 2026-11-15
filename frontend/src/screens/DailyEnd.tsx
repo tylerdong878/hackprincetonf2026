@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ConBubble } from '../components/ConBubble'
-import { IconArrow, IconCheck, IconChevron, IconFlame, IconMask, IconShare, IconSparkles, OutcomeSquare, SaltCrystal } from '../components/Icon'
+import { IconCheck, IconChevron, IconFlame, IconMask, IconShare, IconSparkles, OutcomeSquare, SaltCrystal } from '../components/Icon'
 import { LeanMeter } from '../components/LeanMeter'
 import { btnClass, LinkButton } from '../components/ui'
 import { computeLean, gridFor, GRID_LEGEND, hms, leanLabel, msUntilMidnightET, outcomeStyle, shortDate, trickLabel } from '../lib/format'
@@ -278,7 +278,6 @@ export function DailyEnd({ daily, result, alreadyPlayed }: { daily: DailyRespons
             <span className="block text-[21px] leading-tight font-bold">Bonus round: Con the Con</span>
             <span className="block text-[14px] text-muted">Doctor a real post. Our AI tries to bust you, live.</span>
           </span>
-          <IconArrow size={24} className="shrink-0 text-press transition group-hover:translate-x-1" />
         </a>
 
         <section className="paper-card bg-white/90">

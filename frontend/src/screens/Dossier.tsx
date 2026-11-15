@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ConBubble } from '../components/ConBubble'
 import { LeanMeter } from '../components/LeanMeter'
 import { SiteHeader } from '../components/Header'
-import { IconArrow, IconFlame, OutcomeSquare } from '../components/Icon'
+import { IconFlame, OutcomeSquare } from '../components/Icon'
 import { TrickIcon } from '../components/TrickPicker'
 import { Button, ErrorState, LinkButton, Loading, SectionLabel } from '../components/ui'
 import { api } from '../lib/api'
@@ -268,8 +268,7 @@ export function Dossier() {
             <p className="mt-3 text-[17px] italic">What the Con has learned about you, trick by trick.</p>
           </div>
           <div className="flex items-center gap-4 bg-white/80 p-2 md:bg-transparent md:p-0">
-            <LinkButton to="/" variant="primary" size="lg">
-              <IconArrow size={20} />
+            <LinkButton to="/casefiles" variant="primary" size="lg">
               Play a case
             </LinkButton>
             <Button

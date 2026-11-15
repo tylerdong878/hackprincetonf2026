@@ -1,6 +1,6 @@
 import { SiteHeader } from '../components/Header'
 import { PostChart } from '../components/PostChart'
-import { IconArrow, IconArrowLeft, IconBook, IconLens, IconWarn } from '../components/Icon'
+import { IconArrowLeft, IconBook, IconLens, IconWarn } from '../components/Icon'
 import { TrickIcon } from '../components/TrickPicker'
 import { LinkButton, SectionLabel } from '../components/ui'
 import { CASEBOOK } from '../lib/content'
@@ -79,8 +79,7 @@ export function Casebook({ trickId }: { trickId?: string }) {
               </section>
             </div>
             <div className="mt-10 flex flex-wrap gap-4">
-              <LinkButton to="/" variant="primary" size="lg">
-                <IconArrow size={20} />
+              <LinkButton to="/casefiles" variant="primary" size="lg">
                 Play a case
               </LinkButton>
               <LinkButton to="/casebook" size="lg">
@@ -125,7 +124,6 @@ export function Casebook({ trickId }: { trickId?: string }) {
                       <span className="mt-3 flex-1 text-[16px] leading-relaxed">{t.what}</span>
                       <span className="caps mt-5 inline-flex items-center gap-1.5 self-end text-[15px] font-semibold text-press">
                         Read the tell
-                        <IconArrow size={16} className="transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </span>
                   </a>

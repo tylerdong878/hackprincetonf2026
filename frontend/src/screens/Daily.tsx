@@ -4,7 +4,6 @@ import { AccountView, DataView, normalizeEvidence, SourceView, ToolRow, TOOLS } 
 import { BarHeader, SiteHeader, SoundToggle } from '../components/Header'
 import {
   ClueToken,
-  IconArrow,
   IconArrowLeft,
   IconCheck,
   IconGlasses,
@@ -415,7 +414,7 @@ function DailyBriefing({ daily, onStart }: { daily: DailyResponse; onStart: () =
               </li>
             </ul>
             <button ref={startRef} type="button" onClick={onStart} className={`${btnClass('primary', 'lg')} mt-6 min-h-16 w-full py-4 text-[22px]`}>
-              <IconArrow size={22} /> Start
+              Start
             </button>
           </section>
         </div>
@@ -739,7 +738,6 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                   disabled={finishing}
                   className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}
                 >
-                  {!finishing && <IconArrow size={22} />}
                   {nextLabel}
                 </button>
               </>
@@ -862,7 +860,6 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
                 </div>
               )}
               <button ref={nextBtn} type="button" onClick={next} disabled={finishing} className={`${btnClass('primary', 'lg')} w-full py-4 text-xl`}>
-                {!finishing && <IconArrow size={22} />}
                 {nextLabel}
               </button>
             </>
@@ -980,7 +977,7 @@ export function DailyScreen() {
             <p className="font-display text-2xl font-bold">You’ve already played today’s Grain.</p>
             <p className="mt-1 text-muted">Come back tomorrow for #{daily.daily_number + 1}.</p>
             <Button className="mt-4" variant="primary" onClick={() => navigate('/con')}>
-              Con the Con meanwhile →
+              Con the Con meanwhile
             </Button>
           </main>
         ) : (

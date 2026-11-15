@@ -227,7 +227,7 @@ function StoryLink({ url }: { url?: string | null }) {
   if (!url) return null
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" className="break-all text-[#1F5FD1] underline underline-offset-2 hover:no-underline">
-      Read the real story ↗
+      Read the real story
     </a>
   )
 }

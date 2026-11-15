@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { SiteHeader } from '../components/Header'
-import { IconArrow, IconFolder, IconLens } from '../components/Icon'
+import { IconFolder, IconLens } from '../components/Icon'
 import { Button, ErrorState, Loading } from '../components/ui'
 import { api, ApiError, caseCache } from '../lib/api'
 import { caseNo } from '../lib/format'
@@ -84,7 +84,7 @@ export function CaseFiles() {
                 All approved cases
               </h2>
               <a href={href('/editor')} className="caps inline-flex items-center gap-1.5 pb-1 text-[13px] font-bold hover:underline">
-                Editor’s Desk <IconArrow size={15} />
+                Editor’s Desk
               </a>
               <div className="double-rule-thin w-full" aria-hidden="true" />
             </div>
@@ -102,7 +102,6 @@ export function CaseFiles() {
                           {caseNo(c.number)}{c.difficulty ? `, ${c.difficulty}` : ''}
                         </span>
                       </span>
-                      <IconArrow size={26} className="shrink-0 text-press transition-transform group-hover:translate-x-1" />
                     </a>
                   </li>
                 ))}
