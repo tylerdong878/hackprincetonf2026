@@ -1,0 +1,20 @@
+{
+  "status": "approved",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T09:43:51Z",
+  "tricks": [
+    "made-up-story"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/11/06/nx-s1-6027897/how-octopuses-squeeze-through-teeny-tiny-holes",
+    "https://nj1015.com/longwood-gardens-cosmic-christmas-2026/",
+    "https://nj1015.com/new-jersey-worst-drivers-2/"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-15",
+  "theme": "Strange But True",
+  "planned_date": "2026-11-16"
+}

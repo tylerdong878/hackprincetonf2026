@@ -58,7 +58,8 @@ make_chart on data topics, as the skill says), all in the same turn.
 3. Call write_case with the posts the case shape asks for: each doctored post (forgery_id, a persona or empty \
 author_name, a short body), at least one real_suspicious post (startling but true), the rest real (source_id; \
 each source once). On a daily, at least one REAL post is shared by a persona (source_id + by_persona=true), so \
-the poster never gives the answer away. Source labels are filled in for every post. Title: short, no spoilers. \
+the poster never gives the answer away. Source labels are filled in for every post. Title: 3-8 catchy words naming a few of the day's subjects \
+(like "Dinosaur Blood, Mouse Gladiators & BBQ Records"), never a date or "Daily Grain", no spoilers. \
 Briefing: one line in the Con's voice (smug, playful, never says which post or how many are fake). For each \
 doctored post write a one-sentence tell, a 2-3 sentence explanation and two Con lines (fooled / caught).
 Your own words (bodies, claims) only react to the material: no new numbers, no conclusions the source doesn't \

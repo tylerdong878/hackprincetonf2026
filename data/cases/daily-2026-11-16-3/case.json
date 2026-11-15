@@ -1,0 +1,117 @@
+{
+  "id": "daily-2026-11-16-3",
+  "number": 25,
+  "title": "Robot Octopuses, Floating Trees & Jersey Drivers",
+  "topic": "hackprinceton fun",
+  "briefing": "Some of these are real, some are tall tales — today's spread has 0–3 doctored posts. Good luck sorting the weird from the invented.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail",
+    "made-up-story"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Trivia Tornado",
+        "handle": "@triviatornado",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#C2410C"
+      },
+      "posted_at": "2026-11-15T08:00:00Z",
+      "body": "wait, this is real?? “How octopuses squeeze through teeny tiny holes”",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Lab Notes Lite",
+        "handle": "@labnoteslite",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0E7490"
+      },
+      "posted_at": "2026-11-15T04:00:00Z",
+      "body": "A university lab says its robot octopus slips through a keyhole-sized hole in exactly 7 seconds.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "Boardwalk Buzz",
+        "handle": "@boardwalkbuzz",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#0369A1"
+      },
+      "posted_at": "2026-11-15T01:00:00Z",
+      "body": "A botanical garden now has a 22-foot tree that floats three feet off the ground and spins on its own.",
+      "quote": null,
+      "chart": null,
+      "source_label": null,
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-14T16:07:50Z",
+      "body": "Longwood Gardens goes cosmic for Christmas 2026, and I can't wait",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 14, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "New Jersey 101.5",
+        "handle": "@nj1015",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#DC2626"
+      },
+      "posted_at": "2026-11-14T00:43:04Z",
+      "body": "LendingTree says New Jersey drivers are the worst in America.",
+      "quote": null,
+      "chart": null,
+      "source_label": "New Jersey 101.5 · Nov 13, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    }
+  ]
+}
