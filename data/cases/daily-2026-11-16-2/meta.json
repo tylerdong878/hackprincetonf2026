@@ -1,0 +1,19 @@
+{
+  "status": "awaiting_approval",
+  "origin": "pipeline",
+  "daily": false,
+  "difficulty": "hard",
+  "created_at": "2026-11-15T06:34:07Z",
+  "tricks": [
+    "out-of-context-quote"
+  ],
+  "sources": [
+    "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus",
+    "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+    "https://www.npr.org/2026/09/20/nx-s1-5940782/cookbook-rhythm-and-roux-brian-landry-peter-harris"
+  ],
+  "rejection_reason": null,
+  "mode": "daily",
+  "daily_date": "2026-11-16",
+  "theme": "Food Fight"
+}

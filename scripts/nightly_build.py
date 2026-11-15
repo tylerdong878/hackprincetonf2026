@@ -78,9 +78,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"[{stamp}] building {d} ({d:%A}): {topic}", flush=True)
     if args.dry_run:
         return 0
-    # 30 calls: a clean run is ~18, and guardrail rejections can push a hard day past the default 25.
+    # 40 calls: noisy feeds plus the safety blocklist can take the researcher alone to ~18, and a solver retry adds ~10.
     cmd = [sys.executable, "-m", "pipeline.build_case", "--mode", "daily", "--daily-date", d.isoformat(),
-           "--topic", topic, "--hold-for-editor", "--max-calls", "30"]
+           "--topic", topic, "--hold-for-editor", "--max-calls", "40"]
     return subprocess.run(cmd, cwd=ROOT).returncode
 
 

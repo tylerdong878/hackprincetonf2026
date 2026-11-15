@@ -427,6 +427,16 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
   const post = posts[idx]
   const rec = prog.cards[post.id]
   const answered = !!rec
+  // First-time tip above card 1 ("How to spot the Con"), remembered per browser once dismissed or card 1 is answered.
+  const [tipSeen, setTipSeen] = useState(() => loadJSON<boolean>('gos.tip.spot_the_con') === true)
+  const dismissTip = () => {
+    setTipSeen(true)
+    saveJSON('gos.tip.spot_the_con', true)
+  }
+  useEffect(() => {
+    if (idx === 0 && answered && !tipSeen) dismissTip()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, answered, tipSeen])
   const isLast = idx === posts.length - 1
   const opened = prog.evidence[post.id] ?? {}
 
@@ -564,6 +574,24 @@ function DailyPlay({ daily, playerId, onFinished }: { daily: DailyResponse; play
       <p className="dateline mt-2 text-center">
         Card {idx + 1} of {posts.length} · {DAILY_RANGE}
       </p>
+
+      {idx === 0 && !answered && !tipSeen && (
+        <aside
+          className="mt-3 border-2 border-ink bg-sheet px-4 py-3 text-[14.5px] leading-relaxed shadow-[var(--hard)]"
+          aria-label="How to spot the Con"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <p>
+              <span className="caps mr-1 text-[12.5px] font-semibold tracking-[0.08em] text-press">How to spot the Con:</span>
+              big claims with no “may” or “think” · numbers with no time frame · charts that don’t start at 0 · real words cut
+              short. <i>Not sure? Tap <b>Use 1</b> to check the source.</i>
+            </p>
+            <button type="button" onClick={dismissTip} aria-label="Dismiss tip" className="shrink-0 px-1 text-xl leading-none text-muted hover:text-ink">
+              ×
+            </button>
+          </div>
+        </aside>
+      )}
 
       <div key={post.id} className="card-in mt-4">
         <div className={flipClass} style={{ transformOrigin: 'center' }}>
