@@ -1,0 +1,84 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "",
+      "highlight": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+      "after": "(Image credit: Stephanie Scarbrough)"
+    },
+    "account": {
+      "name": "Hot Take Hotline",
+      "handle": "@hottakehotline",
+      "created": "October 2026",
+      "followers": 420,
+      "verified": false,
+      "bio": "All takes. Mostly hot. 🔥",
+      "recent_posts": [
+        "Unpopular opinion incoming.",
+        "Fight me in the replies 🔥"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-11",
+      "url": "https://www.npr.org/2026/11/11/nx-s1-6034639/your-guide-to-hosting-a-flavorful-cozy-and-stress-free-thanksgiving",
+      "before": "",
+      "highlight": "New recipes and decorating ideas to try this Thanksgiving",
+      "after": "Whether you're hosting friendsgiving or Thanksgiving, we've got foolproof turkey recipes, advice on how to stay present while hosting, and directions on how to create a stunning floral arrangement. (Image credit: filadendron/Getty Images)"
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-11-11",
+      "url": "https://www.npr.org/2026/11/11/nx-s1-6034639/your-guide-to-hosting-a-flavorful-cozy-and-stress-free-thanksgiving",
+      "before": "",
+      "highlight": "Whether you're hosting friendsgiving or Thanksgiving, we've got foolproof turkey recipes, advice on how to stay present while hosting, and directions on how to create a stunning floral arrangement.",
+      "after": "(Image credit: filadendron/Getty Images)"
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-20",
+      "url": "https://www.npr.org/2026/09/20/nx-s1-5940782/cookbook-rhythm-and-roux-brian-landry-peter-harris",
+      "before": "Rythm & Roux.'/>",
+      "highlight": "At Bayou Bar, music and food go hand in hand. Which is why a new cookbook from chef Brian Landry and bandleader Peter Harris has recipes from the menu and stories from the musicians who play there.",
+      "after": "(Image credit: Catie Dull)"
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

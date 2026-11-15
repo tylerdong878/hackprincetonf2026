@@ -1,0 +1,91 @@
+{
+  "id": "2026-11-15-food-news",
+  "number": 14,
+  "title": "Candy Prices, Thanksgiving Tips, and a Deli Comeback",
+  "topic": "food news",
+  "briefing": "A little Halloween sticker shock, a holiday hosting guide, a cookbook from the bayou, and a deli legend returns — one of these isn't telling the whole story.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Hot Take Hotline",
+        "handle": "@hottakehotline",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#BE185D"
+      },
+      "posted_at": "2026-11-14T22:00:00Z",
+      "body": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 30, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-11-11T10:00:00Z",
+      "body": "New recipes and decorating ideas to try this Thanksgiving",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 11, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "Turnpike Tea",
+        "handle": "@turnpiketea",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-14T17:00:00Z",
+      "body": "Foolproof turkey recipes, hosting advice, AND a stunning floral arrangement guide? This reads like a lifestyle brand press release. “Whether you're hosting friendsgiving or Thanksgiving, we've got foolproof turkey recipes, advice on how to stay present while hosting, and directions on how to create a stunning floral arrangement.”",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Nov 11, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-09-20T11:00:00Z",
+      "body": "At Bayou Bar, music and food go hand in hand. Which is why a new cookbook from chef Brian Landry and bandleader Peter Harris has recipes from the menu and stories from the musicians who play there.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 20, 2026",
+      "tools": [
+        "source",
+        "account"
+      ]
+    }
+  ]
+}
