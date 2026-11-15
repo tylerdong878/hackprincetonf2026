@@ -109,7 +109,7 @@ For a public link, set `GOS_PUBLIC=1`. That hides the API docs, puts a password 
 ## Tests
 
 ```bash
-uv run python -m pytest -q              # 429 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
+uv run python -m pytest -q              # 435 tests: server, pipeline guardrails, iMessage bot, content builder; no network or model calls
 cd frontend && npm run build  # typecheck + production build
 ```
 
