@@ -1,0 +1,20 @@
+{"t": 155.12, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-16-2/case.json"}
+{"t": 155.17, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-16-2/evidence.json"}
+{"t": 155.17, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-16-2/answer_key.json"}
+{"t": 155.17, "type": "file_written", "agent": "forger", "path": "/cases/daily-2026-11-16-2/meta.json"}
+{"t": 155.17, "type": "tool_called", "agent": "forger", "tool": "write_case", "summary": "Wrote case daily-2026-11-16-2 (#20, revision 1): 5 posts.", "spoiler": true}
+{"t": 156.58, "type": "subagent_finished", "name": "forger", "summary": "daily-2026-11-16-2 · doctored: p1", "spoiler": true}
+{"t": 168.44, "type": "plan_updated", "todos": [{"content": "Research real sources", "status": "completed"}, {"content": "Forge the case", "status": "completed"}, {"content": "Blind-solve the case", "status": "in_progress"}, {"content": "Send to the editor for approval", "status": "pending"}]}
+{"t": 168.44, "type": "subagent_started", "name": "blind-solver", "task": "Solve case daily-2026-11-16-2."}
+{"t": 180.33, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 1/3 (p1/source).", "spoiler": true}
+{"t": 180.34, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 2/3 (p2/source).", "spoiler": true}
+{"t": 180.34, "type": "tool_called", "agent": "blind-solver", "tool": "open_evidence", "summary": "Clue 3/3 (p5/source).", "spoiler": true}
+{"t": 201.78, "type": "tool_called", "agent": "blind-solver", "tool": "submit_verdict", "summary": "Verdict recorded.", "spoiler": true}
+{"t": 201.8, "type": "solver_result", "pass": false, "tools_used": ["source"], "difficulty": "hard", "attempt": 1}
+{"t": 201.8, "type": "file_written", "agent": "blind-solver", "path": "/cases/daily-2026-11-16-2/solver_log.md"}
+{"t": 201.8, "type": "subagent_finished", "name": "blind-solver", "summary": "Blind solver attempt 1/2: FAIL. Opened: p1/source, p2/source, p5/source. Its reasoning: I checked the sources for the three substantive claims. p1's \"Carnegie Deli ... reopened in New York City after a 10-year hiatus\" matches its NPR source verbatim (including \"New York City\" and \"10-year hiatus\"),…", "spoiler": true}
+{"t": 208.06, "type": "subagent_started", "name": "forger", "task": "Fix case daily-2026-11-16-2 based on blind-solver feedback. Feedback: \"Missed doctored post p1 (out-of-context-quote): its evidence kit doesn't expose the trick clearly enough. Make the tell checkable with the post's evidence (bigger crop / clearer omission / a window the data table contradicts).\"…", "spoiler": true}
+{"t": 208.08, "type": "plan_updated", "todos": [{"content": "Research real sources", "status": "completed"}, {"content": "Forge the case", "status": "in_progress"}, {"content": "Blind-solve the case", "status": "pending"}, {"content": "Send to the editor for approval", "status": "pending"}]}
+{"t": 208.08, "type": "subagent_finished", "name": "forger", "summary": "Refused: only 2 model calls left, kept for the hand-off, so forger can't start. Call submit_for_review now for case daily-2026-11-16-2 and say what was not finished.", "spoiler": true}
+{"t": 211.11, "type": "awaiting_approval"}
+{"t": 211.11, "type": "case_status", "status": "awaiting_approval"}

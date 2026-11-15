@@ -1,0 +1,103 @@
+{
+  "p1": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-19",
+      "url": "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus",
+      "before": "",
+      "highlight": "Carnegie Deli, famous for its sandwiches piled high with meat, has reopened as a sit-down restaurant in New York City after a 10-year hiatus.",
+      "after": ""
+    },
+    "account": {
+      "name": "Jersey Bill Watch",
+      "handle": "@jerseybills",
+      "created": "October 2026",
+      "followers": 1840,
+      "verified": false,
+      "bio": "Exposing what they don't want you to know about your bills.",
+      "recent_posts": [
+        "Your utility bill is a SCAM. Thread 🧵",
+        "Share before they delete this!"
+      ]
+    }
+  },
+  "p2": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "",
+      "highlight": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.",
+      "after": "(Image credit: Stephanie Scarbrough)"
+    },
+    "account": {
+      "name": "Turnpike Tea",
+      "handle": "@turnpiketea",
+      "created": "March 2021",
+      "followers": 6200,
+      "verified": false,
+      "bio": "Jersey gossip, exit by exit. ☕",
+      "recent_posts": [
+        "Exit 9 drama: a thread 🧵",
+        "Who else is stuck on the Parkway?"
+      ]
+    }
+  },
+  "p3": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-10-30",
+      "url": "https://www.npr.org/2026/10/30/nx-s1-6018566/halloween-candy-prices-chocolate",
+      "before": "",
+      "highlight": "Candy prices got you scared stiff? What to know about the cost of Halloween this year",
+      "after": "Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data. (Image credit: Stephanie Scarbrough)"
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p4": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-19",
+      "url": "https://www.npr.org/2026/09/19/nx-s1-5973215/iconic-carnegie-deli-reopens-in-midtown-manhattan-after-10-year-hiatus",
+      "before": "",
+      "highlight": "Iconic Carnegie Deli reopens in Midtown Manhattan after 10-year hiatus",
+      "after": "Carnegie Deli, famous for its sandwiches piled high with meat, has reopened as a sit-down restaurant in New York City after a 10-year hiatus."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  },
+  "p5": {
+    "source": {
+      "outlet": "NPR",
+      "date": "2026-09-20",
+      "url": "https://www.npr.org/2026/09/20/nx-s1-5940782/cookbook-rhythm-and-roux-brian-landry-peter-harris",
+      "before": "",
+      "highlight": "A new cookbook pays tribute to two New Orleans staples - 'Rhythm & Roux'",
+      "after": "Rythm & Roux.'/> At Bayou Bar, music and food go hand in hand."
+    },
+    "account": {
+      "name": "NPR",
+      "handle": "@NPR",
+      "created": null,
+      "followers": null,
+      "verified": true,
+      "bio": "News outlet · npr.org",
+      "recent_posts": []
+    }
+  }
+}

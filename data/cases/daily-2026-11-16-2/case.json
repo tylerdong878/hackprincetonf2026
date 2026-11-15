@@ -1,0 +1,116 @@
+{
+  "id": "daily-2026-11-16-2",
+  "number": 20,
+  "title": "Daily Grain: Food Fight",
+  "topic": "food news",
+  "briefing": "0–3 doctored today. Some prices are scary, some comebacks are misleading, and one cookbook knows the score.",
+  "clue_budget": 3,
+  "trick_options": [
+    "out-of-context-quote",
+    "misleading-chart",
+    "cherry-picked-stat",
+    "edited-detail"
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "author": {
+        "name": "Jersey Bill Watch",
+        "handle": "@jerseybills",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#E3A42B"
+      },
+      "posted_at": "2026-11-15T04:00:00Z",
+      "body": "Carnegie Deli, famous for its sandwiches piled high with meat, has reopened in New York City after a 10-year hiatus.",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 19, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p2",
+      "author": {
+        "name": "Turnpike Tea",
+        "handle": "@turnpiketea",
+        "kind": "person",
+        "verified": false,
+        "avatar_color": "#8B5CF6"
+      },
+      "posted_at": "2026-11-15T02:00:00Z",
+      "body": "Candy up 18% in two years? My Halloween budget just quit. “Prices for candy, the most popular Halloween purchase, and gum have risen 7.7% in one year and are up more than 18% in two years, according to the latest federal data.”",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 30, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "stat"
+    },
+    {
+      "id": "p3",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-10-30T09:00:00Z",
+      "body": "Candy prices got you scared stiff? What to know about the cost of Halloween this year",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Oct 30, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p4",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-09-19T11:40:47Z",
+      "body": "Iconic Carnegie Deli reopens in Midtown Manhattan after 10-year hiatus",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 19, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    },
+    {
+      "id": "p5",
+      "author": {
+        "name": "NPR",
+        "handle": "@NPR",
+        "kind": "outlet",
+        "verified": true,
+        "avatar_color": "#1D4ED8"
+      },
+      "posted_at": "2026-09-20T11:00:00Z",
+      "body": "A new cookbook pays tribute to two New Orleans staples - 'Rhythm & Roux'",
+      "quote": null,
+      "chart": null,
+      "source_label": "NPR · Sept 20, 2026",
+      "tools": [
+        "source",
+        "account"
+      ],
+      "card_style": "headline"
+    }
+  ]
+}

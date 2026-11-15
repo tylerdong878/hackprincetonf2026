@@ -130,7 +130,7 @@ uv run --env-file .env.build python scripts/nightly_build.py --dry-run  # say wh
 
 - Keep the build key in a separate `.env.build`, so builds never spend the game server's live-judging quota.
 - Weekday themes come from `TOPIC_HINTS` in `pipeline/topics.py`: food, sports, science, tech and Jersey Weird. Each topic reads only its listed feeds. Topics without chart data skip the misleading-chart trick.
-- Each run is capped at 30 model calls, with 2 held back so the run always reaches the editor instead of stopping as a draft.
+- Each run is capped at 40 model calls, with 2 held back so the run always reaches the editor instead of stopping as a draft.
 
 ## iMessage bot
 
